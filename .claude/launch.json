@@ -1,0 +1,10 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "survivor-arena",
+      "program": "server.js",
+      "port": 3000
+    }
+  ]
+}
