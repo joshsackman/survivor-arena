@@ -60,7 +60,8 @@ the server dropdown before assuming the change failed.
 - **Don't add features nobody asked for.** One suggestion, once, one sentence.
 - **Ignore linting, formatting, and code style.** They don't matter today.
 - After every change that works:
-  `git add -A && git commit -m "short description"`
+  `git add -A && git commit -m "short description" && git push`
+  Pushing to GitHub auto-deploys to the live Netlify site in about a minute.
 
 ## Codebase map (verified against this repo)
 
