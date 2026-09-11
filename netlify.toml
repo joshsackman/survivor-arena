@@ -1,0 +1,14 @@
+# Netlify: publish only the game files (not tests, docs tooling, or CLAUDE.md).
+[build]
+  command = "rm -rf _site && mkdir -p _site && cp index.html styles.css game.js service-worker.js manifest.json _site/ && cp -r src docs _site/"
+  publish = "_site"
+
+# Netlify runs npm install (package.json exists); skip Playwright's test browsers.
+[build.environment]
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+
+# Always re-check the service worker so visitors pick up new versions.
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache"

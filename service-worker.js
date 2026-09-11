@@ -11,7 +11,7 @@
 /* eslint-env serviceworker */
 /* global self, caches, fetch */
 
-const CACHE = 'survivor-v2.2.0';
+const CACHE = 'survivor-v2.8.0-net';
 const ASSETS = [
     './',
     './index.html',
@@ -57,23 +57,19 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
     if (req.method !== 'GET') return;
-    // Cache-first for same-origin GETs; bypass everything else.
+    // Network-first for same-origin GETs so new deploys show up right away;
+    // fall back to the cache only when offline. Bypass everything else.
     const url = new URL(req.url);
     if (url.origin !== self.location.origin) return;
     event.respondWith(
-        caches.match(req).then(
-            (hit) =>
-                hit ||
-                fetch(req)
-                    .then((res) => {
-                        // Opportunistically populate the cache for new same-origin assets.
-                        if (res && res.status === 200) {
-                            const copy = res.clone();
-                            caches.open(CACHE).then((c) => c.put(req, copy));
-                        }
-                        return res;
-                    })
-                    .catch(() => caches.match('./index.html'))
-        )
+        fetch(req)
+            .then((res) => {
+                if (res && res.status === 200) {
+                    const copy = res.clone();
+                    caches.open(CACHE).then((c) => c.put(req, copy));
+                }
+                return res;
+            })
+            .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
     );
 });
