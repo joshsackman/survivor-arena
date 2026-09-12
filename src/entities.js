@@ -1015,14 +1015,17 @@ export class Mine {
 // Exp Orb
 // ---------------------------------------------------------------------------
 export class ExpOrb {
-    constructor(x, y, value) {
+    constructor(x, y, value, artSet) {
         this.x = x;
         this.y = y;
         this.value = value;
         this.size = 4 + Math.log(value + 1) * 1.5;
         // v2.8: the drops are candy now. The wrapper is picked once, here, so
         // a pickup keeps the same look for its whole life on the ground.
-        this.art = 'candy' + (1 + Math.floor(Math.random() * 3));
+        // A stage can hand in its own set -- Jamaica drops food instead.
+        const set =
+            Array.isArray(artSet) && artSet.length ? artSet : ['candy1', 'candy2', 'candy3'];
+        this.art = set[Math.floor(Math.random() * set.length)];
         this.shouldRemove = false;
         this.magnetSpeed = 0;
         this.life = CONFIG.EXP_ORB_LIFETIME;

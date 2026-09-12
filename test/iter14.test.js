@@ -27,7 +27,7 @@ import { Weapon } from '../src/weapons.js';
 // ---------------------------------------------------------------------------
 test('iter14 stages: tundra is registered and exposed by listStages', () => {
     const ids = listStages().map((s) => s.id);
-    assert.deepEqual(ids, ['forest', 'crypt', 'tundra']);
+    assert.deepEqual(ids, ['forest', 'crypt', 'tundra', 'jamaica']);
     assert.ok(STAGES.TUNDRA, 'TUNDRA bucket must exist on STAGES');
     assert.equal(STAGES.TUNDRA.id, 'tundra');
 });

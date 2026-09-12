@@ -443,6 +443,33 @@ export const ENEMIES = {
         color: '#3B3B3B',
         size: 13
     },
+    DUPPY: {
+        id: 'duppy',
+        name: 'Duppy',
+        archetype: 'chaser',
+        // A spirit: drifts straight at you and through whatever is in the way.
+        hp: 32,
+        speed: 96,
+        damage: 14,
+        exp: 20,
+        color: '#F8F8F8',
+        size: 15
+    },
+    PITCHY_PATCHY: {
+        id: 'pitchy_patchy',
+        name: 'Pitchy-Patchy',
+        archetype: 'dasher',
+        dasher: true,
+        dashSpeed: 300,
+        dashInterval: 3.4,
+        dashDuration: 0.5,
+        hp: 40,
+        speed: 130,
+        damage: 16,
+        exp: 24,
+        color: '#E8720C',
+        size: 16
+    },
     JUMP_SCARE: {
         id: 'jump_scare',
         name: 'The Jump Scare',

@@ -153,6 +153,34 @@ export const STAGES = Object.freeze({
             // and tests can assert the flag exists.
             warmthSourceEnabled: false
         })
+    }),
+    // ----------------------------------------------------------------------
+    // Jamaica — the kids' stage.
+    //
+    // Warm instead of spooky: daylight, bright houses, food on the ground
+    // instead of candy. The locals are a Duppy (the Jamaican word for a
+    // spirit) and Pitchy-Patchy, a real character from Jonkonnu, Jamaica's
+    // masquerade tradition where dancers cover themselves in strips of
+    // bright cloth -- which is exactly this game's everyone-is-in-a-costume
+    // premise, so the stage fits without inventing anything.
+    // ----------------------------------------------------------------------
+    JAMAICA: Object.freeze({
+        id: 'jamaica',
+        name: 'Jamaica',
+        icon: '🇯🇲',
+        description: 'Sunshine, patties and festival. The duppies are out.',
+        background: { fill: '#1E6F8C', gridAlpha: 0.04 },
+        musicStyle: 'jamaica',
+        poolOverrides: {
+            duppy: 2.2,
+            pitchy_patchy: 2.0,
+            bat: 0.6,
+            zombie: 0.5,
+            skeleton: 0.5,
+            golem: 0.8
+        },
+        extraEnemies: ['duppy', 'pitchy_patchy'],
+        bossOffsets: {}
     })
 });
 
@@ -169,7 +197,7 @@ export function getStage(id) {
 
 /** Stable ordering for the stage picker UI. */
 export function listStages() {
-    return [STAGES.FOREST, STAGES.CRYPT, STAGES.TUNDRA];
+    return [STAGES.FOREST, STAGES.CRYPT, STAGES.TUNDRA, STAGES.JAMAICA];
 }
 
 /**

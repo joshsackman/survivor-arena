@@ -380,7 +380,8 @@ export class AudioEngine {
         if (/bully/.test(id)) return 'bully';
         if (/^pet_cat$/.test(id)) return 'cat';
         if (/wolf|pet_/.test(id)) return 'dog';
-        if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|ghost|mage/.test(id)) return 'kid';
+        if (/duppy/.test(id)) return 'grandma';
+        if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|pitchy_patchy|ghost|mage/.test(id)) return 'kid';
         return null;
     }
 
@@ -460,6 +461,16 @@ export class AudioEngine {
                 melody: [0, 7, 0, 7, 3, 10, 3, 10, 0, 7, 0, 7, 5, 12, 5, 12],
                 bass: [0, 0, 0, 0, -2, -2, -2, -2, -4, -4, -4, -4, -2, -2, -2, -2],
                 turnaround: [12, 7, 3, 0]
+            },
+            // Jamaica: offbeat skank. The chord stabs fall on the off beats
+            // (steps 2, 6, 10, 14) and the bass walks underneath them.
+            jamaica: {
+                stepMs: 116,
+                root: 262,
+                wave: 'triangle',
+                melody: [null, 7, null, 4, null, 7, null, 12, null, 9, null, 7, null, 4, null, 7],
+                bass: [0, null, null, 0, -5, null, null, -5, -3, null, null, -3, -5, null, -5, null],
+                turnaround: [7, 5, 4, 0]
             },
             boss: {
                 stepMs: 92,

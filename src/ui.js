@@ -310,6 +310,8 @@ export class UI {
             'freddy',
             'bean_always',
             'jump_scare',
+            'duppy',
+            'pitchy_patchy',
             'slime',
             'slimeling',
             'illusionist',

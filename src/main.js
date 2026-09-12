@@ -606,6 +606,7 @@ export class Game {
     _stageTheme() {
         if (this.stageId === 'crypt') return 'haunted';
         if (this.stageId === 'tundra') return 'area51';
+        if (this.stageId === 'jamaica') return 'jamaica';
         return 'street';
     }
 
@@ -2175,7 +2176,15 @@ export class Game {
 
     // --- Helpers ----------------------------------------------------------
     dropExp(x, y, amount) {
-        this.expOrbs.push(new ExpOrb(x, y, amount));
+        this.expOrbs.push(new ExpOrb(x, y, amount, this._dropArt()));
+    }
+    /** What the drops look like on this stage. Jamaica hands out real food. */
+    _dropArt() {
+        if (this.stageId !== 'jamaica') return null;
+        // The flag turns up now and then among the food.
+        return Math.random() < 0.12
+            ? ['ja_flag']
+            : ['patty', 'festival', 'jerk', 'mango'];
     }
     /**
      * v2.8: a burst of confetti every time a neighbour goes down -- small,
@@ -2379,6 +2388,7 @@ export class Game {
         const stage = this.stageId;
         const area51 = stage === 'tundra';
         const haunted = stage === 'crypt';
+        const jamaica = stage === 'jamaica';
 
         // Same layout everywhere -- the road, its edges and the turning circle
         // are the arena the gameplay is tuned around. What changes per stage is
@@ -2397,6 +2407,13 @@ export class Game {
                 lawn: '#241733', walk: '#3A2547', road: '#4A3528', line: '#7A5C42',
                 walls: ['#5A3F6B', '#6B4A7D', '#4C3459'], roof: '#2A1B38',
                 win: '#FFB703', dark: '#2A1B38', door: '#7A4A22', trim: '#9B5CFF'
+            },
+            // Jamaica: sunshine. Bright painted houses with zinc roofs,
+            // green all around, and the flag's black/green/gold as the trim.
+            jamaica: {
+                lawn: '#1B5E3A', walk: '#E8DCC0', road: '#6E6F78', line: '#FFC72C',
+                walls: ['#E8720C', '#00A6A6', '#FFC72C'], roof: '#8A9BA8',
+                win: '#FFF1B8', dark: '#2A3A33', door: '#7A3B1E', trim: '#009B3A'
             },
             // Area 51: bunkers dug into the property, not houses.
             tundra: {
@@ -2508,6 +2525,50 @@ export class Game {
                     ctx.fillRect(doorX, doorY, 48, 62);
                     ctx.fillStyle = P.trim;
                     ctx.fillRect(doorX + 36, doorY + 30, 6, 6);
+                } else if (jamaica) {
+                    ctx.fillStyle = wall;
+                    ctx.fillRect(hx, top, hw, hh);
+                    // Corrugated zinc roof: flat, ridged, overhanging.
+                    ctx.fillStyle = P.roof;
+                    const rTop = side === 0 ? top - 14 : top + hh - 4;
+                    ctx.fillRect(hx - 14, rTop, hw + 28, 18);
+                    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+                    for (let k = 0; k < 14; k++) ctx.fillRect(hx - 10 + k * 18, rTop, 5, 18);
+                    // Painted shutters either side of bright windows.
+                    for (let wI = 0; wI < 2; wI++) {
+                        const wx = hx + 28 + wI * 112;
+                        const wy = side === 0 ? top + 40 : top + hh - 84;
+                        ctx.fillStyle = P.win;
+                        ctx.fillRect(wx, wy, 56, 44);
+                        ctx.fillStyle = P.trim;
+                        ctx.fillRect(wx - 10, wy, 10, 44);
+                        ctx.fillRect(wx + 56, wy, 10, 44);
+                    }
+                    // Door with a gold step.
+                    ctx.fillStyle = P.door;
+                    ctx.fillRect(doorX, doorY, 48, 62);
+                    ctx.fillStyle = P.line;
+                    ctx.fillRect(doorX - 4, doorY + 58, 56, 8);
+                    // A palm tree beside the house.
+                    const px = hx + hw - 26;
+                    const py = side === 0 ? front + 16 : front - 78;
+                    ctx.fillStyle = '#7A3B1E';
+                    ctx.fillRect(px, py, 8, 62);
+                    ctx.fillStyle = '#0E7A3C';
+                    for (let f = 0; f < 5; f++) {
+                        const a2 = -Math.PI / 2 + (f - 2) * 0.55;
+                        ctx.beginPath();
+                        ctx.moveTo(px + 4, py);
+                        ctx.quadraticCurveTo(
+                            px + 4 + Math.cos(a2) * 34,
+                            py + Math.sin(a2) * 34,
+                            px + 4 + Math.cos(a2) * 52,
+                            py + Math.sin(a2) * 52 + 12
+                        );
+                        ctx.lineWidth = 7;
+                        ctx.strokeStyle = '#0E7A3C';
+                        ctx.stroke();
+                    }
                 } else if (area51) {
                     // A bunker: low concrete, blast door, hazard stripes and a
                     // floodlight washing the apron in front of it.

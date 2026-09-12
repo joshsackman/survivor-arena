@@ -66,6 +66,16 @@ const C = {
     deck: '#2E2E3A',
     wheel: '#E8E8E8',
     realAlien: '#3FD6C5',
+    jaGold: '#FFC72C',
+    jaGreen: '#009B3A',
+    jaBlack: '#101820',
+    patty: '#E8A317',
+    pattyCrust: '#C47A2F',
+    jerk: '#7A3B1E',
+    mango: '#FF8C1A',
+    cloth1: '#E8720C',
+    cloth2: '#009B3A',
+    cloth3: '#FFC72C',
     realAlienDark: '#0F8B8A',
     realGlow: '#A7FFEB'
 };
@@ -645,6 +655,62 @@ const SPRITES = {
 
     // Candy: what the neighbours drop. Three wrappers so a street full of
     // pickups doesn't read as one repeated shape.
+    patty: {
+        rows: [
+            '...........',
+            '..PPPPPPP..',
+            '.PCCCCCCCP.',
+            '.PCCCCCCCP.',
+            '..PPPPPPP..',
+            '...........'
+        ],
+        palette: { P: C.pattyCrust, C: C.patty }
+    },
+    festival: {
+        rows: [
+            '...........',
+            '...FFFFF...',
+            '..FFFFFFF..',
+            '..FFFFFFF..',
+            '...FFFFF...',
+            '...........'
+        ],
+        palette: { F: C.patty }
+    },
+    jerk: {
+        rows: [
+            '.....B.....',
+            '....JJJ....',
+            '...JJJJJ...',
+            '...JJJJJ...',
+            '....JJJ....',
+            '...........'
+        ],
+        palette: { J: C.jerk, B: C.sheet }
+    },
+    mango: {
+        rows: [
+            '.....S.....',
+            '...MMMMM...',
+            '..MMMMMMM..',
+            '..MMMMMMM..',
+            '...MMMMM...',
+            '...........'
+        ],
+        palette: { M: C.mango, S: C.jaGreen }
+    },
+    ja_flag: {
+        rows: [
+            'GGGKKKKKGGG',
+            'YGGGKKKGGGY',
+            'YYGGGKGGGYY',
+            'YYGGGKGGGYY',
+            'YGGGKKKGGGY',
+            'GGGKKKKKGGG'
+        ],
+        palette: { G: C.jaGreen, K: C.jaBlack, Y: C.jaGold }
+    },
+
     candy1: {
         rows: [
             '...W...W...',
@@ -706,6 +772,53 @@ const SPRITES = {
             P: C.spray,
             N: C.pants,
             L: C.pants,
+            W: C.shoe
+        }
+    },
+
+    duppy: {
+        rows: [
+            '................',
+            '.....DDDDDD.....',
+            '....DDDDDDDD....',
+            '...DDDDDDDDDD...',
+            '...DDKKDDKKDD...',
+            '...DDKKDDKKDD...',
+            '...DDDDDDDDDD...',
+            '...DDDDDDDDDD...',
+            '..DDDDDDDDDDDD..',
+            '..DDDDDDDDDDDD..',
+            '..DDDDDDDDDDDD..',
+            '..DD.DD..DD.DD..',
+            '..D...D..D...D..',
+            '................'
+        ],
+        palette: { D: C.sheet, K: C.jaBlack }
+    },
+
+    pitchy_patchy: {
+        rows: [
+            '................',
+            '.....AAAAAA.....',
+            '....ABABABAB....',
+            '....FFFFFFFF....',
+            '....FKFFFFKF....',
+            '....FFFFFFFF....',
+            '..ABABABABABAB..',
+            '..BABABABABABA..',
+            '..ABABABABABAB..',
+            '..BACABACABACA..',
+            '..ABABABABABAB..',
+            '...BABA..ABAB...',
+            '....AB....BA....',
+            '...WWW....WWW...'
+        ],
+        palette: {
+            A: C.cloth1,
+            B: C.cloth2,
+            C: C.cloth3,
+            F: C.neighbourSkin,
+            K: C.eye,
             W: C.shoe
         }
     },
