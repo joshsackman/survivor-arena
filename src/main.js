@@ -61,6 +61,7 @@ import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
 import { KonamiDetector } from './konami.js';
 import { submitScore, fetchTopScores, checkInitials, normaliseInitials } from './leaderboard.js';
+import { drawSprite, hasSprite } from './sprites.js';
 
 registerWeaponClass(Weapon);
 
@@ -81,21 +82,28 @@ function getEnemySprite(def, size) {
     if (cached) return cached;
     if (typeof document === 'undefined') return null; // SSR / test guard
     const pad = 4;
-    const d = size * 2 + pad * 2;
+    // v2.8: pixel-art neighbours go through this same cache, so the fast path
+    // stays one drawImage per enemy. A character with art needs a taller
+    // canvas than the old blob; everyone without art keeps the circle.
+    const usesArt = hasSprite(def.id);
+    const targetH = size * 2.6;
+    const d = (usesArt ? Math.ceil(targetH * 1.5) : size * 2) + pad * 2;
     const off = document.createElement('canvas');
     off.width = d;
     off.height = d;
     const ox = d / 2;
     const oy = d / 2;
     const c = off.getContext('2d');
-    c.fillStyle = def.color || '#ff4444';
-    c.beginPath();
-    c.arc(ox, oy, size, 0, Math.PI * 2);
-    c.fill();
-    c.fillStyle = 'rgba(255,255,255,0.25)';
-    c.beginPath();
-    c.arc(ox, oy, size * 0.5, 0, Math.PI * 2);
-    c.fill();
+    if (!usesArt || !drawSprite(c, def.id, ox, oy, targetH)) {
+        c.fillStyle = def.color || '#ff4444';
+        c.beginPath();
+        c.arc(ox, oy, size, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = 'rgba(255,255,255,0.25)';
+        c.beginPath();
+        c.arc(ox, oy, size * 0.5, 0, Math.PI * 2);
+        c.fill();
+    }
     SPRITE_CACHE.set(key, off);
     return off;
 }

@@ -17,6 +17,7 @@
 
 import { CONFIG } from './config.js';
 import { ENEMIES } from './data.js';
+import { drawSprite } from './sprites.js';
 
 export class Player {
     constructor(x, y) {
@@ -223,22 +224,27 @@ export class Player {
         ctx.save();
         ctx.globalAlpha = strobe;
 
+        // Soft alien glow under the costume so the hero stays findable in a crowd.
         const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.2);
-        grad.addColorStop(0, 'rgba(100,200,255,0.35)');
-        grad.addColorStop(1, 'rgba(100,200,255,0)');
+        grad.addColorStop(0, 'rgba(150,240,160,0.32)');
+        grad.addColorStop(1, 'rgba(150,240,160,0)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = '#44aaff';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#cfeaff';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.55, 0, Math.PI * 2);
-        ctx.fill();
+        // v2.8: pixel-art kid in a homemade alien costume. The circles below
+        // are the fallback for as long as any character lacks art.
+        if (!drawSprite(ctx, 'player', this.x, this.y, this.size * 2.8)) {
+            ctx.fillStyle = '#9ed98d';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#e8f7e0';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // Garlic aura ring
         const garlic = this.weapons.find((w) => w.id === 'garlic');
@@ -469,14 +475,24 @@ export class Enemy {
         } else {
             ctx.fillStyle = this.color;
         }
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        // v2.8: pixel-art neighbours. The tint is baked into the sprite cache
+        // so a hit flash follows the character's shape, not a square around it.
+        let tint = null;
+        if (this.flashTimer > 0) tint = 'rgba(255,255,255,0.85)';
+        else if (this.slowTimer > 0) tint = 'rgba(136,204,255,0.6)';
+        else if (this.bomber && this.fuseArmed && Math.floor(performance.now() / 120) % 2 === 0)
+            tint = 'rgba(255,255,255,0.8)';
 
-        ctx.fillStyle = 'rgba(255,255,255,0.25)';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
+        if (!drawSprite(ctx, this.id, this.x, this.y, this.size * 2.6, { tint })) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // Shield ring
         if (this.shielded && this.shieldHp > 0) {
