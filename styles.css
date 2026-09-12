@@ -590,6 +590,11 @@ canvas {
     .special-skill-btn {
         display: block;
     }
+    /* The playfield goes edge-to-edge on touch, so drop the framing. */
+    #gameContainer {
+        border-radius: 0;
+        box-shadow: none;
+    }
 }
 
 /* iter-14: PWA install prompt slot. */

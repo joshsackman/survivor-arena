@@ -544,6 +544,32 @@ export class Game {
     _resize() {
         const container = document.getElementById('gameContainer');
         if (!container) return;
+        // v2.8 mobile: on touch devices the playfield fills the whole screen
+        // rather than letterboxing the fixed 1200x800 landscape frame — on a
+        // phone that frame collapsed to a ~359x239 strip floating mid-screen.
+        // The camera and renderer read CONFIG.CANVAS_* live every frame, so
+        // rewriting them here is safe; we cap at the arena size so the camera
+        // clamp in _updateCamera() can never invert.
+        const touchFirst =
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        if (touchFirst) {
+            const vw = Math.max(1, Math.min(Math.round(window.innerWidth), CONFIG.ARENA_WIDTH));
+            const vh = Math.max(1, Math.min(Math.round(window.innerHeight), CONFIG.ARENA_HEIGHT));
+            CONFIG.CANVAS_WIDTH = vw;
+            CONFIG.CANVAS_HEIGHT = vh;
+            const canvas = this.canvas || document.getElementById('gameCanvas');
+            if (canvas) {
+                canvas.width = vw;
+                canvas.height = vh;
+                canvas.style.width = `${vw}px`;
+                canvas.style.height = `${vh}px`;
+            }
+            container.style.width = `${vw}px`;
+            container.style.height = `${vh}px`;
+            this._updateCamera();
+            return;
+        }
         const w = Math.min(window.innerWidth - 16, CONFIG.CANVAS_WIDTH);
         const h = Math.min(window.innerHeight - 16, CONFIG.CANVAS_HEIGHT);
         const scale = Math.min(w / CONFIG.CANVAS_WIDTH, h / CONFIG.CANVAS_HEIGHT);
