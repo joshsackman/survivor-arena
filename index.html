@@ -291,6 +291,23 @@
                         <summary data-i18n="highScores">High Scores</summary>
                         <div id="highScoreList" class="hs-list"></div>
                     </details>
+                    <div class="global-score" id="globalScoreRow">
+                        <label for="initialsInput">Put your initials on the world board</label>
+                        <div class="global-score-entry">
+                            <input
+                                id="initialsInput"
+                                class="initials-input"
+                                maxlength="3"
+                                autocomplete="off"
+                                autocapitalize="characters"
+                                spellcheck="false"
+                                placeholder="ABC"
+                                aria-label="Your initials, three letters"
+                            />
+                            <button id="btnSubmitScore" class="btn primary">Send</button>
+                        </div>
+                        <div id="globalScoreStatus" class="global-score-status" role="status"></div>
+                    </div>
                     <div class="btn-row">
                         <button id="btnRetry" class="btn primary" data-i18n="retry">Retry</button>
                         <button id="btnMenu" class="btn ghost" data-i18n="mainMenu">

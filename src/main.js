@@ -60,6 +60,7 @@ import { dailyChallenge, saveDailyResult } from './daily.js';
 import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
 import { KonamiDetector } from './konami.js';
+import { submitScore, fetchTopScores, checkInitials, normaliseInitials } from './leaderboard.js';
 
 registerWeaponClass(Weapon);
 
@@ -930,6 +931,114 @@ export class Game {
         }
     }
 
+    /**
+     * v2.8: let the player post the finished run to the shared online board.
+     * Everything degrades quietly — a missing form, a blocked word or no
+     * network must never stop the game-over screen working.
+     */
+    _wireGlobalScore() {
+        const row = document.getElementById('globalScoreRow');
+        const input = document.getElementById('initialsInput');
+        const btn = document.getElementById('btnSubmitScore');
+        const status = document.getElementById('globalScoreStatus');
+        if (!row || !input || !btn || !status) return;
+        // Daily runs already have their own slot; keep them off the global board.
+        row.style.display = this.dailyMode ? 'none' : '';
+        if (this.dailyMode) return;
+
+        status.textContent = '';
+        btn.disabled = false;
+        try {
+            input.value = localStorage.getItem('vs_last_initials') || '';
+        } catch {
+            input.value = '';
+        }
+        input.oninput = () => {
+            input.value = normaliseInitials(input.value);
+        };
+        btn.onclick = async () => {
+            const check = checkInitials(input.value);
+            if (!check.ok) {
+                status.textContent =
+                    check.reason === 'blocked'
+                        ? 'Those letters are not allowed — pick others.'
+                        : 'Use 3 letters, A to Z.';
+                return;
+            }
+            btn.disabled = true;
+            status.textContent = 'Sending...';
+            const out = await submitScore({
+                initials: input.value,
+                kills: this.kills,
+                timeSurvived: this.gameTime,
+                level: this.player?.level || 1,
+                stage: this.stageId
+            });
+            if (out.ok) {
+                try {
+                    localStorage.setItem('vs_last_initials', normaliseInitials(input.value));
+                } catch {
+                    /* private mode — not worth failing over */
+                }
+                status.textContent = 'You are on the world board!';
+            } else if (out.error === 'blocked') {
+                status.textContent = 'Those letters are not allowed — pick others.';
+                btn.disabled = false;
+            } else {
+                status.textContent = 'Could not send it — check the internet.';
+                btn.disabled = false;
+            }
+        };
+    }
+
+    /**
+     * Fetch and render the shared board inside the leaderboard dialog. Rows
+     * come from the internet, so every field is re-sanitised before it is put
+     * into HTML.
+     */
+    async _renderGlobalBoard() {
+        const card = document.querySelector('#leaderboardScreen .leaderboard-card');
+        if (!card) return;
+        let sec = card.querySelector('.lb-global');
+        if (!sec) {
+            sec = document.createElement('section');
+            sec.className = 'lb-section lb-global';
+            const title = card.querySelector('h2');
+            if (title && title.nextSibling) card.insertBefore(sec, title.nextSibling);
+            else card.appendChild(sec);
+        }
+        const head = '<h3>World board</h3>';
+        sec.innerHTML = head + '<div class="hs-empty">Loading...</div>';
+        const { ok, rows } = await fetchTopScores(20);
+        if (!ok) {
+            sec.innerHTML = head + '<div class="hs-empty">Offline — try again later.</div>';
+            return;
+        }
+        if (!rows.length) {
+            sec.innerHTML = head + '<div class="hs-empty">No scores yet. Be the first!</div>';
+            return;
+        }
+        sec.innerHTML =
+            head +
+            '<div class="hs-list scroll">' +
+            '<div class="hs-head"><span>#</span><span>Who</span><span>Time</span><span>Lv</span><span>Kills</span></div>' +
+            rows
+                .map((r, i) => {
+                    const secs = Math.max(0, Math.floor(Number(r.time_survived) || 0));
+                    const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+                    const ss = String(secs % 60).padStart(2, '0');
+                    const who = String(r.initials || '')
+                        .toUpperCase()
+                        .replace(/[^A-Z]/g, '')
+                        .slice(0, 3);
+                    const lvl = Math.max(1, Math.floor(Number(r.level) || 1));
+                    const kills = Math.max(0, Math.floor(Number(r.kills) || 0));
+                    return `<div class="hs-row"><span>${i + 1}</span><span>${who}</span><span>${mm}:${ss}</span><span>${lvl}</span><span>${kills}</span></div>`;
+                })
+                .join('') +
+            '</div>';
+    }
+
     gameOver() {
         this.state = GameState.GAMEOVER;
         cancelAnimationFrame(this.raf);
@@ -1031,9 +1140,12 @@ export class Game {
         }
 
         this.ui.showGameOver(this);
+        this._wireGlobalScore();
     }
 
     openLeaderboard() {
+        // Rendered after showLeaderboard() has written its markup.
+        setTimeout(() => this._renderGlobalBoard(), 0);
         this.ui.showLeaderboard(this.save.highScores || [], loadSpeedrunScores(), () => {
             /* closed */
         });

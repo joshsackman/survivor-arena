@@ -1155,3 +1155,48 @@ body.cb-mode .exp-fill {
     font-size: 14px;
     line-height: 1.7;
 }
+
+/* v2.8: global leaderboard — initials entry on the game-over card. */
+.global-score {
+    margin: 14px 0 6px;
+}
+.global-score label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+.global-score-entry {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+.initials-input {
+    width: 92px;
+    padding: 8px 10px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+.initials-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.global-score-status {
+    min-height: 18px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--accent);
+}
+.lb-global .hs-row span:nth-child(2),
+.lb-global .hs-head span:nth-child(2) {
+    font-weight: 700;
+    letter-spacing: 2px;
+}
