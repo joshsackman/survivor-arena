@@ -25,7 +25,7 @@
 export const WEAPONS = {
     WHIP: {
         id: 'whip',
-        name: 'Whip',
+        name: 'Silly String',
         icon: '⚔️',
         description: 'Lashes to both sides of the hero. Evolves: full circle sweep.',
         baseDamage: 20,
@@ -39,7 +39,7 @@ export const WEAPONS = {
     },
     MAGIC_WAND: {
         id: 'magic_wand',
-        name: 'Magic Wand',
+        name: 'Glow Stick',
         icon: '🔮',
         description: 'Homing bolt that seeks the closest foe. Evolves: triple volley.',
         baseDamage: 15,
@@ -55,7 +55,7 @@ export const WEAPONS = {
     },
     KNIFE: {
         id: 'knife',
-        name: 'Knife',
+        name: 'Candy Corn Toss',
         icon: '🗡️',
         description: 'Piercing blade thrown forward. Evolves: wide 5-blade fan.',
         baseDamage: 12,
@@ -74,7 +74,7 @@ export const WEAPONS = {
     },
     ORBIT: {
         id: 'orbit',
-        name: 'Orbiter',
+        name: "Spinning Jack-o'-Lanterns",
         icon: '💫',
         description: 'Spinning shards circle the hero. Evolves: two rings spinning.',
         baseDamage: 16,
@@ -90,7 +90,7 @@ export const WEAPONS = {
     },
     LIGHTNING: {
         id: 'lightning',
-        name: 'Lightning',
+        name: 'Motion Sensor Light',
         icon: '⚡',
         description: 'Smites a random foe. Lv3+ chains. Evolves: storm burst.',
         baseDamage: 35,
@@ -107,7 +107,7 @@ export const WEAPONS = {
     },
     MINE: {
         id: 'mine',
-        name: 'Area Mine',
+        name: 'Toilet Paper Trap',
         icon: '💣',
         description: 'Drops a mine that arms and detonates. Evolves: double-stack.',
         baseDamage: 45,
@@ -122,7 +122,7 @@ export const WEAPONS = {
     },
     GARLIC: {
         id: 'garlic',
-        name: 'Garlic',
+        name: 'Fog Machine',
         icon: '🧄',
         description: 'Damaging aura around the hero.',
         baseDamage: 5,
@@ -135,7 +135,7 @@ export const WEAPONS = {
     // --- v2.4 additions ---------------------------------------------------
     FROST_NOVA: {
         id: 'frost_nova',
-        name: 'Frost Nova',
+        name: 'Brain Freeze',
         icon: '❄️',
         description: 'Expanding ring of ice slows foes caught in the burst. Evolves: twin-ring.',
         baseDamage: 28,
@@ -151,7 +151,7 @@ export const WEAPONS = {
     },
     SOUL_DRAIN: {
         id: 'soul_drain',
-        name: 'Soul Drain',
+        name: 'Pillowcase Vacuum',
         icon: '🩸',
         description: 'Beam that tethers the nearest foe and heals on tick. Evolves: dual-lash.',
         baseDamage: 8,
@@ -166,7 +166,7 @@ export const WEAPONS = {
     },
     BOOMERANG: {
         id: 'boomerang',
-        name: 'Boomerang',
+        name: 'Flying Paper Plate',
         icon: '🪃',
         description: 'Flung forward, homes back to the hero. Evolves: twin arc.',
         baseDamage: 18,
@@ -189,7 +189,7 @@ export const WEAPONS = {
     // available as a starter once UNLOCKS.konami_code is earned.
     RETRO_BLASTER: {
         id: 'retro_blaster',
-        name: 'Retro Blaster',
+        name: 'Toy Ray Gun',
         icon: '👾',
         description: '8-bit arcade beam. Pierces forward in a tight burst. Evolves: triple beam.',
         baseDamage: 14,
@@ -210,70 +210,70 @@ export const WEAPONS = {
 export const PASSIVES = {
     MAX_HP: {
         id: 'max_hp',
-        name: 'Vitality',
+        name: 'Extra Padding',
         icon: '❤️',
         description: 'Max HP +20%',
         effect: { maxHpMult: 0.2 }
     },
     RECOVERY: {
         id: 'recovery',
-        name: 'Recovery',
+        name: 'Snack Break',
         icon: '💚',
         description: 'Regen +0.5 HP/s',
         effect: { hpRegen: 0.5 }
     },
     ARMOR: {
         id: 'armor',
-        name: 'Armor',
+        name: 'Thick Costume',
         icon: '🛡️',
         description: 'Damage taken -1',
         effect: { armor: 1 }
     },
     MOVESPEED: {
         id: 'movespeed',
-        name: 'Swiftness',
+        name: 'Good Sneakers',
         icon: '👟',
         description: 'Move speed +10%',
         effect: { speedMult: 0.1 }
     },
     MIGHT: {
         id: 'might',
-        name: 'Might',
+        name: 'Sugar Rush',
         icon: '💪',
         description: 'Damage +10%',
         effect: { damageMult: 0.1 }
     },
     AREA: {
         id: 'area',
-        name: 'Area',
+        name: 'Giant Costume',
         icon: '📏',
         description: 'Weapon range +10%',
         effect: { areaMult: 0.1 }
     },
     COOLDOWN: {
         id: 'cooldown',
-        name: 'Cooldown',
+        name: 'Fast Hands',
         icon: '⏱️',
         description: 'Attack speed +8%',
         effect: { cooldownMult: -0.08 }
     },
     MAGNET: {
         id: 'magnet',
-        name: 'Magnet',
+        name: 'Candy Magnet',
         icon: '🧲',
         description: 'Pickup range +25%',
         effect: { magnetMult: 0.25 }
     },
     GROWTH: {
         id: 'growth',
-        name: 'Growth',
+        name: 'Full-Size Bars',
         icon: '📈',
         description: 'XP gain +10%',
         effect: { expMult: 0.1 }
     },
     LUCK: {
         id: 'luck',
-        name: 'Luck',
+        name: 'Lucky House',
         icon: '🍀',
         description: 'Crit chance +5%',
         effect: { critChance: 0.05 }
@@ -288,21 +288,21 @@ export const PASSIVES = {
     // immortal even with five stacks.
     DODGE: {
         id: 'dodge',
-        name: 'Evasion',
+        name: 'Slippery Costume',
         icon: '💨',
         description: 'Dodge chance +5%',
         effect: { dodgeChance: 0.05 }
     },
     MAGNET_PLUS: {
         id: 'magnet_plus',
-        name: 'Pickup Magnet+',
+        name: 'Candy Magnet+',
         icon: '🧲',
         description: 'Pickup range +35%',
         effect: { magnetMult: 0.35 }
     },
     DAMAGE_REDUCTION: {
         id: 'damage_reduction',
-        name: 'Bulwark',
+        name: 'Pillowcase Shield',
         icon: '🛡️',
         description: 'Incoming damage -8%',
         effect: { damageReduction: 0.08 }
@@ -321,7 +321,7 @@ export const PASSIVES = {
 export const ENEMIES = {
     BAT: {
         id: 'bat',
-        name: 'Bat',
+        name: 'Little Kid in a Bad Costume',
         archetype: 'chaser',
         hp: 15,
         speed: 110,
@@ -332,7 +332,7 @@ export const ENEMIES = {
     },
     ZOMBIE: {
         id: 'zombie',
-        name: 'Zombie',
+        name: 'Dad',
         archetype: 'chaser',
         hp: 30,
         speed: 70,
@@ -343,7 +343,7 @@ export const ENEMIES = {
     },
     SKELETON: {
         id: 'skeleton',
-        name: 'Skeleton',
+        name: 'Mom Book Club',
         archetype: 'chaser',
         hp: 25,
         speed: 95,
@@ -354,7 +354,7 @@ export const ENEMIES = {
     },
     WOLF: {
         id: 'wolf',
-        name: 'Dire Wolf',
+        name: 'Ferocious Pet',
         archetype: 'dasher',
         dasher: true,
         dashSpeed: 320,
@@ -369,7 +369,7 @@ export const ENEMIES = {
     },
     GOLEM: {
         id: 'golem',
-        name: 'Golem',
+        name: 'Grandma',
         archetype: 'shielded',
         shielded: true,
         shieldHp: 60,
@@ -383,7 +383,7 @@ export const ENEMIES = {
     },
     GHOST: {
         id: 'ghost',
-        name: 'Ghost',
+        name: 'Kid in a Sheet',
         archetype: 'chaser',
         hp: 20,
         speed: 130,
@@ -396,7 +396,7 @@ export const ENEMIES = {
     // --- New archetypes --------------------------------------------------
     MAGE: {
         id: 'mage',
-        name: 'Cultist',
+        name: 'Teen With a Pillowcase',
         archetype: 'ranged',
         ranged: true,
         firingRange: 360,
@@ -413,7 +413,7 @@ export const ENEMIES = {
     },
     SLIME: {
         id: 'slime',
-        name: 'Slime',
+        name: 'Smashed Pumpkin',
         archetype: 'splitter',
         splitter: true,
         splitCount: 2,
@@ -426,7 +426,7 @@ export const ENEMIES = {
     },
     SLIMELING: {
         id: 'slimeling',
-        name: 'Slimeling',
+        name: 'Pumpkin Chunk',
         archetype: 'chaser',
         hp: 18,
         speed: 105,
@@ -438,7 +438,7 @@ export const ENEMIES = {
     // --- v2.4 additions: bomber (self-destructs) + illusionist (clone) ---
     BOMBER: {
         id: 'bomber',
-        name: 'Bomber',
+        name: 'Egg Thrower',
         archetype: 'bomber',
         bomber: true,
         fuseRange: 80, // begins countdown when within this distance
@@ -454,7 +454,7 @@ export const ENEMIES = {
     },
     ILLUSIONIST: {
         id: 'illusionist',
-        name: 'Illusionist',
+        name: 'The Inflatable',
         archetype: 'illusionist',
         illusionist: true,
         cloneCooldown: 5.5,
@@ -478,7 +478,7 @@ ENEMIES.SLIME.splitInto = 'slimeling';
 export const BOSSES = {
     REAPER: {
         id: 'reaper',
-        name: 'The Reaper',
+        name: 'The Lawn Guy',
         hp: 2500,
         speed: 80,
         damage: 40,
@@ -491,7 +491,7 @@ export const BOSSES = {
     },
     VOID_LORD: {
         id: 'void_lord',
-        name: 'Void Lord',
+        name: 'The Big Dog',
         hp: 6000,
         speed: 60,
         damage: 60,
@@ -505,7 +505,7 @@ export const BOSSES = {
     // --- v2.4 mid/late bosses --------------------------------------------
     NECROMANCER: {
         id: 'necromancer',
-        name: 'Necromancer',
+        name: 'Book Club President',
         hp: 4200,
         speed: 70,
         damage: 50,
@@ -518,7 +518,7 @@ export const BOSSES = {
     },
     CHRONO_LICH: {
         id: 'chrono_lich',
-        name: 'Chrono Lich',
+        name: 'The Giant Tree',
         hp: 10000,
         speed: 55,
         damage: 75,
@@ -536,7 +536,7 @@ export const BOSSES = {
     // achievement registry can reference her by id without a special case.
     ICE_QUEEN: {
         id: 'ice_queen',
-        name: 'The Ice Queen',
+        name: 'THE REAL ALIEN',
         hp: 6200,
         speed: 55,
         damage: 60,
@@ -568,7 +568,7 @@ export const WAVES = [
         to: 90,
         pool: ['zombie', 'skeleton', 'mage'],
         spawnMult: 1.15,
-        label: 'Cultists'
+        label: 'Teens'
     },
     {
         from: 90,
@@ -582,7 +582,7 @@ export const WAVES = [
         to: 180,
         pool: ['wolf', 'ghost', 'slime', 'mage', 'bomber'],
         spawnMult: 1.3,
-        label: 'Splitters'
+        label: 'Pumpkins'
     },
     {
         from: 180,
@@ -603,7 +603,7 @@ export const WAVES = [
         to: 420,
         pool: ['wolf', 'golem', 'ghost', 'slime', 'mage', 'bomber', 'illusionist'],
         spawnMult: 1.6,
-        label: 'Post-Reaper'
+        label: 'Post-Lawn Guy'
     },
     {
         from: 420,
@@ -649,16 +649,16 @@ export const ACHIEVEMENTS = [
     },
     {
         id: 'boss_slayer',
-        name: 'Reaper Down',
+        name: 'Lawn Guy Down',
         icon: '☠️',
-        description: 'Defeat the Reaper mid-boss.',
+        description: 'Defeat the Lawn Guy mid-boss.',
         check: (c) => !!c.run.bossesDefeated?.reaper
     },
     {
         id: 'void_breaker',
-        name: 'Void Breaker',
+        name: 'Big Dog Down',
         icon: '🌌',
-        description: 'Defeat the Void Lord.',
+        description: 'Defeat the Big Dog.',
         check: (c) => !!c.run.bossesDefeated?.void_lord
     },
     {
@@ -715,7 +715,7 @@ export const ACHIEVEMENTS = [
         id: 'speed_demon',
         name: 'Speed Demon',
         icon: '💨',
-        description: 'Defeat the Void Lord in under 5 minutes of real time.',
+        description: 'Defeat the Big Dog in under 5 minutes of real time.',
         check: (c) =>
             !!c.run.bossesDefeated?.void_lord && (c.run.realSecondsToVoidLord || Infinity) < 300
     },
@@ -762,7 +762,7 @@ export const ACHIEVEMENTS = [
         id: 'konami_code',
         name: 'Konami Code',
         icon: '🎮',
-        description: 'Found the legendary cheat. Unlocks the Retro Blaster.',
+        description: 'Found the legendary cheat. Unlocks the Toy Ray Gun.',
         hidden: true,
         check: (c) => !!c.run.konamiCode
     },

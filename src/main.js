@@ -320,7 +320,7 @@ export class Game {
             /* swallow — boot-time miss is fine */
         }
         this._flushAchievementToasts?.();
-        this._announce('Cheat code unlocked. Retro Blaster available.');
+        this._announce('Cheat code unlocked. Toy Ray Gun available.');
     }
 
     /** Toggle a global mute and persist so a refresh keeps the choice. */

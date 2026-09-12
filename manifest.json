@@ -1,14 +1,17 @@
 {
-    "name": "Survivor — Open Source Roguelite",
-    "short_name": "Survivor",
-    "description": "A zero-dependency HTML5 Canvas roguelite inspired by Vampire Survivors. Plays in any modern browser.",
+    "name": "Nice Costume",
+    "short_name": "Nice Costume",
+    "description": "It's Halloween night and your alien costume is too convincing. The whole neighborhood is chasing you.",
     "start_url": "./index.html",
     "scope": "./",
     "display": "fullscreen",
     "orientation": "landscape",
     "theme_color": "#1b1330",
     "background_color": "#0a0a12",
-    "categories": ["games", "entertainment"],
+    "categories": [
+        "games",
+        "entertainment"
+    ],
     "lang": "en",
     "icons": [
         {

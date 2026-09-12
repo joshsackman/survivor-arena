@@ -9,9 +9,9 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta
             name="description"
-            content="Open-source HTML5 Canvas roguelite inspired by Vampire Survivors. Zero dependencies, plays in any modern browser."
+            content="It's Halloween night and your alien costume is too convincing. The whole neighborhood is chasing you."
         />
-        <title>Survivor — Open Source Roguelite</title>
+        <title>Nice Costume</title>
 
         <!-- Canonical + favicon (SVG keeps the bundle dependency-free) -->
         <link rel="canonical" href="https://ricardo-foundry.github.io/canvas-vampire-survivors/" />
@@ -20,10 +20,10 @@
 
         <!-- Open Graph / social share -->
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Survivor — Open Source Roguelite" />
+        <meta property="og:title" content="Nice Costume" />
         <meta
             property="og:description"
-            content="A zero-dependency HTML5 Canvas roguelite. Clone, play, hack."
+            content="It's just a costume. Nobody believes you."
         />
         <meta property="og:image" content="./docs/og-card.svg" />
         <meta property="og:image:width" content="1200" />
@@ -35,17 +35,17 @@
 
         <!-- Twitter card -->
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Survivor — Open Source Roguelite" />
+        <meta name="twitter:title" content="Nice Costume" />
         <meta
             name="twitter:description"
-            content="A zero-dependency HTML5 Canvas roguelite. Clone, play, hack."
+            content="It's just a costume. Nobody believes you."
         />
         <meta name="twitter:image" content="./docs/og-card.svg" />
 
         <link rel="stylesheet" href="./styles.css" />
     </head>
     <body>
-        <div id="gameContainer" aria-label="Survivor game">
+        <div id="gameContainer" aria-label="Nice Costume game">
             <canvas
                 id="gameCanvas"
                 width="1200"
@@ -145,7 +145,7 @@
                 aria-live="polite"
                 style="display: none"
             >
-                <span>Install Survivor as an app for full-screen play.</span>
+                <span>Install Nice Costume as an app for full-screen play.</span>
                 <button id="pwaInstallBtn" class="btn primary">Install</button>
                 <button id="pwaInstallDismiss" class="btn">Not now</button>
             </div>
@@ -159,9 +159,9 @@
                 aria-labelledby="startTitle"
             >
                 <div class="overlay-card">
-                    <h1 id="startTitle" data-i18n="title">SURVIVOR</h1>
+                    <h1 id="startTitle" data-i18n="title">NICE COSTUME</h1>
                     <div class="subtitle" data-i18n="subtitle">
-                        Vampire Survivors style roguelite
+                        It's just a costume. Nobody believes you.
                     </div>
                     <div class="instructions">
                         <div><strong data-i18n="howToPlay">How to play</strong></div>
@@ -182,7 +182,7 @@
                             data-i18n="stage"
                             aria-describedby="btnStageChip"
                         >
-                            Stage <span id="btnStageChip" class="stage-chip">🌲 Whisperwood</span>
+                            Stage <span id="btnStageChip" class="stage-chip">🏘️ The Cul-de-Sac</span>
                         </button>
                         <button id="btnDaily" class="btn ghost" data-i18n="dailyChallenge">
                             Daily Challenge
@@ -272,7 +272,7 @@
                 aria-labelledby="gameOverTitle"
             >
                 <div class="overlay-card gameover">
-                    <h1 id="gameOverTitle" data-i18n="gameover">YOU DIED</h1>
+                    <h1 id="gameOverTitle" data-i18n="gameover">CAUGHT!</h1>
                     <div class="stats">
                         <div>
                             <span data-i18n="finalTime">Survived</span>:

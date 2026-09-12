@@ -261,10 +261,10 @@ test('ui.updateStageChip: writes icon + name into the chip element', async () =>
     const ui = new UI({});
     ui.updateStageChip('crypt');
     const chip = globalThis.document.getElementById('btnStageChip');
-    assert.match(chip.textContent, /Sunken Crypt/);
+    assert.match(chip.textContent, /Haunted House/);
     assert.equal(chip.dataset.stage, 'crypt');
     ui.updateStageChip('forest');
-    assert.match(chip.textContent, /Whisperwood/);
+    assert.match(chip.textContent, /Cul-de-Sac/);
     assert.equal(chip.dataset.stage, 'forest');
     delete globalThis.document;
 });

@@ -14,8 +14,8 @@
 
 const STRINGS = {
     en: {
-        title: 'SURVIVOR',
-        subtitle: 'Vampire Survivors style roguelite',
+        title: 'NICE COSTUME',
+        subtitle: "It's just a costume. Nobody believes you.",
         start: 'Start Run',
         continue: 'Continue',
         settings: 'Settings',
@@ -28,7 +28,7 @@ const STRINGS = {
         time: 'TIME',
         kills: 'KILLS',
         hp: 'HP',
-        gameover: 'YOU DIED',
+        gameover: 'CAUGHT!',
         finalTime: 'Survived',
         finalKills: 'Kills',
         finalLevel: 'Level',
