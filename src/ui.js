@@ -17,7 +17,7 @@ import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
 import { getStage, listStages } from './stages.js';
-import { getSkin, listSkins } from './skins.js';
+import { getSkin, listSkins, isSkinUnlocked } from './skins.js';
 import { buildShareText, dailyStreakSummary, loadDailyHistory } from './daily.js';
 import {
     DEFAULT_KEYMAP,
@@ -61,6 +61,7 @@ export class UI {
             'passiveIcons',
             'achievementToasts',
             'highScoreList',
+            'caughtBy',
             'waveLabel',
             'achievementsScreen',
             'leaderboardScreen',
@@ -148,7 +149,7 @@ export class UI {
     }
 
     /** Costume picker. Same shape as the stage picker so it behaves the same. */
-    showSkinPicker(currentId, onPick) {
+    showSkinPicker(currentId, save, onPick) {
         const m = this.els.skinPickerScreen;
         if (!m) return;
         const skins = listSkins();
@@ -157,15 +158,18 @@ export class UI {
                 <h2>Pick your costume</h2>
                 <div class="stage-grid">
                     ${skins
-                        .map(
-                            (s) => `
-                            <button class="stage-card ${s.id === currentId ? 'active' : ''}" data-skin="${s.id}">
-                                <div class="stage-icon">${s.icon}</div>
+                        .map((s) => {
+                            const open = isSkinUnlocked(s, save);
+                            return `
+                            <button class="stage-card ${s.id === currentId ? 'active' : ''}${
+                                open ? '' : ' locked'
+                            }" data-skin="${s.id}" ${open ? '' : 'disabled'}>
+                                <div class="stage-icon">${open ? s.icon : '🔒'}</div>
                                 <div class="stage-name">${s.name}</div>
                                 <div class="skin-perk">${s.perk}</div>
                                 <div class="stage-desc">${s.blurb}</div>
-                            </button>`
-                        )
+                            </button>`;
+                        })
                         .join('')}
                 </div>
                 <div class="btn-row">
@@ -179,6 +183,7 @@ export class UI {
         m.querySelector('#skinClose')?.addEventListener('click', close);
         m.querySelectorAll('.stage-card').forEach((btn) =>
             btn.addEventListener('click', () => {
+                if (btn.classList.contains('locked')) return;
                 onPick && onPick(btn.dataset.skin);
                 close();
             })
@@ -900,24 +905,39 @@ export class UI {
         m.innerHTML = `
             <div class="settings-card">
                 <h2>${t('settings')}</h2>
-                ${sliderRow('masterVolume', settings.masterVolume)}
-                ${sliderRow('sfxVolume', settings.sfxVolume)}
-                ${sliderRow('musicVolume', settings.musicVolume)}
-                ${checkboxRow('musicEnabled', settings.musicEnabled !== false)}
-                ${selectRow('difficulty', settings.difficulty, ['easy', 'normal', 'hard', 'nightmare'])}
-                ${checkboxRow('showFps', settings.showFps)}
-                ${checkboxRow('screenShake', settings.screenShake)}
-                ${checkboxRow('reducedMotion', settings.reducedMotion)}
-                ${checkboxRow('colorblind', !!settings.colorblind)}
-                ${checkboxRow('damageNumbers', settings.damageNumbers !== false)}
-                ${checkboxRow('criticalFlash', settings.criticalFlash !== false)}
-                ${vibrationRow}
-                ${selectRow('locale', settings.locale, availableLocales())}
-                ${selectRow('touchButtonScale', String(settings.touchButtonScale ?? 1), ['0.8', '1', '1.2'])}
-                ${remapRow}
+
+                <div class="settings-scroll">
+                <div class="settings-group">
+                    <h3>🔊 Sound</h3>
+                    ${sliderRow('masterVolume', settings.masterVolume)}
+                    ${sliderRow('sfxVolume', settings.sfxVolume)}
+                    ${sliderRow('musicVolume', settings.musicVolume)}
+                    ${checkboxRow('musicEnabled', settings.musicEnabled !== false)}
+                </div>
+
+                <div class="settings-group">
+                    <h3>🎮 Game</h3>
+                    ${selectRow('difficulty', settings.difficulty, ['easy', 'normal', 'hard', 'nightmare'])}
+                    ${selectRow('touchButtonScale', String(settings.touchButtonScale ?? 1), ['0.8', '1', '1.2'])}
+                    ${remapRow}
+                </div>
+
+                <details class="settings-group settings-more">
+                    <summary>⚙️ More options</summary>
+                    ${checkboxRow('screenShake', settings.screenShake)}
+                    ${checkboxRow('damageNumbers', settings.damageNumbers !== false)}
+                    ${checkboxRow('criticalFlash', settings.criticalFlash !== false)}
+                    ${checkboxRow('reducedMotion', settings.reducedMotion)}
+                    ${checkboxRow('colorblind', !!settings.colorblind)}
+                    ${vibrationRow}
+                    ${checkboxRow('showFps', settings.showFps)}
+                    ${selectRow('locale', settings.locale, availableLocales())}
+                </details>
+                </div>
+
                 <div class="settings-buttons">
+                    <button data-action="close" class="primary">${t('close')}</button>
                     <button class="danger" data-action="reset">${t('resetData')}</button>
-                    <button data-action="close">${t('close')}</button>
                 </div>
             </div>`;
         m.style.display = 'flex';
@@ -1104,6 +1124,11 @@ export class UI {
         const s = Math.floor(game.gameTime % 60)
             .toString()
             .padStart(2, '0');
+        // Who got you -- dying told you nothing before this.
+        if (this.els.caughtBy) {
+            const who = game._lastAttacker;
+            this.els.caughtBy.textContent = who ? `${who} got you` : '';
+        }
         this.els.finalTime.textContent = `${m}:${s}`;
         this.els.finalKills.textContent = game.kills;
         this.els.finalLevel.textContent = game.player.level;

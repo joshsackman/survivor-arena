@@ -784,6 +784,7 @@ export class Game {
         this._penaltyHpMult = 1;
         this._penaltyDmgMult = 1;
         this._penaltySpeedMult = 1;
+        this._lastAttacker = null;
         setEnemySpeedMult(1);
         // v2.8: the names are half the joke, so each neighbour gets introduced
         // the first time you meet them in a run.
@@ -916,7 +917,7 @@ export class Game {
 
     /** Show the stage picker overlay; persists the choice via `save.settings.stage`. */
     openSkinPicker() {
-        this.ui.showSkinPicker?.(this.skinId, (id) => {
+        this.ui.showSkinPicker?.(this.skinId, this.save, (id) => {
             this.skinId = id;
             this.save.settings.skin = id;
             saveSave(this.save);
@@ -1656,6 +1657,7 @@ export class Game {
             const d = Math.hypot(dx, dy);
             if (d < e.size + this.player.size && !this.player.invincible) {
                 if (e.type?.stealsCandy) this._stealCandy(e);
+                this._lastAttacker = e.type?.name || null;
                 this.player.takeDamage(e.damage, this);
                 this.createFloatingText(
                     Math.round(e.damage),
@@ -2377,6 +2379,7 @@ export class Game {
                 this.enemyProjectiles.push(
                     new EnemyProjectile(boss.x, boss.y, a, 250, 26 * (this.enemyDmgMult || 1), {
                         kind: 'bolt',
+                        ownerName: boss.type?.name || 'Robot Rob',
                         splatRadius: 78,
                         splatDamage: 20 * (this.enemyDmgMult || 1)
                     })
@@ -2393,6 +2396,7 @@ export class Game {
                 this.enemyProjectiles.push(
                     new EnemyProjectile(boss.x + Math.cos(a) * r, boss.y + Math.sin(a) * r, 0, 0, 0, {
                         kind: 'paint',
+                        ownerName: boss.type?.name || 'Owen the Animator',
                         splatRadius: 56,
                         splatDamage: 14 * (this.enemyDmgMult || 1)
                     })
@@ -2595,12 +2599,36 @@ export class Game {
             ctx.fill();
         }
 
-        ctx.fillStyle = P.line;
-        const dash = 46;
-        const startDash = Math.floor(cx / (dash * 2)) * (dash * 2);
-        for (let x = startDash; x < cx + vw; x += dash * 2) {
-            if (x > bulbX - bulbR) break;
-            ctx.fillRect(x, bulbY - 3, dash, 6);
+        if (haunted) {
+            // Floorboards running the length of the corridor.
+            ctx.fillStyle = 'rgba(0,0,0,0.18)';
+            for (let y = roadTop; y < roadBottom; y += 26) ctx.fillRect(cx, y, vw, 2);
+            const plank = 150;
+            const startPlank = Math.floor(cx / plank) * plank;
+            for (let x = startPlank; x < cx + vw; x += plank) {
+                for (let y = roadTop; y < roadBottom; y += 26) {
+                    ctx.fillRect(x + ((y / 26) % 2) * 75, y, 2, 26);
+                }
+            }
+            // A threadbare carpet runner down the middle.
+            const runH = 96;
+            ctx.fillStyle = '#5A1F2D';
+            ctx.fillRect(cx, bulbY - runH / 2, vw, runH);
+            ctx.fillStyle = '#7A3346';
+            ctx.fillRect(cx, bulbY - runH / 2 + 6, vw, 4);
+            ctx.fillRect(cx, bulbY + runH / 2 - 10, vw, 4);
+            ctx.fillStyle = 'rgba(255,211,122,0.10)';
+            for (let x = Math.floor(cx / 60) * 60; x < cx + vw; x += 60) {
+                ctx.fillRect(x, bulbY - runH / 2 + 14, 26, runH - 28);
+            }
+        } else {
+            ctx.fillStyle = P.line;
+            const dash = 46;
+            const startDash = Math.floor(cx / (dash * 2)) * (dash * 2);
+            for (let x = startDash; x < cx + vw; x += dash * 2) {
+                if (x > bulbX - bulbR) break;
+                ctx.fillRect(x, bulbY - 3, dash, 6);
+            }
         }
 
         // Houses. Each one is a body, a gable roof, lit windows, a porch with
@@ -2655,6 +2683,16 @@ export class Game {
                         ctx.arc(hx + hw - 8, side === 0 ? top + 8 : top + hh - 8, r, 0, Math.PI / 2);
                         ctx.stroke();
                     }
+                    // A framed portrait with two pale eyes following you.
+                    const pxr = hx + hw - 74;
+                    const pyr = side === 0 ? top + 26 : top + hh - 72;
+                    ctx.fillStyle = '#3A2A1E';
+                    ctx.fillRect(pxr, pyr, 46, 46);
+                    ctx.fillStyle = '#1A1420';
+                    ctx.fillRect(pxr + 5, pyr + 5, 36, 36);
+                    ctx.fillStyle = '#FFD37A';
+                    ctx.fillRect(pxr + 13, pyr + 18, 6, 5);
+                    ctx.fillRect(pxr + 27, pyr + 18, 6, 5);
                     // Doorway into the corridor.
                     ctx.fillStyle = P.dark;
                     ctx.fillRect(doorX - 6, doorY, 60, 62);

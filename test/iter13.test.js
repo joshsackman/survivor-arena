@@ -109,8 +109,13 @@ test('streak: collapses multiple stages on the same date to one played day', () 
 
 test('streak: saveDailyResult round-trips into the streak summary', () => {
     _resetDailyForTests();
+    // Relative to today: saveDailyResult prunes anything older than 14 days,
+    // so a hard-coded date silently deletes itself once the clock moves past
+    // it. `today` keeps this test true whenever it runs.
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
     saveDailyResult({
-        date: '2026-04-25',
+        date: today,
         stage: 'forest',
         timeSurvived: 480,
         kills: 320,
@@ -120,7 +125,10 @@ test('streak: saveDailyResult round-trips into the streak summary', () => {
         noHit: false,
         seed: 1
     });
-    const s = dailyStreakSummary(undefined, new Date(Date.UTC(2026, 3, 25)));
+    const s = dailyStreakSummary(
+        undefined,
+        new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+    );
     // Today is played, won.
     assert.equal(s.days[0].played, true);
     assert.equal(s.days[0].won, true);

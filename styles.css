@@ -1539,3 +1539,66 @@ body.cb-mode .exp-fill {
     letter-spacing: 0.04em;
     margin: 2px 0 4px;
 }
+
+/* Who caught you, under the game-over title. */
+.caught-by {
+    margin: -6px 0 12px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* A costume you have not earned yet. */
+.stage-card.locked {
+    opacity: 0.45;
+    filter: grayscale(0.7);
+    cursor: not-allowed;
+}
+
+/* Settings, grouped instead of one long wall of controls. */
+.settings-group {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+}
+.settings-group h3 {
+    margin: 0 0 8px;
+    font-size: 0.84rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+.settings-more > summary {
+    cursor: pointer;
+    font-size: 0.84rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    list-style: none;
+}
+.settings-more > summary::-webkit-details-marker {
+    display: none;
+}
+.settings-more[open] > summary {
+    margin-bottom: 8px;
+    color: var(--accent);
+}
+
+/* Same shape as .howto-card, which already solved this: the card is a flex
+   column, the groups scroll in the middle, and the buttons never move. Three
+   attempts at max-height arithmetic stranded the buttons off-screen. */
+.settings-card {
+    display: flex;
+    flex-direction: column;
+}
+.settings-card h2,
+.settings-card .settings-buttons {
+    flex-shrink: 0;
+}
+.settings-card .settings-scroll {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+}

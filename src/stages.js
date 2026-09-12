@@ -93,10 +93,10 @@ export const STAGES = Object.freeze({
         // ranged caster -- that pressure is the point of the stage.
         extraEnemies: ['poltergeist', 'armour', 'mage'],
         bossOffsets: {
-            // Reaper arrives 60s earlier (5:00 -> 4:00).
-            reaper: -60,
-            // Necromancer also pulled in slightly so the 4:00→7:30 gap is healthier.
-            necromancer: -30
+            // Scaled to the compressed schedule: the house still rushes you,
+            // but -60 would now clamp the Lawn Guy to the 30s floor.
+            reaper: -20,
+            necromancer: -20
         }
     }),
     // ----------------------------------------------------------------------
@@ -203,9 +203,9 @@ export const STAGES = Object.freeze({
             ghost: 0.4
         },
         extraEnemies: ['rusty_bot', 'scrap_drone'],
-        // Rob is the reason you came to the junkyard, so he arrives at 3:00
-        // instead of inheriting the 10-minute slot nobody ever reached.
-        bossOffsets: { void_lord: -420 },
+        // Rob is the reason you came to the junkyard, so he lands a little
+        // before the Big Dog's new slot rather than inheriting it.
+        bossOffsets: { void_lord: -15 },
         bossOverrides: { void_lord: 'robot_rob' }
     }),
     // ----------------------------------------------------------------------
@@ -229,7 +229,8 @@ export const STAGES = Object.freeze({
             ghost: 0.3
         },
         extraEnemies: ['cactus', 'vulture', 'snake'],
-        bossOffsets: {}
+        bossOffsets: {},
+        bossOverrides: { void_lord: 'big_g' }
     })
 });
 
@@ -325,7 +326,7 @@ export function getBossesFor(id) {
     // and never on their own. Currently just IceQueen (tundra-exclusive).
     // Skipping these on stages that don't override into them keeps the
     // forest/crypt boss timelines pristine.
-    const overrideOnlyIds = new Set(['ice_queen', 'robot_rob']);
+    const overrideOnlyIds = new Set(['ice_queen', 'robot_rob', 'big_g']);
 
     const out = [];
     for (const b of Object.values(BOSSES)) {

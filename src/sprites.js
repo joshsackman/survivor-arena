@@ -79,6 +79,10 @@ const C = {
     snakeBody: '#A8B84A',
     snakeDark: '#6E7A2E',
     tongue: '#E8455E',
+    tabby: '#E8913C',
+    tabbyStripe: '#B8641F',
+    catNose: '#E8709E',
+    muzzle: '#FBD7B7',
     rock: '#8A6A4A',
     steel: '#8A8F98',
     steelDark: '#5A6069',
@@ -870,6 +874,37 @@ const SPRITES = {
             '.G...G..G...G...'
         ],
         palette: { G: C.sheet, K: C.eye }
+    },
+
+    big_g: {
+        rows: [
+            '....................',
+            '..OO............OO..',
+            '..OOO..........OOO..',
+            '..OOOOOOOOOOOOOOOO..',
+            '..OSSOOOOOOOOOOSSO..',
+            '..OOOOOOOOOOOOOOOO..',
+            '..OOKKOOOOOOOOKKOO..',
+            '..OOKKOOOOOOOOKKOO..',
+            '..OOOOOOOPPOOOOOOO..',
+            '..OOOOOOWWWWOOOOOO..',
+            '..OOOOOOWWWWOOOOOO..',
+            '..OOOOOOOOOOOOOOOO..',
+            '..OSSOOOOOOOOOOSSO..',
+            '..OOOOOOOOOOOOOOOO..',
+            '...OOOOOOOOOOOOOO...',
+            '....OOOO....OOOO....',
+            '....OOOO....OOOO....',
+            '...MMMM......MMMM...'
+        ],
+        palette: {
+            O: C.tabby,
+            S: C.tabbyStripe,
+            K: C.eye,
+            P: C.catNose,
+            W: C.muzzle,
+            M: C.muzzle
+        }
     },
 
     lil_timmy: {

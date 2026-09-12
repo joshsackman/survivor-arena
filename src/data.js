@@ -826,7 +826,7 @@ export const BOSSES = {
         size: 36,
         boss: true,
         ability: 'summon',
-        spawnAt: 300 // 5 minutes
+        spawnAt: 90 // 1:30
     },
     VOID_LORD: {
         id: 'void_lord',
@@ -839,7 +839,21 @@ export const BOSSES = {
         size: 46,
         boss: true,
         ability: 'charge',
-        spawnAt: 600 // 10 minutes
+        spawnAt: 195 // 3:15
+    },
+    BIG_G: {
+        id: 'big_g',
+        name: 'Big G',
+        // An orange tabby that owns the valley. Boss-sized but cat-fast.
+        hp: 5200,
+        speed: 128,
+        damage: 52,
+        exp: 1000,
+        color: '#E8913C',
+        size: 42,
+        boss: true,
+        ability: 'charge',
+        spawnAt: 240
     },
     LIL_TIMMY: {
         id: 'lil_timmy',
@@ -854,7 +868,7 @@ export const BOSSES = {
         size: 40,
         boss: true,
         ability: 'charge',
-        spawnAt: 240
+        spawnAt: 60
     },
     OWEN: {
         id: 'owen',
@@ -868,7 +882,7 @@ export const BOSSES = {
         boss: true,
         // Drops pixels around the street that hurt to stand in.
         ability: 'pixels',
-        spawnAt: 375 // 6:15
+        spawnAt: 120 // 2:00
     },
     ROBOT_ROB: {
         id: 'robot_rob',
@@ -887,7 +901,7 @@ export const BOSSES = {
         // He comes back every two minutes, tougher each time. Without this a
         // boss spawns once per run and is never seen again.
         repeatEvery: 120,
-        spawnAt: 630
+        spawnAt: 210
     },
     // --- v2.4 mid/late bosses --------------------------------------------
     NECROMANCER: {
@@ -901,7 +915,7 @@ export const BOSSES = {
         size: 40,
         boss: true,
         ability: 'summon',
-        spawnAt: 450 // 7:30
+        spawnAt: 150 // 2:30
     },
     CHRONO_LICH: {
         id: 'chrono_lich',
@@ -914,7 +928,7 @@ export const BOSSES = {
         size: 50,
         boss: true,
         ability: 'charge',
-        spawnAt: 720 // 12:00
+        spawnAt: 255 // 4:15
     },
     // --- iter-14 tundra final boss ---------------------------------------
     // IceQueen is a frost-palette variant of the 10-minute boss. The tundra
@@ -937,7 +951,7 @@ export const BOSSES = {
         // 720). Tundra's `bossOverrides` swaps her into VoidLord's 600 slot
         // at runtime; this raw value is never read on tundra (the override
         // path uses the source boss's spawnAt + offset).
-        spawnAt: 660,
+        spawnAt: 225, // 3:45
         iceQueen: true // visual flag, read by entities renderer for frost halo
     }
 };

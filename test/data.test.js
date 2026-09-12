@@ -62,9 +62,10 @@ test('data: v2.4 bosses are on a strictly increasing timeline', () => {
     for (let i = 1; i < spawns.length; i++) {
         assert.ok(spawns[i] > spawns[i - 1], `duplicate spawn ${spawns[i]}`);
     }
-    // Lil Timmy 240, Reaper 300, Owen 375, Necromancer 450, Void Lord 600,
-    // Robot Rob 630 (junkyard-only), IceQueen 660 (tundra-only), Chrono 720.
-    assert.deepEqual(spawns, [240, 300, 375, 450, 600, 630, 660, 720]);
+    // Compressed to match how long runs actually last (median ~2 min):
+    // Timmy 60, Reaper 90, Owen 120, Necromancer 150, Void Lord 195,
+    // Robot Rob 210 (junkyard-only), IceQueen 225 (tundra-only), Chrono 255.
+    assert.deepEqual(spawns, [60, 90, 120, 150, 195, 210, 225, 240, 255]);
 });
 
 test('data: every boss has hp/damage/exp/size/color and boss flag', () => {

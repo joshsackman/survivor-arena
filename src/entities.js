@@ -356,6 +356,7 @@ export class Enemy {
                     // Damage player if in range.
                     const pd = Math.hypot(game.player.x - this.x, game.player.y - this.y);
                     if (pd < br && !game.player.invincible) {
+                        game._lastAttacker = this.type?.name || null;
                         game.player.takeDamage(bd, game);
                         game.createFloatingText(
                             Math.round(bd),
@@ -444,6 +445,7 @@ export class Enemy {
                         this.type.projectileDamage * (game.enemyDmgMult || 1),
                         {
                             kind: this.type.projectileKind,
+                            ownerName: this.type.name,
                             splatRadius: this.type.splatRadius,
                             splatDamage: (this.type.splatDamage || 0) * (game.enemyDmgMult || 1)
                         }
@@ -672,6 +674,7 @@ export class EnemyProjectile {
         // so the Egg Thrower is a threat you have to move away from rather
         // than a dot you can tank.
         this.kind = opts.kind || 'bolt';
+        this.ownerName = opts.ownerName || null;
         this.splatRadius = opts.splatRadius || 0;
         this.splatDamage = opts.splatDamage || 0;
         this.spin = Math.random() * Math.PI;
@@ -688,6 +691,7 @@ export class EnemyProjectile {
         const d = Math.hypot(this.x - p.x, this.y - p.y);
         if (d < p.size + this.size) {
             if (!p.invincible) {
+                game._lastAttacker = this.ownerName || game._lastAttacker;
                 p.takeDamage(this.damage, game);
                 game.createFloatingText(Math.round(this.damage), p.x, p.y - 30, '#ff6644');
             }
@@ -718,6 +722,7 @@ export class EnemyProjectile {
         if (!p || p.invincible) return;
         const d = Math.hypot(this.x - p.x, this.y - p.y);
         if (d <= this.splatRadius) {
+            game._lastAttacker = this.ownerName || game._lastAttacker;
             p.takeDamage(this.splatDamage, game);
             const word =
                 this.kind === 'bolt' ? 'CLANG!' : this.kind === 'paint' ? 'SPRAYED!' : 'SPLAT!';

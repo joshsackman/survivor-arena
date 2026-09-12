@@ -390,7 +390,7 @@ export class AudioEngine {
         if (/^mom|skeleton/.test(id)) return 'mom';
         if (/grandma|golem/.test(id)) return 'grandma';
         if (/bully/.test(id)) return 'bully';
-        if (/^pet_cat$/.test(id)) return 'cat';
+        if (/^pet_cat$/.test(id) || /big_g/.test(id)) return 'cat';
         if (/wolf|pet_/.test(id)) return 'dog';
         if (/duppy/.test(id)) return 'grandma';
         if (/rusty_bot|scrap_drone|robot_rob/.test(id)) return 'ufo';

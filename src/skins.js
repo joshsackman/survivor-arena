@@ -41,6 +41,17 @@ export const SKINS = Object.freeze({
         perk: '+20% damage',
         damageMult: 1.2
     }),
+    PUMPKIN: Object.freeze({
+        id: 'pumpkin',
+        name: 'Jack-o-Lantern',
+        sprite: 'pumpkin_kid',
+        icon: '🎃',
+        blurb: 'Beat any boss to unlock. Tough and hits hard, but slower.',
+        perk: '+30 health, +10% damage',
+        maxHpBonus: 30,
+        damageMult: 1.1,
+        lockedUntilBossKill: true
+    }),
     GHOST: Object.freeze({
         id: 'ghost',
         name: 'Ghost',
@@ -53,7 +64,13 @@ export const SKINS = Object.freeze({
 });
 
 export function listSkins() {
-    return [SKINS.ALIEN, SKINS.ZOMBIE, SKINS.ROBOT, SKINS.GHOST];
+    return [SKINS.ALIEN, SKINS.ZOMBIE, SKINS.ROBOT, SKINS.GHOST, SKINS.PUMPKIN];
+}
+
+/** A locked costume stays visible in the picker, but greyed out. */
+export function isSkinUnlocked(skin, save) {
+    if (!skin?.lockedUntilBossKill) return true;
+    return (save?.totals?.bossKills || 0) > 0;
 }
 
 export function getSkin(id) {
