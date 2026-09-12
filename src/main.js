@@ -1693,8 +1693,12 @@ export class Game {
         const type = findEnemyDef(pick) || ENEMIES.BAT;
         const angle = frnd() * Math.PI * 2;
         const dist = CONFIG.SPAWN_RADIUS + frnd() * 120;
-        const x = this.player.x + Math.cos(angle) * dist;
-        const y = this.player.y + Math.sin(angle) * dist;
+        const aw = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+        const ah = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+        // v2.8: keep neighbours on the street. Unclamped spawns put a chunk of
+        // every wave outside the arena, where the player never sees them.
+        const x = Math.max(24, Math.min(aw - 24, this.player.x + Math.cos(angle) * dist));
+        const y = Math.max(24, Math.min(ah - 24, this.player.y + Math.sin(angle) * dist));
         this.enemies.push(new Enemy(x, y, type, hpMult, dmgMult));
     }
 
@@ -1817,7 +1821,7 @@ export class Game {
         ctx.save();
         ctx.translate(-this.camera.worldX + this.camera.x, -this.camera.worldY + this.camera.y);
 
-        this._drawGrid();
+        this._drawStreet();
 
         for (const o of this.expOrbs) o.render(ctx);
         for (const m of this.mines) m.render(ctx);
@@ -1876,6 +1880,118 @@ export class Game {
      * the first grid line >= camera.worldX to the last one <= worldX+vw,
      * which auto-clips to the visible region without any per-frame guess.
      */
+    /**
+     * v2.8: the cul-de-sac. Drawn in world space (we are already inside the
+     * camera transform) and clipped to the visible window, so cost does not
+     * grow with arena size: lawns, a road with a dashed centre line,
+     * sidewalks, a turning circle at the end, and house fronts with lit
+     * windows and a pumpkin on every porch.
+     *
+     * House details are derived from the house index, never random, so a
+     * porch light cannot flicker between frames.
+     */
+    _drawStreet() {
+        const ctx = this.ctx;
+        const W = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+        const H = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+        const cx = this.camera.worldX;
+        const cy = this.camera.worldY;
+        const vw = CONFIG.CANVAS_WIDTH;
+        const vh = CONFIG.CANVAS_HEIGHT;
+        const area51 = this.stageId === 'tundra';
+
+        const P = area51
+            ? { lawn: '#1b2620', walk: '#33403a', road: '#232b28', line: '#63786b',
+                house: '#28332f', roof: '#1b2422', win: '#9be8c9', pumpkin: '#7cf2b0' }
+            : { lawn: '#1d2a1c', walk: '#3a3145', road: '#2a2233', line: '#6b5a7a',
+                house: '#2e2340', roof: '#201730', win: '#ffb703', pumpkin: '#ff7518' };
+
+        // Lawn under everything, covering exactly the visible window.
+        ctx.fillStyle = P.lawn;
+        ctx.fillRect(cx, cy, vw, vh);
+
+        const roadTop = H * 0.36;
+        const roadH = H * 0.28;
+        const roadBottom = roadTop + roadH;
+        const walk = 22;
+
+        // Sidewalks, then the road on top of them.
+        ctx.fillStyle = P.walk;
+        ctx.fillRect(cx, roadTop - walk, vw, walk);
+        ctx.fillRect(cx, roadBottom, vw, walk);
+        ctx.fillStyle = P.road;
+        ctx.fillRect(cx, roadTop, vw, roadH);
+
+        // Turning circle at the closed end of the street.
+        const bulbX = W - H * 0.30;
+        const bulbY = roadTop + roadH / 2;
+        const bulbR = H * 0.30;
+        if (bulbX + bulbR > cx && bulbX - bulbR < cx + vw) {
+            ctx.fillStyle = P.walk;
+            ctx.beginPath();
+            ctx.arc(bulbX, bulbY, bulbR + walk, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = P.road;
+            ctx.beginPath();
+            ctx.arc(bulbX, bulbY, bulbR, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Dashed centre line, stopping where the circle begins.
+        ctx.fillStyle = P.line;
+        const dash = 44;
+        const startDash = Math.floor(cx / (dash * 2)) * (dash * 2);
+        for (let x = startDash; x < cx + vw; x += dash * 2) {
+            if (x > bulbX - bulbR) break;
+            ctx.fillRect(x, bulbY - 3, dash, 6);
+        }
+
+        // Houses along both sides. Only the ones in shot are drawn.
+        const spacing = 340;
+        const hw = 250;
+        const hh = 190;
+        const first = Math.max(0, Math.floor((cx - hw) / spacing));
+        const last = Math.ceil((cx + vw) / spacing);
+        for (let i = first; i <= last; i++) {
+            const hx = i * spacing + 40;
+            if (hx > W - 120) continue;
+            const hash = (i * 2654435761) >>> 0;
+            for (const side of [0, 1]) {
+                const hy = side === 0 ? roadTop - walk - 40 - hh : roadBottom + walk + 40;
+                if (hy + hh < cy || hy > cy + vh) continue;
+
+                // Porch light pooling on the lawn.
+                const lightY = side === 0 ? hy + hh + 26 : hy - 26;
+                const glow = ctx.createRadialGradient(hx + hw / 2, lightY, 0, hx + hw / 2, lightY, 120);
+                glow.addColorStop(0, area51 ? 'rgba(155,232,201,0.20)' : 'rgba(255,183,3,0.18)');
+                glow.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = glow;
+                ctx.fillRect(hx + hw / 2 - 120, lightY - 120, 240, 240);
+
+                ctx.fillStyle = P.house;
+                ctx.fillRect(hx, hy, hw, hh);
+                ctx.fillStyle = P.roof;
+                if (side === 0) ctx.fillRect(hx - 12, hy + hh - 26, hw + 24, 26);
+                else ctx.fillRect(hx - 12, hy, hw + 24, 26);
+
+                // Windows: lit or dark, fixed per house.
+                for (let wI = 0; wI < 3; wI++) {
+                    const lit = ((hash >> wI) & 1) === 1;
+                    ctx.fillStyle = lit ? P.win : P.roof;
+                    ctx.fillRect(hx + 26 + wI * 74, hy + (side === 0 ? 40 : 62), 42, 40);
+                }
+
+                // Door, and a pumpkin beside it.
+                const doorX = hx + hw / 2 - 20;
+                const doorY = side === 0 ? hy + hh - 80 : hy + 52;
+                ctx.fillStyle = P.roof;
+                ctx.fillRect(doorX, doorY, 40, 56);
+                ctx.fillStyle = P.pumpkin;
+                ctx.fillRect(doorX + 52, doorY + 38, 18, 18);
+            }
+        }
+    }
+
     _drawGrid() {
         const ctx = this.ctx;
         const alpha = (getBackgroundFor(this.stageId).gridAlpha ?? 0.04).toFixed(3);

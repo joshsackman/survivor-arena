@@ -22,8 +22,8 @@ export const CONFIG = {
     // arena edge. The renderer translates by `-camera.worldX + viewport/2` so
     // entity coords stay in arena space everywhere except `_drawGrid` (which
     // intentionally tiles in screen space). See `_updateCamera()` in main.js.
-    ARENA_WIDTH: 2400,
-    ARENA_HEIGHT: 1600,
+    ARENA_WIDTH: 2000,
+    ARENA_HEIGHT: 1200,
     PLAYER_SPEED: 240, // px / second (was 4 px/frame => 240 @ 60fps)
     PLAYER_SIZE: 20,
     MAX_ENEMIES: 300,
