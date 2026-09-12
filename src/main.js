@@ -398,10 +398,9 @@ export class Game {
         // H/M but a remap takes effect immediately.
         this.input.onActionHelp = () => this.toggleHelp();
         this.input.onActionMute = () => this.toggleMute();
-        // Virtual joystick
-        const joy = document.getElementById('joystickBase');
-        const knob = document.getElementById('joystickKnob');
-        if (joy && knob) this.input.attachJoystick(joy, knob);
+        // v2.8: drag anywhere to move on touch (replaces the virtual joystick).
+        const surface = document.getElementById('gameContainer');
+        if (surface) this.input.attachDragMove(surface);
         // iter-14: mobile special-skill button. The button is a placeholder
         // for now — wires through to togglePause until per-build skills are
         // implemented, so the press at least gives the player a way out.

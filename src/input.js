@@ -179,6 +179,77 @@ export class InputManager {
         if (this.joystick) this.joystick.destroy();
     }
 
+    /**
+     * Drag-to-move (v2.8 mobile): touching anywhere on `surfaceEl` anchors a
+     * movement origin at the finger; dragging away from that origin steers the
+     * player, and lifting stops them. Replaces the fixed-position joystick on
+     * phones/tablets so kids can just drag wherever their thumb lands.
+     *
+     * Feeds the same `touchVec` the joystick used, so `getMoveVector()` needs
+     * no changes. Touches that start on a button are ignored so menu taps and
+     * the pause control keep working.
+     */
+    attachDragMove(surfaceEl, maxR = 70) {
+        if (!surfaceEl) return;
+        let dragId = null;
+        let ox = 0;
+        let oy = 0;
+        const setVec = (cx, cy) => {
+            const dx = cx - ox;
+            const dy = cy - oy;
+            const d = Math.hypot(dx, dy);
+            if (d === 0) {
+                this.touchVec.x = 0;
+                this.touchVec.y = 0;
+                return;
+            }
+            const raw = Math.min(d, maxR) / maxR;
+            // Same deadzone shape as the joystick: ignore micro-jitter, then
+            // remap the live band to 0..1 so speed ramps smoothly.
+            const mag = raw < JOYSTICK_DEADZONE ? 0 : (raw - JOYSTICK_DEADZONE) / (1 - JOYSTICK_DEADZONE);
+            this.touchVec.x = (dx / d) * mag;
+            this.touchVec.y = (dy / d) * mag;
+        };
+        const clear = () => {
+            dragId = null;
+            this.touchVec.x = 0;
+            this.touchVec.y = 0;
+        };
+        const start = (e) => {
+            if (dragId !== null) return;
+            if (e.target?.closest?.('button, .special-skill-btn, .pwa-install-prompt')) return;
+            const t = e.changedTouches[0];
+            if (!t) return;
+            dragId = t.identifier;
+            ox = t.clientX;
+            oy = t.clientY;
+            setVec(t.clientX, t.clientY);
+            e.preventDefault();
+        };
+        const move = (e) => {
+            if (dragId === null) return;
+            for (const t of e.changedTouches) {
+                if (t.identifier === dragId) {
+                    setVec(t.clientX, t.clientY);
+                    e.preventDefault();
+                }
+            }
+        };
+        const end = (e) => {
+            if (dragId === null) return;
+            for (const t of e.changedTouches) if (t.identifier === dragId) clear();
+        };
+
+        surfaceEl.addEventListener('touchstart', start, { passive: false });
+        window.addEventListener('touchmove', move, { passive: false });
+        window.addEventListener('touchend', end);
+        window.addEventListener('touchcancel', end);
+        this.listeners.push(['touchstart', start, surfaceEl]);
+        this.listeners.push(['touchmove', move, window]);
+        this.listeners.push(['touchend', end, window]);
+        this.listeners.push(['touchcancel', end, window]);
+    }
+
     attachJoystick(joystickEl, knobEl) {
         this.joystick = new VirtualJoystick(joystickEl, knobEl, (vx, vy) => {
             this.touchVec.x = vx;

@@ -586,7 +586,7 @@ canvas {
 }
 
 @media (hover: none) and (pointer: coarse) {
-    .joystick,
+    /* v2.8: movement is drag-anywhere now, so the joystick stays hidden. */
     .special-skill-btn {
         display: block;
     }
