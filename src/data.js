@@ -332,7 +332,7 @@ export const ENEMIES = {
     },
     ZOMBIE: {
         id: 'zombie',
-        name: 'Dad',
+        name: 'Flashlight Dad',
         archetype: 'chaser',
         hp: 30,
         speed: 70,
@@ -343,7 +343,7 @@ export const ENEMIES = {
     },
     SKELETON: {
         id: 'skeleton',
-        name: 'Mom Book Club',
+        name: 'Robe Mom',
         archetype: 'chaser',
         hp: 25,
         speed: 95,
@@ -354,7 +354,7 @@ export const ENEMIES = {
     },
     WOLF: {
         id: 'wolf',
-        name: 'Ferocious Pet',
+        name: 'Barking Dog',
         archetype: 'dasher',
         dasher: true,
         dashSpeed: 320,
@@ -369,7 +369,7 @@ export const ENEMIES = {
     },
     GOLEM: {
         id: 'golem',
-        name: 'Grandma',
+        name: 'Nightgown Grandma',
         archetype: 'shielded',
         shielded: true,
         shieldHp: 60,
@@ -380,6 +380,94 @@ export const ENEMIES = {
         exp: 50,
         color: '#cbbfe0',
         size: 28
+    },
+    DAD_RAKE: {
+        id: 'dad_rake',
+        name: 'Rake Dad',
+        archetype: 'chaser',
+        hp: 38,
+        speed: 64,
+        damage: 19,
+        exp: 17,
+        color: '#B44D4D',
+        size: 19
+    },
+    DAD_POLO: {
+        id: 'dad_polo',
+        name: 'Polo Dad',
+        archetype: 'chaser',
+        hp: 26,
+        speed: 84,
+        damage: 13,
+        exp: 15,
+        color: '#3E7F3B',
+        size: 17
+    },
+    MOM_WORKOUT: {
+        id: 'mom_workout',
+        name: 'Workout Mom',
+        archetype: 'chaser',
+        hp: 26,
+        speed: 112,
+        damage: 14,
+        exp: 18,
+        color: '#9B5CFF',
+        size: 16
+    },
+    MOM_CARDIGAN: {
+        id: 'mom_cardigan',
+        name: 'Cardigan Mom',
+        archetype: 'chaser',
+        hp: 34,
+        speed: 66,
+        damage: 16,
+        exp: 18,
+        color: '#C47A2F',
+        size: 17
+    },
+    PET_CAT: {
+        id: 'pet_cat',
+        name: 'Angry Cat',
+        archetype: 'dasher',
+        dasher: true,
+        dashSpeed: 380,
+        dashInterval: 2.8,
+        dashDuration: 0.45,
+        hp: 26,
+        speed: 165,
+        damage: 16,
+        exp: 20,
+        color: '#3B3B3B',
+        size: 13
+    },
+    PET_CHASE: {
+        id: 'pet_chase',
+        name: 'Chasing Dog',
+        archetype: 'dasher',
+        dasher: true,
+        dashSpeed: 300,
+        dashInterval: 3.2,
+        dashDuration: 0.7,
+        hp: 44,
+        speed: 158,
+        damage: 18,
+        exp: 22,
+        color: '#F8F8F8',
+        size: 16
+    },
+    GRANDMA_KNIT: {
+        id: 'grandma_knit',
+        name: 'Knitting Grandma',
+        archetype: 'shielded',
+        shielded: true,
+        shieldHp: 45,
+        damageReduction: 0.4,
+        hp: 105,
+        speed: 55,
+        damage: 26,
+        exp: 48,
+        color: '#9B5CFF',
+        size: 26
     },
     GHOST: {
         id: 'ghost',
@@ -561,61 +649,61 @@ export const BOSSES = {
 // back to the final entry once gameTime exceeds the last window.
 // ---------------------------------------------------------------------------
 export const WAVES = [
-    { from: 0, to: 30, pool: ['bat', 'zombie'], spawnMult: 1.0, label: 'Opening' },
-    { from: 30, to: 60, pool: ['bat', 'zombie', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
+    { from: 0, to: 30, pool: ['bat', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
+    { from: 30, to: 60, pool: ['bat', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
     {
         from: 60,
         to: 90,
-        pool: ['zombie', 'skeleton', 'mage'],
+        pool: ['zombie', 'dad_rake', 'skeleton', 'mom_workout', 'mage'],
         spawnMult: 1.15,
         label: 'Teens'
     },
     {
         from: 90,
         to: 120,
-        pool: ['skeleton', 'wolf', 'ghost', 'mage'],
+        pool: ['skeleton', 'mom_cardigan', 'wolf', 'pet_chase', 'ghost', 'mage'],
         spawnMult: 1.2,
         label: 'Pack'
     },
     {
         from: 120,
         to: 180,
-        pool: ['wolf', 'ghost', 'slime', 'mage', 'bomber'],
+        pool: ['wolf', 'pet_cat', 'ghost', 'slime', 'mage', 'bomber'],
         spawnMult: 1.3,
         label: 'Pumpkins'
     },
     {
         from: 180,
         to: 240,
-        pool: ['wolf', 'golem', 'ghost', 'slime', 'bomber'],
+        pool: ['wolf', 'pet_chase', 'golem', 'ghost', 'slime', 'bomber'],
         spawnMult: 1.4,
         label: 'Vanguard'
     },
     {
         from: 240,
         to: 300,
-        pool: ['golem', 'ghost', 'slime', 'mage', 'illusionist'],
+        pool: ['golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'illusionist'],
         spawnMult: 1.5,
         label: 'Pressure'
     },
     {
         from: 300,
         to: 420,
-        pool: ['wolf', 'golem', 'ghost', 'slime', 'mage', 'bomber', 'illusionist'],
+        pool: ['wolf', 'pet_cat', 'golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'bomber', 'illusionist'],
         spawnMult: 1.6,
         label: 'Post-Lawn Guy'
     },
     {
         from: 420,
         to: 600,
-        pool: ['golem', 'slime', 'mage', 'ghost', 'wolf', 'illusionist'],
+        pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'illusionist'],
         spawnMult: 1.75,
         label: 'Escalation'
     },
     {
         from: 600,
         to: Infinity,
-        pool: ['golem', 'slime', 'mage', 'ghost', 'wolf', 'skeleton', 'bomber', 'illusionist'],
+        pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'pet_cat', 'skeleton', 'mom_cardigan', 'bomber', 'illusionist'],
         spawnMult: 2.0,
         label: 'Endgame'
     }

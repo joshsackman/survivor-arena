@@ -108,21 +108,21 @@ const SPRITES = {
     // Dad (zombie): slow, tough, travels in packs.
     zombie: {
         rows: [
-            '....HHHH....',
-            '...HHHHHH...',
-            '...FFFFFF...',
-            '...FKFFKF...',
-            '...FFFFFF...',
-            '..BBBBBBBB..',
-            '.BBBBBBBBBB.',
-            '.BBBBBBBBBB.',
-            '..BBBBBBBB..',
-            '...FFFFFF...',
-            '...FF..FF...',
-            '...FF..FF...',
-            '..WWW..WWW..'
+            '....HHHH......',
+            '...HHHHHH.....',
+            '...FFFFFF.....',
+            '...FKFFKF.....',
+            '...FFFFFF.....',
+            '..BBBBBBBB....',
+            '.BBBBBBBBBLLL.',
+            '.BBBBBBBBBLLL.',
+            '..BBBBBBBB....',
+            '...PPPPPP.....',
+            '...PP..PP.....',
+            '...PP..PP.....',
+            '..WWW..WWW....'
         ],
-        palette: { H: C.hairBrown, F: C.skin, K: C.eye, B: C.dadBlue, W: C.shoe }
+        palette: { H: C.hairBrown, F: C.neighbourSkin, K: C.eye, B: C.shirt, P: C.pants, L: C.flashlight, W: C.shoe }
     },
 
     // Mom Book Club (skeleton): never alone, always holding a glass.
@@ -267,6 +267,136 @@ const SPRITES = {
             '..............'
         ],
         palette: { I: C.inflate, K: C.eye }
+    },
+
+    // Flashlight Dad already exists as `zombie` below; these are his street.
+    // Rake Dad: the rake is the whole silhouette.
+    dad_rake: {
+        rows: [
+            '..........RRR.',
+            '..........R...',
+            '....HHHH..R...',
+            '...FFFFFF.R...',
+            '...FKFFKF.R...',
+            '...FFFFFF.R...',
+            '..SSSSSSSSR...',
+            '.SSSSSSSSSR...',
+            '..SSSSSSSS....',
+            '...PPPPPP.....',
+            '...PP..PP.....',
+            '...PP..PP.....',
+            '..WWW..WWW....'
+        ],
+        palette: { R: C.rake, H: C.hairBrown, F: C.neighbourSkin, K: C.eye, S: C.eggShirt, P: C.pants, W: C.shoe }
+    },
+
+    // Polo Dad: cap, tucked polo, arms already reaching.
+    dad_polo: {
+        rows: [
+            '...CCCCCC...',
+            '..CCCCCCCC..',
+            '...FFFFFF...',
+            '...FKFFKF...',
+            '...FFFFFF...',
+            'SS.SSSSSS.SS',
+            '.SSSSSSSSSS.',
+            '..SSSSSSSS..',
+            '...PPPPPP...',
+            '...PP..PP...',
+            '...PP..PP...',
+            '..WWW..WWW..'
+        ],
+        palette: { C: C.shirt, F: C.neighbourSkin, K: C.eye, S: C.eggShirt, P: C.pants, W: C.shoe }
+    },
+
+    // Workout Mom: headband, ponytail, already mid-stride.
+    mom_workout: {
+        rows: [
+            '...BBBBBB.DD',
+            '..DDDDDDDD.D',
+            '..DFFFFFFD..',
+            '..FKFFKFF...',
+            '..FFFFFFF...',
+            '..TTTTTTTT..',
+            '.TTTTTTTTTT.',
+            '..TTTTTTTT..',
+            '...LLLLLL...',
+            '...LL..LL...',
+            '..LL....LL..',
+            '.WWW....WWW.'
+        ],
+        palette: { B: C.momPink, D: C.hairBrown, F: C.neighbourSkin, K: C.eye, T: C.cardigan, L: C.pants, W: C.shoe }
+    },
+
+    // Cardigan Mom: glasses, clipboard, absolutely writing this down.
+    mom_cardigan: {
+        rows: [
+            '...DDDDDD...',
+            '..DDDDDDDD..',
+            '..DFFFFFFD..',
+            '..GGFFFGG...',
+            '..FFFFFFF...',
+            '..CCCCCCCC..',
+            '.CCCCCCCCPP.',
+            '.CCCCCCCCPP.',
+            '..CCCCCCCC..',
+            '...LL..LL...',
+            '...LL..LL...',
+            '..WWW..WWW..'
+        ],
+        palette: { D: C.hairBrown, F: C.neighbourSkin, G: C.glass, C: C.rake, P: C.sheet, L: C.pants, W: C.shoe }
+    },
+
+    // Angry Cat: low, arched, tail up.
+    pet_cat: {
+        rows: [
+            '.E......E...',
+            '.EE....EE...',
+            '.GGGGGGGG.TT',
+            '.GYGGGGYG.T.',
+            '.GGGGGGGG.T.',
+            'GGGGGGGGGGT.',
+            'GGGGGGGGGG..',
+            '.GG.GG.GG...',
+            '.GG.GG.GG...'
+        ],
+        palette: { E: C.pants, G: C.pants, Y: '#FFF04D', T: C.pants }
+    },
+
+    // Chasing Dog: white and brown, stretched out at a run.
+    pet_chase: {
+        rows: [
+            '..BB.........',
+            '..BBBBBB..TT.',
+            '..BKWWWBBBT..',
+            '..BWWWWBBB...',
+            '.WWWWWWWWWW..',
+            '.WWWBBBWWWW..',
+            '.WW.WW.WW.W..',
+            '.WW.WW.WW....'
+        ],
+        palette: { B: C.dogBrown, W: C.sheet, K: C.eye, T: C.dogBrown }
+    },
+
+    // Knitting Grandma: needles out, bag in hand, still faster than you think.
+    grandma_knit: {
+        rows: [
+            '....VVVVVV....',
+            '...VVVVVVVV...',
+            '...VFFFFFFV...',
+            '...FGGFFGGF...',
+            '...FFFFFFFF...',
+            '..CCCCCCCCCC..',
+            '.CCCCCCCCCCNN.',
+            '.CCCCCCCCCCNN.',
+            '..CCCCCCCCCC..',
+            '...CCCCCCCC...',
+            '...LL....LL...',
+            '...LL....LL...',
+            '..WWW....WWW..',
+            '..............'
+        ],
+        palette: { V: C.hairGrey, F: C.neighbourSkin, G: C.glass, C: C.cardigan, N: C.momPink, L: C.pants, W: C.shoe }
     },
 
     // Candy: what the neighbours drop. Three wrappers so a street full of

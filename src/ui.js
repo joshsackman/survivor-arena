@@ -297,7 +297,11 @@ export class UI {
         const order = [
             'bat',
             'zombie',
+            'dad_rake',
+            'dad_polo',
             'skeleton',
+            'mom_workout',
+            'mom_cardigan',
             'ghost',
             'mage',
             'bomber',
@@ -305,7 +309,10 @@ export class UI {
             'slimeling',
             'illusionist',
             'wolf',
-            'golem'
+            'pet_cat',
+            'pet_chase',
+            'golem',
+            'grandma_knit'
         ];
         const byId = Object.create(null);
         for (const def of Object.values(ENEMIES)) byId[def.id] = def;
