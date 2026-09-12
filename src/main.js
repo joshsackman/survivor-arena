@@ -1715,17 +1715,22 @@ export class Game {
             this._announce(`${type.name} is here`);
             return;
         }
-        // Keep the nameplate inside the viewport for neighbours.
+        // Keep the nameplate inside the viewport AND clear of the HUD: the
+        // level/time block sits top-left, kills top-right, and the HP bar and
+        // weapon chips run along the bottom. Clamping to the raw viewport put
+        // names straight through them.
         const vw = CONFIG.CANVAS_WIDTH;
         const vh = CONFIG.CANVAS_HEIGHT;
-        const pad = boss ? 150 : 90;
+        const padX = 110;
+        const hudTop = 96;
+        const hudBottom = 104;
         const cx = Math.min(
-            Math.max(x, this.camera.worldX + pad),
-            this.camera.worldX + vw - pad
+            Math.max(x, this.camera.worldX + padX),
+            this.camera.worldX + vw - padX
         );
         const cy = Math.min(
-            Math.max(y - (type.size || 16) - 18, this.camera.worldY + 46),
-            this.camera.worldY + vh - 40
+            Math.max(y - (type.size || 16) - 18, this.camera.worldY + hudTop),
+            this.camera.worldY + vh - hudBottom
         );
         this.createFloatingText(type.name, cx, cy, boss ? '#FF4B4B' : '#FFC830', {
             life: boss ? 2.6 : 2.1,

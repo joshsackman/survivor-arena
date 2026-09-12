@@ -566,22 +566,24 @@ const SPRITES = {
     // one every kid has worn at least once.
     box_kid: {
         rows: [
-            '....FFFF....',
-            '...FKFFKF...',
-            '....FFFF....',
-            '..BBBBBBBB..',
-            '.BBBBBBBBBB.',
-            '.BBBBBBBBBB.',
-            '.BBTTTTTTBB.',
-            '.BBBBBBBBBB.',
-            '.BBBBBBBBBB.',
-            '..BBBBBBBB..',
-            '...LL..LL...',
-            '...LL..LL...',
-            '..WWW..WWW..'
+            '..BBBBBBBBBB..',
+            '.BBBBBBBBBBBB.',
+            '.BBBBBBBBBBBB.',
+            '.BB.EE..EE.BB.',
+            '.BB.EE..EE.BB.',
+            '.BBBBBBBBBBBB.',
+            '.BB.M....M.BB.',
+            '.BB..MMMM..BB.',
+            '.BBBBBBBBBBBB.',
+            '.BBBBBBBBBBBB.',
+            '.BBBBBBBBBBBB.',
+            '..BBBBBBBBBB..',
+            '...LL....LL...',
+            '..WWW....WWW..'
         ],
-        palette: { F: C.neighbourSkin, K: C.eye, B: C.rake, T: C.bark, L: C.pants, W: C.shoe }
+        palette: { B: C.rake, E: C.bark, M: C.bark, L: C.pants, W: C.shoe }
     },
+
 
     // Kid in a Sheet (ghost): two eye holes, ragged hem.
     ghost: {
