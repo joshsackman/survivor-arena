@@ -207,6 +207,29 @@ export const STAGES = Object.freeze({
         // instead of inheriting the 10-minute slot nobody ever reached.
         bossOffsets: { void_lord: -420 },
         bossOverrides: { void_lord: 'robot_rob' }
+    }),
+    // ----------------------------------------------------------------------
+    // Huss Valley - desert. Orange sand, and the neighbours live in caverns
+    // cut into the rock instead of houses.
+    // ----------------------------------------------------------------------
+    HUSS_VALLEY: Object.freeze({
+        id: 'huss_valley',
+        name: 'Huss Valley',
+        icon: '🏜️',
+        description: 'Orange sand and cavern doorways. Cacti, vultures and rattlesnakes.',
+        background: { fill: '#C96A2E', gridAlpha: 0.04 },
+        musicStyle: 'desert',
+        poolOverrides: {
+            cactus: 2.2,
+            vulture: 2.0,
+            snake: 2.0,
+            bat: 0.4,
+            zombie: 0.4,
+            skeleton: 0.4,
+            ghost: 0.3
+        },
+        extraEnemies: ['cactus', 'vulture', 'snake'],
+        bossOffsets: {}
     })
 });
 
@@ -223,7 +246,14 @@ export function getStage(id) {
 
 /** Stable ordering for the stage picker UI. */
 export function listStages() {
-    return [STAGES.FOREST, STAGES.CRYPT, STAGES.TUNDRA, STAGES.JAMAICA, STAGES.JUNKYARD];
+    return [
+        STAGES.FOREST,
+        STAGES.CRYPT,
+        STAGES.TUNDRA,
+        STAGES.JAMAICA,
+        STAGES.JUNKYARD,
+        STAGES.HUSS_VALLEY
+    ];
 }
 
 /**

@@ -443,6 +443,46 @@ export const ENEMIES = {
         color: '#3B3B3B',
         size: 13
     },
+    CACTUS: {
+        id: 'cactus',
+        name: 'Walking Cactus',
+        archetype: 'chaser',
+        // Slow and thick, and it hurts to touch. You go around it.
+        hp: 70,
+        speed: 46,
+        damage: 20,
+        exp: 26,
+        color: '#4E8C3A',
+        size: 17
+    },
+    VULTURE: {
+        id: 'vulture',
+        name: 'Vulture',
+        archetype: 'dasher',
+        // Circles, then swoops.
+        dasher: true,
+        dashSpeed: 340,
+        dashInterval: 3.0,
+        dashDuration: 0.6,
+        hp: 28,
+        speed: 138,
+        damage: 14,
+        exp: 22,
+        color: '#4A3B3B',
+        size: 15
+    },
+    SNAKE: {
+        id: 'snake',
+        name: 'Rattlesnake',
+        archetype: 'chaser',
+        // Fast and flimsy: it gets to you before you notice it.
+        hp: 22,
+        speed: 176,
+        damage: 15,
+        exp: 20,
+        color: '#A8B84A',
+        size: 13
+    },
     RUSTY_BOT: {
         id: 'rusty_bot',
         name: 'Rusty Bot',

@@ -238,6 +238,18 @@ export class AudioEngine {
                         { freq: 900, dur: 0.22, type: 'sawtooth', volume: V.mid, at: 40, sweep: 700 }
                     ])
             },
+            screech: {
+                cooldown: 140,
+                run: () =>
+                    this._seq([
+                        { freq: 1180, dur: 0.07, type: 'sawtooth', volume: V.quiet, sweep: -420 },
+                        { freq: 980, dur: 0.06, type: 'sawtooth', volume: V.quiet, at: 70, sweep: -300 }
+                    ])
+            },
+            hiss: {
+                cooldown: 140,
+                run: () => this.tone({ noise: true, dur: 0.16, volume: V.quiet, release: 0.12 })
+            },
             powerdown: {
                 run: () =>
                     this._seq([
@@ -382,6 +394,9 @@ export class AudioEngine {
         if (/wolf|pet_/.test(id)) return 'dog';
         if (/duppy/.test(id)) return 'grandma';
         if (/rusty_bot|scrap_drone|robot_rob/.test(id)) return 'ufo';
+        if (/vulture/.test(id)) return 'screech';
+        if (/snake/.test(id)) return 'hiss';
+        if (/cactus/.test(id)) return 'grandma';
         if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|pitchy_patchy|ghost|mage/.test(id)) return 'kid';
         return null;
     }
@@ -484,6 +499,17 @@ export class AudioEngine {
                 // The bass is the lead voice: round, walking, always moving.
                 bass: [0, null, 0, 7, 5, null, 5, 0, -2, null, -2, 5, 3, null, 0, 2],
                 turnaround: [12, 10, 7, 0]
+            },
+            // Huss Valley: wide, slow and dry. Phrygian dominant (that flat
+            // second) is what makes it sound like a desert and not just a
+            // sad key, with long gaps so it feels like open space.
+            desert: {
+                stepMs: 128,
+                root: 175,
+                wave: 'triangle',
+                melody: [0, 1, 4, 1, 0, null, 7, 8, 7, 4, 1, 0, null, 1, 0, null],
+                bass: [0, null, 0, null, -5, null, -5, null, -7, null, -7, null, -5, null, -5, null],
+                turnaround: [8, 7, 4, 1]
             },
             // Robot Junkyard: a machine, not a tune. A buzzing sawtooth cell
             // hammered over and over like a stamping press, a motor that

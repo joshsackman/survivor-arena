@@ -1522,3 +1522,11 @@ body.cb-mode .exp-fill {
     letter-spacing: 0.05em;
     font-size: 0.86rem;
 }
+
+/* The run you just posted, so you can find yourself on the world board. */
+.hs-row.mine {
+    background: rgba(142, 224, 107, 0.18);
+    outline: 2px solid var(--accent);
+    border-radius: 6px;
+    font-weight: 700;
+}

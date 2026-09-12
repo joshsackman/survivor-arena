@@ -610,6 +610,7 @@ export class Game {
         if (this.stageId === 'tundra') return 'area51';
         if (this.stageId === 'jamaica') return 'jamaica';
         if (this.stageId === 'junkyard') return 'junkyard';
+        if (this.stageId === 'huss_valley') return 'desert';
         return 'street';
     }
 
@@ -1177,7 +1178,12 @@ export class Game {
                 } catch {
                     /* private mode — not worth failing over */
                 }
-                status.textContent = 'You are on the world board!';
+                this._justPosted = {
+                    initials: normaliseInitials(input.value),
+                    time: Math.round(this.gameTime)
+                };
+                status.textContent = 'Saved! Open World Board to see your place.';
+                btn.disabled = false;
             } else if (out.error === 'blocked') {
                 status.textContent = 'Those letters are not allowed — pick others.';
                 btn.disabled = false;
@@ -1230,10 +1236,18 @@ export class Game {
                         .slice(0, 3);
                     const lvl = Math.max(1, Math.floor(Number(r.level) || 1));
                     const kills = Math.max(0, Math.floor(Number(r.kills) || 0));
-                    return `<div class="hs-row"><span>${i + 1}</span><span>${who}</span><span>${mm}:${ss}</span><span>${lvl}</span><span>${kills}</span></div>`;
+                    const mine =
+                        this._justPosted &&
+                        this._justPosted.initials === who &&
+                        this._justPosted.time === secs;
+                    return `<div class="hs-row${mine ? ' mine' : ''}"><span>${i + 1}</span><span>${who}</span><span>${mm}:${ss}</span><span>${lvl}</span><span>${kills}</span></div>`;
                 })
                 .join('') +
             '</div>';
+        // Scroll their own row into view -- a short run sorts to the bottom,
+        // and a score you cannot see reads as a score that never saved.
+        const mineEl = sec.querySelector('.hs-row.mine');
+        if (mineEl) mineEl.scrollIntoView({ block: 'center' });
     }
 
     gameOver() {
@@ -2427,6 +2441,7 @@ export class Game {
         const haunted = stage === 'crypt';
         const jamaica = stage === 'jamaica';
         const junkyard = stage === 'junkyard';
+        const huss = stage === 'huss_valley';
 
         // Same layout everywhere -- the road, its edges and the turning circle
         // are the arena the gameplay is tuned around. What changes per stage is
@@ -2452,6 +2467,12 @@ export class Game {
                 lawn: '#1B5E3A', walk: '#E8DCC0', road: '#6E6F78', line: '#FFC72C',
                 walls: ['#E8720C', '#00A6A6', '#FFC72C'], roof: '#8A9BA8',
                 win: '#FFF1B8', dark: '#2A3A33', door: '#7A3B1E', trim: '#009B3A'
+            },
+            // Huss Valley: orange sand, rock walls, a dusty track through it.
+            huss_valley: {
+                lawn: '#C96A2E', walk: '#E0A165', road: '#B8763E', line: '#FFE0A3',
+                walls: ['#8A6A4A', '#9B7A55', '#7A5C40'], roof: '#6B4F36',
+                win: '#FFD37A', dark: '#2A1A10', door: '#2A1A10', trim: '#4E8C3A'
             },
             // Robot Junkyard: oil-stained dirt, stacks of crushed cars.
             junkyard: {
@@ -2613,6 +2634,54 @@ export class Game {
                         ctx.strokeStyle = '#0E7A3C';
                         ctx.stroke();
                     }
+                } else if (huss) {
+                    // A cavern cut into the rock, not a house: a rough rock
+                    // face with a dark arched mouth facing the track.
+                    ctx.fillStyle = wall;
+                    ctx.fillRect(hx, top, hw, hh);
+                    // Broken rock edge along the top of the face.
+                    ctx.fillStyle = P.roof;
+                    for (let k = 0; k < 10; k++) {
+                        const bh2 = 8 + ((hash >> k) & 7) * 2;
+                        ctx.fillRect(hx + k * 23, side === 0 ? top : top + hh - bh2, 23, bh2);
+                    }
+                    // The cave mouth.
+                    const mouthW = 104;
+                    const mouthH = 84;
+                    const mx = hx + hw / 2 - mouthW / 2;
+                    const my = side === 0 ? top + hh - mouthH : top;
+                    ctx.fillStyle = P.dark;
+                    ctx.beginPath();
+                    ctx.moveTo(mx, my + mouthH);
+                    ctx.lineTo(mx, my + mouthH * 0.42);
+                    ctx.quadraticCurveTo(
+                        mx + mouthW / 2,
+                        my - 10,
+                        mx + mouthW,
+                        my + mouthH * 0.42
+                    );
+                    ctx.lineTo(mx + mouthW, my + mouthH);
+                    ctx.closePath();
+                    ctx.fill();
+                    // A lantern by the entrance so it reads as lived-in.
+                    const lx2 = mx - 18;
+                    const ly2 = my + mouthH - 30;
+                    ctx.fillStyle = P.win;
+                    ctx.fillRect(lx2, ly2, 10, 14);
+                    const g4 = ctx.createRadialGradient(lx2 + 5, ly2 + 7, 0, lx2 + 5, ly2 + 7, 90);
+                    g4.addColorStop(0, 'rgba(255,211,122,0.18)');
+                    g4.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = g4;
+                    ctx.fillRect(lx2 - 85, ly2 - 85, 180, 180);
+                    // Cacti dotted along the sand outside.
+                    const cxp = hx + hw - 40;
+                    const cyp = side === 0 ? front + 14 : front - 58;
+                    ctx.fillStyle = '#4E8C3A';
+                    ctx.fillRect(cxp, cyp, 10, 44);
+                    ctx.fillRect(cxp - 12, cyp + 12, 12, 8);
+                    ctx.fillRect(cxp - 12, cyp + 12, 6, 22);
+                    ctx.fillRect(cxp + 10, cyp + 6, 12, 8);
+                    ctx.fillRect(cxp + 16, cyp - 8, 6, 22);
                 } else if (junkyard) {
                     // A stack of crushed cars instead of a house: three
                     // squashed slabs, an oil drum and a hanging work light.

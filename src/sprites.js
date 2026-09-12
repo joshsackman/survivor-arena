@@ -68,6 +68,15 @@ const C = {
     realAlien: '#3FD6C5',
     jaGold: '#FFC72C',
     rust: '#8A4B2A',
+    cactus: '#4E8C3A',
+    cactusDark: '#2F5E24',
+    feather: '#4A3B3B',
+    featherLite: '#6B5757',
+    vultureHead: '#C97B5A',
+    snakeBody: '#A8B84A',
+    snakeDark: '#6E7A2E',
+    tongue: '#E8455E',
+    rock: '#8A6A4A',
     steel: '#8A8F98',
     steelDark: '#5A6069',
     visor: '#4FC3F7',
@@ -827,6 +836,72 @@ const SPRITES = {
             L: C.pants,
             W: C.shoe
         }
+    },
+
+    cactus: {
+        rows: [
+            '................',
+            '......GGGG......',
+            '..GG..GGGG..GG..',
+            '..GG..GGGG..GG..',
+            '..GGGGGGGGGGGG..',
+            '..GGGGGGGGGGGG..',
+            '..GGKKGGGGKKGG..',
+            '..GGKKGGGGKKGG..',
+            '..GGGGGGGGGGGG..',
+            '..GGGMMMMMMGGG..',
+            '......GGGG......',
+            '......GGGG......',
+            '......GGGG......',
+            '.....SSSSSS.....'
+        ],
+        palette: { G: C.cactus, K: C.eye, M: C.eye, S: C.cactusDark }
+    },
+
+    vulture: {
+        rows: [
+            '................',
+            '.......HH.......',
+            '......HKKH......',
+            '......HHHH......',
+            '.......BB.......',
+            '..FF...BB...FF..',
+            '.FFFF.BBBB.FFFF.',
+            'FFFFFFBBBBFFFFFF',
+            '.FFFF.BBBB.FFFF.',
+            '..FF..BBBB..FF..',
+            '......BBBB......',
+            '.......BB.......',
+            '......LL.LL.....',
+            '................'
+        ],
+        palette: {
+            H: C.vultureHead,
+            K: C.eye,
+            B: C.feather,
+            F: C.featherLite,
+            L: C.vultureHead
+        }
+    },
+
+    snake: {
+        rows: [
+            '................',
+            '..........SSSS..',
+            '.........SSKKSS.',
+            '.........SSSSSS.',
+            '..........STTS..',
+            '..........SS....',
+            '.........SS.....',
+            '..SSSSSSSS......',
+            '.SSDDSSDDSS.....',
+            '.SS......SSS....',
+            '.SSDDSSDDSS.....',
+            '..SSSSSSSS......',
+            '................',
+            '................'
+        ],
+        palette: { S: C.snakeBody, D: C.snakeDark, K: C.eye, T: C.tongue }
     },
 
     rusty_bot: {
