@@ -59,6 +59,12 @@ const C = {
     mowerDark: '#8B1E2D',
     bark: '#4E2F1E',
     leaves: '#3E7F3B',
+    bean: '#5FA83C',
+    beanLite: '#9BE06B',
+    blueStreak: '#4FC3F7',
+    spray: '#FF4FD8',
+    deck: '#2E2E3A',
+    wheel: '#E8E8E8',
     realAlien: '#3FD6C5',
     realAlienDark: '#0F8B8A',
     realGlow: '#A7FFEB'
@@ -378,16 +384,22 @@ const SPRITES = {
     // Chasing Dog: white and brown, stretched out at a run.
     pet_chase: {
         rows: [
-            '..BB.........',
-            '..BBBBBB..TT.',
-            '..BKWWWBBBT..',
-            '..BWWWWBBB...',
-            '.WWWWWWWWWW..',
-            '.WWWBBBWWWW..',
-            '.WW.WW.WW.W..',
-            '.WW.WW.WW....'
+            '................',
+            '............BB..',
+            '...........BBBB.',
+            '.T.........BBBBB',
+            '.TT.......BBBBBB',
+            '..BBBBBBBBBBKBBB',
+            '..BBBBBBBBBBBBSS',
+            '..BBBBBBBBBBBBSS',
+            '..BBBBBBBBBBBB..',
+            '..BBBBBBBBBBBB..',
+            '..BB..BB..BB.BB.',
+            '..BB..BB..BB.BB.',
+            '..WW..WW..WW.WW.',
+            '................'
         ],
-        palette: { B: C.dogBrown, W: C.sheet, K: C.eye, T: C.dogBrown }
+        palette: { B: C.dogBrown, T: C.dogBrown, K: C.eye, S: C.dogSnout, W: C.dogSnout }
     },
 
     // Knitting Grandma: needles out, bag in hand, still faster than you think.
@@ -669,6 +681,107 @@ const SPRITES = {
 
     // Kid in a Cardboard Box: the plainest costume on the street, and the
     // one every kid has worn at least once.
+    owen: {
+        rows: [
+            '................',
+            '.....HHHHHH.....',
+            '....HHHHHHHH....',
+            '....FFFFFFFF....',
+            '....FKFFFFKF....',
+            '....FFFFFFFF....',
+            '...TTTTTTTTTT...',
+            '..PTTTTTTTTTTP..',
+            '..PTTTTTTTTTTP..',
+            '...TTTTTTTTTT...',
+            '....NNNNNNNN....',
+            '....NNNNNNNN....',
+            '....LL....LL....',
+            '...WWW....WWW...'
+        ],
+        palette: {
+            H: C.bark,
+            F: C.neighbourSkin,
+            K: C.eye,
+            T: C.hoodie,
+            P: C.spray,
+            N: C.pants,
+            L: C.pants,
+            W: C.shoe
+        }
+    },
+
+    jump_scare: {
+        rows: [
+            '................',
+            '.....VVVVVV.....',
+            '....VVVVVVVV....',
+            '...VVVVVVVVVV...',
+            '...VVKKVVKKVV...',
+            '...VVKKVVKKVV...',
+            '...VVVVVVVVVV...',
+            '...VVKVVVVKVV...',
+            '...VVVKKKKVVV...',
+            '....VVVVVVVV....',
+            '..VVVVVVVVVVVV..',
+            '..VV.VVVVVV.VV..',
+            '.....LL..LL.....',
+            '....WWW..WWW....'
+        ],
+        palette: { V: C.cardigan, K: C.eye, L: C.pants, W: C.shoe }
+    },
+
+    bean_always: {
+        rows: [
+            '....GGGGGG....',
+            '...GGGGGGGG...',
+            '..GGGHHGGGGG..',
+            '..GGHHGGGGGG..',
+            '.GGGHGGGGGGGG.',
+            '.GGGGGGGGGGGG.',
+            '.GGGGGGGGGGGG.',
+            '.GGGGGGGGGGGG.',
+            '..GGGGGGGGGG..',
+            '..GGGGGGGGGG..',
+            '...GGGGGGGG...',
+            '....GGGGGG....',
+            '....LL..LL....',
+            '...WWW..WWW...'
+        ],
+        palette: { G: C.bean, H: C.beanLite, L: C.pants, W: C.shoe }
+    },
+
+    freddy: {
+        rows: [
+            '................',
+            '....HHHHHH......',
+            '...HHBBHHHH.....',
+            '...FFFFFFFF.....',
+            '...FKFFFFKF.....',
+            '...FFFFFFFF.....',
+            '..SSSSSSSSSS.CC.',
+            '..SSSSSSSSSS.CC.',
+            '..SSSSSSSSSS.NN.',
+            '...PPPPPPPP.....',
+            '...PPPPPPPP.....',
+            '...WW....WW.....',
+            '.DDDDDDDDDDDD...',
+            '..OO......OO....'
+        ],
+        palette: {
+            H: C.bark,
+            B: C.blueStreak,
+            F: C.neighbourSkin,
+            K: C.eye,
+            S: C.hoodie,
+            C: C.metal,
+            N: C.spray,
+            P: C.pants,
+            W: C.shoe,
+            D: C.deck,
+            O: C.wheel
+        }
+    },
+
     box_kid: {
         rows: [
             '..BBBBBBBBBB..',

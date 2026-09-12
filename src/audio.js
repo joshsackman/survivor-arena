@@ -230,6 +230,14 @@ export class AudioEngine {
                         { freq: 1568, dur: 0.18, type: 'triangle', volume: V.mid, at: 180 }
                     ])
             },
+            scare: {
+                cooldown: 300,
+                run: () =>
+                    this._seq([
+                        { freq: 180, dur: 0.06, type: 'sawtooth', volume: V.mid },
+                        { freq: 900, dur: 0.22, type: 'sawtooth', volume: V.mid, at: 40, sweep: 700 }
+                    ])
+            },
             powerdown: {
                 run: () =>
                     this._seq([
@@ -372,7 +380,7 @@ export class AudioEngine {
         if (/bully/.test(id)) return 'bully';
         if (/^pet_cat$/.test(id)) return 'cat';
         if (/wolf|pet_/.test(id)) return 'dog';
-        if (/bat|box_kid|pumpkin_kid|ghost|mage/.test(id)) return 'kid';
+        if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|ghost|mage/.test(id)) return 'kid';
         return null;
     }
 

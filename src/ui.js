@@ -12,7 +12,7 @@
  *   - totalAchievements()    convenience for tests / badges
  */
 
-import { ACHIEVEMENTS, ENEMIES, PASSIVES, WEAPONS } from './data.js';
+import { ACHIEVEMENTS, BOSSES, ENEMIES, PASSIVES, WEAPONS } from './data.js';
 import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
@@ -307,6 +307,9 @@ export class UI {
             'ghost',
             'mage',
             'bomber',
+            'freddy',
+            'bean_always',
+            'jump_scare',
             'slime',
             'slimeling',
             'illusionist',
@@ -337,9 +340,21 @@ export class UI {
             );
         }
         if (!cards.length) return '';
+        const bossCards = [];
+        for (const def of Object.values(BOSSES)) {
+            const art = hasSprite(def.id) ? spriteDataUrl(def.id, 56) : null;
+            const img = art
+                ? `<img class="roster-art" src="${art}" alt="" width="56" height="56">`
+                : `<span class="roster-art roster-dot" style="background:${def.color}"></span>`;
+            bossCards.push(
+                `<div class="roster-card boss">${img}<span class="roster-name">${def.name}</span></div>`
+            );
+        }
+        if (!bossCards.length) return cards.join('');
         return (
             cards.join('') +
-            '<div class="roster-card roster-more"><span class="roster-name">Bosses are still in the garage</span></div>'
+            '<div class="roster-section">The Bosses</div>' +
+            bossCards.join('')
         );
     }
 

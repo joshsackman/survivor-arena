@@ -443,6 +443,55 @@ export const ENEMIES = {
         color: '#3B3B3B',
         size: 13
     },
+    JUMP_SCARE: {
+        id: 'jump_scare',
+        name: 'The Jump Scare',
+        archetype: 'chaser',
+        // Waits completely still, then bursts out when you wander too close.
+        // main.js gives him the ambush behaviour; the numbers are the payoff.
+        ambush: true,
+        ambushRange: 150,
+        hp: 34,
+        speed: 200,
+        damage: 22,
+        exp: 30,
+        color: '#9B5CFF',
+        size: 16
+    },
+    BEAN_ALWAYS: {
+        id: 'bean_always',
+        name: 'Bean Always',
+        archetype: 'chaser',
+        // A giant bean is not fast, but it takes a lot of hitting.
+        hp: 46,
+        speed: 58,
+        damage: 15,
+        exp: 18,
+        color: '#5FA83C',
+        size: 17
+    },
+    FREDDY: {
+        id: 'freddy',
+        name: 'Freddy',
+        archetype: 'ranged',
+        // Quick on the board, and sprays from a distance rather than touching
+        // you -- so you have to keep moving instead of tanking him.
+        ranged: true,
+        firingRange: 340,
+        keepDistance: 200,
+        projectileSpeed: 300,
+        projectileDamage: 10,
+        projectileKind: 'paint',
+        splatRadius: 60,
+        splatDamage: 7,
+        fireCooldown: 2.4,
+        hp: 30,
+        speed: 168,
+        damage: 8,
+        exp: 26,
+        color: '#4FC3F7',
+        size: 15
+    },
     PET_CHASE: {
         id: 'pet_chase',
         name: 'Chasing Dog',
@@ -456,7 +505,7 @@ export const ENEMIES = {
         damage: 18,
         exp: 22,
         color: '#F8F8F8',
-        size: 16
+        size: 12
     },
     GRANDMA_KNIT: {
         id: 'grandma_knit',
@@ -695,6 +744,20 @@ export const BOSSES = {
         ability: 'charge',
         spawnAt: 600 // 10 minutes
     },
+    OWEN: {
+        id: 'owen',
+        name: 'Owen the Animator',
+        hp: 3400,
+        speed: 75,
+        damage: 45,
+        exp: 700,
+        color: '#49577A',
+        size: 38,
+        boss: true,
+        // Drops pixels around the street that hurt to stand in.
+        ability: 'pixels',
+        spawnAt: 375 // 6:15
+    },
     // --- v2.4 mid/late bosses --------------------------------------------
     NECROMANCER: {
         id: 'necromancer',
@@ -759,35 +822,35 @@ export const WAVES = [
     {
         from: 60,
         to: 90,
-        pool: ['zombie', 'dad_polo', 'dad_rake', 'skeleton', 'mom_workout', 'mage', 'box_kid'],
+        pool: ['zombie', 'dad_polo', 'dad_rake', 'skeleton', 'mom_workout', 'mage', 'box_kid', 'freddy'],
         spawnMult: 1.6,
         label: 'Teens'
     },
     {
         from: 90,
         to: 120,
-        pool: ['skeleton', 'mom_cardigan', 'wolf', 'pet_chase', 'ghost', 'mage'],
+        pool: ['skeleton', 'mom_cardigan', 'wolf', 'pet_chase', 'ghost', 'mage', 'bean_always'],
         spawnMult: 1.7,
         label: 'Pack'
     },
     {
         from: 120,
         to: 180,
-        pool: ['wolf', 'pet_cat', 'ghost', 'slime', 'mage', 'bomber'],
+        pool: ['wolf', 'pet_cat', 'ghost', 'slime', 'mage', 'bomber', 'bean_always', 'jump_scare'],
         spawnMult: 1.8,
         label: 'Pumpkins'
     },
     {
         from: 180,
         to: 240,
-        pool: ['wolf', 'pet_chase', 'golem', 'ghost', 'slime', 'bomber'],
+        pool: ['wolf', 'pet_chase', 'golem', 'ghost', 'slime', 'bomber', 'freddy', 'jump_scare'],
         spawnMult: 1.9,
         label: 'Vanguard'
     },
     {
         from: 240,
         to: 300,
-        pool: ['golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'illusionist'],
+        pool: ['golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'illusionist', 'freddy', 'jump_scare'],
         spawnMult: 2.0,
         label: 'Pressure'
     },
@@ -801,7 +864,7 @@ export const WAVES = [
     {
         from: 420,
         to: 600,
-        pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'illusionist'],
+        pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'illusionist', 'bean_always', 'jump_scare'],
         spawnMult: 2.3,
         label: 'Escalation'
     },

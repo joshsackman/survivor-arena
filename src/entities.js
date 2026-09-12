@@ -389,6 +389,24 @@ export class Enemy {
             }
         }
 
+        // --- Jump Scare: perfectly still, then out of nowhere. ----------
+        if (this.type.ambush && !this._sprung) {
+            if (d > (this.type.ambushRange || 150)) {
+                // Not yet noticed you: do not move at all.
+                if (this.flashTimer > 0) this.flashTimer -= dt;
+                return;
+            }
+            this._sprung = true;
+            game.audio?.play?.('scare');
+            game.createParticles?.(this.x, this.y, '#9B5CFF', 16);
+            game.createFloatingText?.('BOO!', this.x, this.y - 40, '#9B5CFF', {
+                size: 20,
+                crit: true,
+                life: 1.1
+            });
+            game.shake?.(6);
+        }
+
         if (this.ranged && this.type.keepDistance) {
             // Stay at preferred range: advance when far, retreat when close.
             const keep = this.type.keepDistance;
@@ -667,9 +685,14 @@ export class EnemyProjectile {
 
     /** Yolk everywhere, and a small blast that hurts if you are standing in it. */
     _splat(game) {
-        if (this.kind !== 'egg') return;
-        game.createParticles?.(this.x, this.y, '#FFEE9C', 10);
-        game.createParticles?.(this.x, this.y, '#F8F8F8', 6);
+        if (this.kind !== 'egg' && this.kind !== 'paint') return;
+        if (this.kind === 'paint') {
+            game.createParticles?.(this.x, this.y, '#FF4FD8', 12);
+            game.createParticles?.(this.x, this.y, '#4FC3F7', 6);
+        } else {
+            game.createParticles?.(this.x, this.y, '#FFEE9C', 10);
+            game.createParticles?.(this.x, this.y, '#F8F8F8', 6);
+        }
         game.audio?.play?.('impact');
         if (!this.splatRadius || !this.splatDamage) return;
         const p = game.player;
@@ -677,7 +700,9 @@ export class EnemyProjectile {
         const d = Math.hypot(this.x - p.x, this.y - p.y);
         if (d <= this.splatRadius) {
             p.takeDamage(this.splatDamage, game);
-            game.createFloatingText('SPLAT!', p.x, p.y - 46, '#FFEE9C', {
+            const word = this.kind === 'paint' ? 'SPRAYED!' : 'SPLAT!';
+            const hue = this.kind === 'paint' ? '#FF4FD8' : '#FFEE9C';
+            game.createFloatingText(word, p.x, p.y - 46, hue, {
                 size: 15,
                 crit: true,
                 life: 1
@@ -694,6 +719,16 @@ export class EnemyProjectile {
             ctx.fillRect(-5, -7, 10, 14);
             ctx.fillStyle = '#FFEE9C';
             ctx.fillRect(-3, -7, 6, 4);
+            ctx.restore();
+            return;
+        }
+        if (this.kind === 'paint') {
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.spin + this.life * 8);
+            ctx.fillStyle = '#FF4FD8';
+            ctx.fillRect(-5, -5, 10, 10);
+            ctx.fillStyle = '#4FC3F7';
+            ctx.fillRect(-2, -5, 4, 4);
             ctx.restore();
             return;
         }

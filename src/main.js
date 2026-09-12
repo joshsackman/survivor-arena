@@ -18,6 +18,7 @@ import { CONFIG, Difficulty, GameState } from './config.js';
 import { ACHIEVEMENTS, BOSSES, ENEMIES, WAVES, WEAPONS } from './data.js';
 import {
     Enemy,
+    EnemyProjectile,
     ExpOrb,
     FloatingText,
     Particle,
@@ -2252,6 +2253,21 @@ export class Game {
                 );
             }
             this.createParticles(boss.x, boss.y, '#aa33ff', 20);
+        } else if (boss.ability === 'pixels') {
+            // Scatters pixels around himself that hurt to stand in.
+            for (let i = 0; i < 7; i++) {
+                const a = (i / 7) * Math.PI * 2 + Math.random() * 0.5;
+                const r = 60 + Math.random() * 90;
+                this.enemyProjectiles.push(
+                    new EnemyProjectile(boss.x + Math.cos(a) * r, boss.y + Math.sin(a) * r, 0, 0, 0, {
+                        kind: 'paint',
+                        splatRadius: 56,
+                        splatDamage: 14 * (this.enemyDmgMult || 1)
+                    })
+                );
+            }
+            this.createParticles(boss.x, boss.y, '#FF4FD8', 18);
+            this.audio?.play?.('shoot');
         } else if (boss.ability === 'charge') {
             const dx = this.player.x - boss.x;
             const dy = this.player.y - boss.y;
