@@ -30,6 +30,7 @@ const ASSETS = [
     './src/i18n.js',
     './src/storage.js',
     './src/achievements.js',
+    './src/leaderboard.js',
     './docs/hero.svg',
     './docs/og-card.svg'
 ];
