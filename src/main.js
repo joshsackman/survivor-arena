@@ -601,6 +601,13 @@ export class Game {
      * out front and the mob closing in behind him. Built from the same sprite
      * art the game uses, so the menu can never drift from what you meet.
      */
+    /** Which music a stage plays. Each place should sound like itself. */
+    _stageTheme() {
+        if (this.stageId === 'crypt') return 'haunted';
+        if (this.stageId === 'tundra') return 'area51';
+        return 'street';
+    }
+
     _paintStartScene() {
         const host = document.getElementById('startScene');
         if (!host) return;
@@ -843,7 +850,7 @@ export class Game {
         // The transition into the run should be audible: a short rising
         // flourish, then the chase theme.
         this.audio.chaseStart();
-        this.audio.startMusic('street');
+        this.audio.startMusic(this._stageTheme());
 
         this.lastTime = performance.now();
         this._scheduleFrame();
@@ -1096,7 +1103,7 @@ export class Game {
             // Resume the theme that fits the moment -- unpausing mid-boss
             // should not drop back to the street music -- and no flourish,
             // which would fire every time a kid pauses to read something.
-            this.audio.startMusic(this.enemies.some((e) => e.boss) ? 'boss' : 'street');
+            this.audio.startMusic(this.enemies.some((e) => e.boss) ? 'boss' : this._stageTheme());
             this.lastTime = performance.now();
             // iter-16 bug-bash: shift the speedrun + run-start anchors forward
             // by however long we were paused so wall-clock readings exclude
@@ -1639,7 +1646,8 @@ export class Game {
             this.audio.explosion();
             this.achievements.onBossDefeated(e.id);
             // Back to the chase once the last boss on screen is down.
-            if (!this.enemies.some((x) => x.boss && x !== e)) this.audio.startMusic('street');
+            if (!this.enemies.some((x) => x.boss && x !== e))
+                this.audio.startMusic(this._stageTheme());
             this._announce(`${e.id.replace('_', ' ')} defeated`);
             // Mark no-hit-boss if the player's unhit streak is longer than
             // the fight itself. We use the unhit timer (seconds without

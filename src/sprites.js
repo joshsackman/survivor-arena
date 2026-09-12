@@ -550,6 +550,82 @@ const SPRITES = {
         palette: { C: C.shirt, F: C.neighbourSkin, K: C.eye, M: C.eye, H: C.pants, P: C.hoodie, W: C.shoe }
     },
 
+    // ---- Haunted House natives ----------------------------------------
+    // Poltergeist: a sheet that nobody is wearing.
+    poltergeist: {
+        rows: [
+            '...SSSSSS...',
+            '..SSSSSSSS..',
+            '.SSSSSSSSSS.',
+            '.SSKKSSKKSS.',
+            '.SSKKSSKKSS.',
+            '.SSSSSSSSSS.',
+            '.SSSSSSSSSS.',
+            '.SSSSSSSSSS.',
+            '..SS.SS.SS..',
+            '............'
+        ],
+        palette: { S: '#C8CCD6', K: C.eye }
+    },
+
+    // Suit of armour that came off its stand.
+    armour: {
+        rows: [
+            '....MMMM....',
+            '...MMMMMM...',
+            '...MKMMKM...',
+            '...MMMMMM...',
+            '..MMMMMMMM..',
+            '.MMMMMMMMMM.',
+            '.MMMMMMMMMM.',
+            '..MMMMMMMM..',
+            '...MM..MM...',
+            '...MM..MM...',
+            '..MMM..MMM..',
+            '............'
+        ],
+        palette: { M: C.metal, K: '#FF4B4B' }
+    },
+
+    // ---- Area 51 natives ----------------------------------------------
+    // A guard who very much wants your badge.
+    guard: {
+        rows: [
+            '....HHHH....',
+            '...HHHHHH...',
+            '...FFFFFF...',
+            '...FKFFKF...',
+            '...FFFFFF...',
+            '..UUUUUUUU..',
+            '.UUUUUUUUUU.',
+            '.UUUUUUUUUU.',
+            '..UUUUUUUU..',
+            '...UU..UU...',
+            '...UU..UU...',
+            '..WWW..WWW..'
+        ],
+        palette: { H: C.eye, F: C.neighbourSkin, K: C.eye, U: '#3A5A50', W: C.eye }
+    },
+
+    // The actual greys. Small, quick, and not wearing anything.
+    grey: {
+        rows: [
+            '...GGGGGG...',
+            '..GGGGGGGG..',
+            '.GGGGGGGGGG.',
+            '.GGKKGGKKGG.',
+            '.GGKKGGKKGG.',
+            '..GGGGGGGG..',
+            '...GGGGGG...',
+            '....GGGG....',
+            '..G.GGGG.G..',
+            '..GGGGGGGG..',
+            '....GG.GG...',
+            '............'
+        ],
+        palette: { G: C.realAlien, K: C.eye }
+    },
+
     // Candy: what the neighbours drop. Three wrappers so a street full of
     // pickups doesn't read as one repeated shape.
     candy1: {

@@ -421,6 +421,24 @@ export class AudioEngine {
                 // The goofy turnaround: a quick chromatic scramble home.
                 turnaround: [12, 11, 10, 9]
             },
+            // Inside the haunted house: slower, creakier, minor seconds.
+            haunted: {
+                stepMs: 132,
+                root: 220,
+                wave: 'triangle',
+                melody: [0, null, 1, null, 0, null, -1, null, 0, 1, 3, 1, 0, null, null, null],
+                bass: [0, null, null, null, -4, null, null, null, -5, null, null, null, -4, null, null, null],
+                turnaround: [3, 2, 1, 0]
+            },
+            // Area 51: cold, electronic, marching.
+            area51: {
+                stepMs: 104,
+                root: 262,
+                wave: 'square',
+                melody: [0, 7, 0, 7, 3, 10, 3, 10, 0, 7, 0, 7, 5, 12, 5, 12],
+                bass: [0, 0, 0, 0, -2, -2, -2, -2, -4, -4, -4, -4, -2, -2, -2, -2],
+                turnaround: [12, 7, 3, 0]
+            },
             boss: {
                 stepMs: 92,
                 root: 196,

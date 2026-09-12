@@ -315,7 +315,12 @@ export class UI {
             'pet_chase',
             'bully',
             'golem',
-            'grandma_knit'
+            'grandma_knit',
+            // Stage natives: you only meet these in their own place.
+            'poltergeist',
+            'armour',
+            'guard',
+            'grey'
         ];
         const byId = Object.create(null);
         for (const def of Object.values(ENEMIES)) byId[def.id] = def;
@@ -411,6 +416,22 @@ export class UI {
     }
 
     showLeaderboard(normalScores, speedrunScores, onClose) {
+        // v2.8: old-school arcade board -- rank, name, score. The previous
+        // version was two seven-column tables including weapon lists and a
+        // speedrun section for a mode that is no longer in the menu.
+        const renderArcadeRow = (r, i) => {
+            const secs = Math.max(0, Math.floor(r.timeSurvived ?? 0));
+            const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+            const ss = String(secs % 60).padStart(2, '0');
+            const who = String(r.initials || 'YOU')
+                .toUpperCase()
+                .replace(/[^A-Z]/g, '')
+                .slice(0, 3)
+                .padEnd(3, '.');
+            const rank = String(i + 1).padStart(2, '0');
+            return `<div class="arcade-row${i === 0 ? ' top' : ''}"><span>${rank}</span><span>${who}</span><span>${mm}:${ss}</span><span>${r.kills ?? 0}</span></div>`;
+        };
+
         const m = this.els.leaderboardScreen;
         if (!m) return;
         const renderRow = (r, i) => {
@@ -451,30 +472,16 @@ export class UI {
             return `<div class="hs-row wide"><span>${i + 1}</span><span>${mm}:${ss}.${ml}</span><span>Lv.${r.level ?? 1}</span><span>${r.kills ?? 0}</span><span class="weapons">${ws}</span><span>${dstr}</span></div>`;
         };
         m.innerHTML = `
-            <div class="overlay-card leaderboard-card">
-                <h2>${t('leaderboard')}</h2>
-                <section class="lb-section">
-                    <h3>${t('highScores')} (${normalScores.length})</h3>
-                    <div class="hs-list scroll">
-                        ${
-                            normalScores.length
-                                ? `<div class="hs-head wide"><span>#</span><span>${t('time')}</span><span>${t('level')}</span><span>${t('kills')}</span><span>${t('weapons')}</span><span>${t('date')}</span><span>${t('noHit')}</span></div>` +
-                                  normalScores.map(renderRow).join('')
-                                : `<div class="hs-empty">${t('noHighScores')}</div>`
-                        }
-                    </div>
-                </section>
-                <section class="lb-section">
-                    <h3>${t('speedrun')} (${speedrunScores.length})</h3>
-                    <div class="hs-list scroll">
-                        ${
-                            speedrunScores.length
-                                ? `<div class="hs-head wide"><span>#</span><span>${t('time')}</span><span>${t('level')}</span><span>${t('kills')}</span><span>${t('weapons')}</span><span>${t('date')}</span></div>` +
-                                  speedrunScores.map(renderSpeedRow).join('')
-                                : `<div class="hs-empty">${t('noHighScores')}</div>`
-                        }
-                    </div>
-                </section>
+            <div class="overlay-card leaderboard-card arcade">
+                <h2>HIGH SCORES</h2>
+                <div class="arcade-board">
+                    <div class="arcade-head"><span>RANK</span><span>NAME</span><span>TIME</span><span>KILLS</span></div>
+                    ${
+                        normalScores.length
+                            ? normalScores.slice(0, 10).map(renderArcadeRow).join('')
+                            : '<div class="hs-empty">NO SCORES YET</div>'
+                    }
+                </div>
                 <div class="btn-row">
                     <button id="lbClose" class="btn primary">${t('close')}</button>
                 </div>

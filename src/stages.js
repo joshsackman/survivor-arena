@@ -76,17 +76,22 @@ export const STAGES = Object.freeze({
         musicStyle: 'crypt',
         // Bias spawns: more mages and illusionists, fewer melee chasers.
         poolOverrides: {
-            mage: 1.8,
-            illusionist: 1.6,
-            ghost: 1.4,
-            skeleton: 1.2,
-            bat: 0.6,
-            zombie: 0.5,
-            wolf: 0.7
+            // The house has its own residents; the neighbours thin out here.
+            poltergeist: 2.2,
+            armour: 1.8,
+            ghost: 1.6,
+            mage: 1.4,
+            illusionist: 1.4,
+            skeleton: 0.8,
+            bat: 0.5,
+            zombie: 0.4,
+            wolf: 0.5
         },
         // Add mage to every wave so the ranged-heavy promise holds in the
         // first 90 seconds where vanilla pools have no caster.
-        extraEnemies: ['mage'],
+        // The natives join the house, but the crypt keeps its guaranteed
+        // ranged caster -- that pressure is the point of the stage.
+        extraEnemies: ['poltergeist', 'armour', 'mage'],
         bossOffsets: {
             // Reaper arrives 60s earlier (5:00 -> 4:00).
             reaper: -60,
@@ -121,15 +126,18 @@ export const STAGES = Object.freeze({
         background: { fill: '#0D1A16', gridAlpha: 0.06 },
         musicStyle: 'forest',
         poolOverrides: {
-            // Wolves and golems thrive in snow, mages and bats less so.
-            wolf: 1.5,
-            golem: 1.4,
-            zombie: 1.1,
-            skeleton: 1.1,
-            bat: 0.5,
-            mage: 0.7
+            // The facility has its own staff -- and its own residents.
+            guard: 2.2,
+            grey: 1.9,
+            golem: 1.2,
+            wolf: 0.8,
+            zombie: 0.4,
+            skeleton: 0.4,
+            bat: 0.4,
+            box_kid: 0.3,
+            pumpkin_kid: 0.3
         },
-        extraEnemies: [],
+        extraEnemies: ['guard', 'grey'],
         // Bosses keep their forest-default timings — the difficulty comes
         // from the always-on modifiers, not from rushing the schedule.
         bossOffsets: {},

@@ -128,11 +128,17 @@ test('data: SLIME.splitInto points to a real enemy', () => {
     assert.ok(ids.has(ENEMIES.SLIME.splitInto));
 });
 
-test('data: Bomber has defensive defaults', () => {
+test('data: Egg Thrower throws eggs that splatter', () => {
     const b = ENEMIES.BOMBER;
-    assert.ok(b.fuseTime > 0);
-    assert.ok(b.blastRadius > 0);
-    assert.ok(b.blastDamage > 0);
+    // v2.8: he used to charge in and detonate like a bomb, which made no
+    // sense for a kid with a carton. He keeps his distance and throws now,
+    // so the contract is the ranged one plus a splat on impact.
+    assert.equal(b.archetype, 'ranged');
+    assert.equal(b.projectileKind, 'egg');
+    assert.ok(b.firingRange > 0);
+    assert.ok(b.projectileDamage > 0);
+    assert.ok(b.splatRadius > 0);
+    assert.ok(b.splatDamage > 0);
 });
 
 test('data: Illusionist clone params are reasonable', () => {

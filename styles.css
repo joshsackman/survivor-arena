@@ -1442,3 +1442,45 @@ body.cb-mode .exp-fill {
 .start-eyebrow {
     font-weight: 700;
 }
+
+/* v2.8: arcade high-score board. Monospaced, three columns, no chrome. */
+.leaderboard-card.arcade {
+    max-width: 460px;
+}
+.leaderboard-card.arcade h2 {
+    letter-spacing: 4px;
+    color: var(--accent);
+}
+.arcade-board {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 15px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.arcade-head,
+.arcade-row {
+    display: grid;
+    grid-template-columns: 3rem 1fr 4.5rem 4rem;
+    gap: 8px;
+    padding: 6px 10px;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+}
+.arcade-head {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+}
+.arcade-row span:nth-child(2) {
+    letter-spacing: 3px;
+    font-weight: 700;
+}
+.arcade-row.top {
+    color: var(--accent);
+}
+.arcade-row:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03);
+}
