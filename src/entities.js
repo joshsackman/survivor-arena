@@ -45,7 +45,7 @@ export class Player {
         this.hp = this.baseMaxHp;
         this.level = 1;
         this.exp = 0;
-        this.expToNext = 80;
+        this.expToNext = 72;
         this.weapons = [];
         this.passives = Object.create(null);
         this.invincible = false;
@@ -191,7 +191,7 @@ export class Player {
         while (this.exp >= this.expToNext) {
             this.exp -= this.expToNext;
             this.level++;
-            this.expToNext = Math.floor(this.expToNext * 1.32);
+            this.expToNext = Math.floor(this.expToNext * 1.28);
             this.hp = Math.min(this.hp + 20, this.maxHp);
             levelUps.push(this.level);
         }
