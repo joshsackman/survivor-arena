@@ -194,17 +194,22 @@ const SPRITES = {
     // Ferocious Pet (wolf): off the leash, low and quick.
     wolf: {
         rows: [
-            '..BB......BB..',
-            '..BBBBBBBBBB..',
-            '..BKBBBBBBKB..',
-            '..BBBWWWWBBB..',
-            '.BBBBBBBBBBBB.',
-            '.BBBBBBBBBBBB.',
-            '.BB.BB..BB.BB.',
-            '.BB.BB..BB.BB.',
-            '..............'
+            '................',
+            '.............BB.',
+            '.T...........BBB',
+            '.TT.........BBBB',
+            '..BBBBBBBBBBBBBB',
+            '..BBBBBBBBBBKBBB',
+            '..BBBBBBBBBBBBSS',
+            '..BBBBBBBBBBBBSS',
+            '..BBBBBBBBBBBBB.',
+            '..BBBBBBBBBBBB..',
+            '..BB..BB..BB.BB.',
+            '..BB..BB..BB.BB.',
+            '..WW..WW..WW.WW.',
+            '................'
         ],
-        palette: { B: C.dogBrown, K: C.eye, W: C.dogSnout }
+        palette: { B: C.dogBrown, T: C.dogBrown, K: C.eye, S: C.dogSnout, W: C.dogSnout }
     },
 
     // Egg Thrower (bomber): egg already cocked back.

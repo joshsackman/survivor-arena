@@ -249,10 +249,17 @@ canvas {
     background: rgba(5, 6, 14, 0.6);
     backdrop-filter: blur(6px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
     pointer-events: auto;
     z-index: 10;
+}
+/* Centres while it fits, scrolls once it doesn't. */
+.overlay > * {
+    margin: auto;
 }
 
 .overlay-card {
@@ -263,7 +270,8 @@ canvas {
     text-align: center;
     min-width: 360px;
     max-width: 92vw;
-    max-height: 92vh;
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
@@ -391,7 +399,8 @@ canvas {
 .achievements-card {
     min-width: 540px;
     max-width: 92vw;
-    max-height: 88vh;
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
     overflow-y: auto;
 }
 .achievements-card .ach-count {
@@ -464,7 +473,8 @@ canvas {
     padding: 26px 28px;
     min-width: 360px;
     max-width: 92vw;
-    max-height: 88vh;
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
     overflow-y: auto;
 }
 .settings-card h2 {
@@ -1221,7 +1231,8 @@ body.cb-mode .exp-fill {
 .howto-card {
     display: flex;
     flex-direction: column;
-    max-height: 88vh;
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
 }
 .howto-card .howto-list,
 .howto-card .roster {

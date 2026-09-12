@@ -577,7 +577,9 @@ export class UI {
                 icon: w.icon,
                 level: w.level,
                 max: CONFIG.WEAPON_MAX_LEVEL,
-                evolved: !!w.isEvolved?.()
+                evolved: !!w.isEvolved?.(),
+                timeLeft: w.def?.duration ? w.timeLeft : null,
+                expired: !!w.isExpired?.()
             }))
         );
         // Passive icons
@@ -591,16 +593,34 @@ export class UI {
 
     _renderChips(container, items) {
         if (!container) return;
+        const sig = items
+            .map(
+                (i) =>
+                    `${i.icon}${i.level}${i.evolved ? 'e' : ''}${i.expired ? 'x' : ''}${
+                        i.timeLeft != null ? Math.ceil(i.timeLeft) : ''
+                    }`
+            )
+            .join('|');
+        if (container._chipSig === sig) return;
+        container._chipSig = sig;
         container.innerHTML = '';
         for (const it of items) {
             const div = document.createElement('div');
             div.className = 'chip active' + (it.level >= it.max ? ' maxed' : '');
             if (it.evolved) div.classList.add('evolved');
+            if (it.expired) div.classList.add('spent');
             div.textContent = it.icon;
             const lvl = document.createElement('span');
             lvl.className = 'chip-lvl';
             lvl.textContent = it.level;
             div.appendChild(lvl);
+            // Temporary powers count down so kids can see them running out.
+            if (it.timeLeft != null) {
+                const t = document.createElement('span');
+                t.className = 'chip-timer';
+                t.textContent = it.expired ? '!' : Math.ceil(it.timeLeft) + 's';
+                div.appendChild(t);
+            }
             container.appendChild(div);
         }
     }

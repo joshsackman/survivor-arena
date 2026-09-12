@@ -212,8 +212,14 @@ export class AudioEngine {
             },
             pickup: {
                 cooldown: 45,
+                // Was a 1180Hz square sweep -- the same waveform and register
+                // as the music's octave sparkle, so candy stopped reading as
+                // feedback. Now a quick triangle two-step, well clear of it.
                 run: () =>
-                    this.tone({ freq: 1180, dur: 0.05, type: 'square', volume: V.soft, sweep: 380 })
+                    this._seq([
+                        { freq: 1568, dur: 0.035, type: 'triangle', volume: V.soft },
+                        { freq: 2093, dur: 0.05, type: 'triangle', volume: V.soft, at: 38 }
+                    ])
             },
             pickupRare: {
                 run: () =>
@@ -222,6 +228,14 @@ export class AudioEngine {
                         { freq: 1047, dur: 0.06, type: 'square', volume: V.mid, at: 60 },
                         { freq: 1319, dur: 0.06, type: 'square', volume: V.mid, at: 120 },
                         { freq: 1568, dur: 0.18, type: 'triangle', volume: V.mid, at: 180 }
+                    ])
+            },
+            powerdown: {
+                run: () =>
+                    this._seq([
+                        { freq: 392, dur: 0.1, type: 'square', volume: V.mid },
+                        { freq: 294, dur: 0.1, type: 'square', volume: V.mid, at: 95 },
+                        { freq: 196, dur: 0.24, type: 'square', volume: V.mid, at: 190 }
                     ])
             },
             doorbell: {
@@ -531,7 +545,15 @@ export class AudioEngine {
 
             // Layer 4 (chaos): octave arpeggio sparkle + extra percussion.
             if (I > 0.75) {
-                if (step % 2 === 1) note((T.melody[step % len] ?? 0) + 12, { vol: 0.022, dur: 0.06 });
+                // Sparkle sits a fifth up on a triangle rather than an octave
+                // up on a square: it stays under the gameplay sounds instead
+                // of competing with the candy pickup.
+                if (step % 2 === 1)
+                    note((T.melody[step % len] ?? 0) + 7, {
+                        vol: 0.018,
+                        dur: 0.06,
+                        wave: 'triangle'
+                    });
                 if (step % 4 === 0) drum(0.04);
             }
 

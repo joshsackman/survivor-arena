@@ -1888,8 +1888,11 @@ export class Game {
     _spawnLogic(dt, hpMult, dmgMult, diffSpawnMult) {
         const wave = this.currentWave;
         const waveMult = wave.spawnMult || 1;
-        const maxEnemies = Math.min(CONFIG.MAX_ENEMIES, 20 + Math.floor(this.gameTime / 10));
-        const interval = Math.max(0.2, 1.2 - this.gameTime / 200) / (diffSpawnMult * waveMult);
+        const maxEnemies = Math.min(CONFIG.MAX_ENEMIES, 26 + Math.floor(this.gameTime / 8));
+        // v2.8: the opening was too gentle -- the kids cleared it without ever
+        // being threatened. Neighbours arrive sooner from the first second and
+        // the ramp still tightens over the run.
+        const interval = Math.max(0.18, 0.9 - this.gameTime / 220) / (diffSpawnMult * waveMult);
         this._spawnAccumulator += dt;
 
         while (this._spawnAccumulator >= interval && this.enemies.length < maxEnemies) {
@@ -2200,6 +2203,16 @@ export class Game {
         for (let i = 0; i < n; i++) {
             this.particles.push(this.pools.particle.acquire(x, y, color));
         }
+    }
+    /** A temporary power ran out. Re-picking it at level-up refills it. */
+    onPowerExpired(weapon) {
+        this.createFloatingText(
+            weapon.name + ' WORE OFF!',
+            this.player.x,
+            this.player.y - 40,
+            '#FF6B6B'
+        );
+        this.audio?.play?.('powerdown');
     }
     createFloatingText(text, x, y, color, opts) {
         if (this.save.settings.reducedMotion) return;

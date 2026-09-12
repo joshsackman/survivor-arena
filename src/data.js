@@ -76,7 +76,8 @@ export const WEAPONS = {
         id: 'orbit',
         name: "Spinning Jack-o'-Lanterns",
         icon: '💫',
-        description: 'Spinning shards circle the hero. Evolves: two rings spinning.',
+        description: 'Pumpkins circle you. WEARS OFF after 20s - pick it again to refill.',
+        duration: 20,
         baseDamage: 16,
         baseCooldown: 0.4, // used as "tick" for damage re-hit window
         baseRange: 120, // orbit radius
@@ -124,7 +125,8 @@ export const WEAPONS = {
         id: 'garlic',
         name: 'Fog Machine',
         icon: '🧄',
-        description: 'Damaging aura around the hero.',
+        description: 'Fog hurts everyone near you. WEARS OFF after 18s - pick it again to refill.',
+        duration: 18,
         baseDamage: 5,
         baseCooldown: 0.2,
         baseRange: 110,
@@ -153,7 +155,8 @@ export const WEAPONS = {
         id: 'soul_drain',
         name: 'Pillowcase Vacuum',
         icon: '🩸',
-        description: 'Beam that tethers the nearest foe and heals on tick. Evolves: dual-lash.',
+        description: 'Vacuum beam that heals you. WEARS OFF after 16s - pick it again to refill.',
+        duration: 16,
         baseDamage: 8,
         baseCooldown: 0.25, // tick rate
         baseRange: 260,
@@ -365,7 +368,7 @@ export const ENEMIES = {
         damage: 20,
         exp: 20,
         color: '#b06a2c',
-        size: 16
+        size: 12
     },
     GOLEM: {
         id: 'golem',
@@ -475,7 +478,7 @@ export const ENEMIES = {
         archetype: 'chaser',
         hp: 24,
         speed: 74,
-        damage: 12,
+        damage: 16,
         exp: 14,
         color: '#C47A2F',
         size: 16
@@ -486,7 +489,7 @@ export const ENEMIES = {
         archetype: 'chaser',
         hp: 30,
         speed: 68,
-        damage: 13,
+        damage: 17,
         exp: 15,
         color: '#E8720C',
         size: 17
@@ -751,62 +754,62 @@ export const BOSSES = {
 // back to the final entry once gameTime exceeds the last window.
 // ---------------------------------------------------------------------------
 export const WAVES = [
-    { from: 0, to: 30, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost'], spawnMult: 1.0, label: 'Opening' },
-    { from: 30, to: 60, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost', 'zombie'], spawnMult: 1.1, label: 'Wave 2' },
+    { from: 0, to: 30, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost'], spawnMult: 1.35, label: 'Opening' },
+    { from: 30, to: 60, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost', 'zombie'], spawnMult: 1.5, label: 'Wave 2' },
     {
         from: 60,
         to: 90,
         pool: ['zombie', 'dad_polo', 'dad_rake', 'skeleton', 'mom_workout', 'mage', 'box_kid'],
-        spawnMult: 1.15,
+        spawnMult: 1.6,
         label: 'Teens'
     },
     {
         from: 90,
         to: 120,
         pool: ['skeleton', 'mom_cardigan', 'wolf', 'pet_chase', 'ghost', 'mage'],
-        spawnMult: 1.2,
+        spawnMult: 1.7,
         label: 'Pack'
     },
     {
         from: 120,
         to: 180,
         pool: ['wolf', 'pet_cat', 'ghost', 'slime', 'mage', 'bomber'],
-        spawnMult: 1.3,
+        spawnMult: 1.8,
         label: 'Pumpkins'
     },
     {
         from: 180,
         to: 240,
         pool: ['wolf', 'pet_chase', 'golem', 'ghost', 'slime', 'bomber'],
-        spawnMult: 1.4,
+        spawnMult: 1.9,
         label: 'Vanguard'
     },
     {
         from: 240,
         to: 300,
         pool: ['golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'illusionist'],
-        spawnMult: 1.5,
+        spawnMult: 2.0,
         label: 'Pressure'
     },
     {
         from: 300,
         to: 420,
         pool: ['wolf', 'pet_cat', 'golem', 'grandma_knit', 'ghost', 'slime', 'mage', 'bomber', 'illusionist'],
-        spawnMult: 1.6,
+        spawnMult: 2.1,
         label: 'Post-Lawn Guy'
     },
     {
         from: 420,
         to: 600,
         pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'illusionist'],
-        spawnMult: 1.75,
+        spawnMult: 2.3,
         label: 'Escalation'
     },
     {
         from: 600,
         to: Infinity,
         pool: ['golem', 'grandma_knit', 'slime', 'mage', 'ghost', 'wolf', 'pet_cat', 'skeleton', 'mom_cardigan', 'bomber', 'illusionist'],
-        spawnMult: 2.0,
+        spawnMult: 2.6,
         label: 'Endgame'
     }
 ];

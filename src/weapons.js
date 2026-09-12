@@ -26,10 +26,22 @@ export class Weapon {
         this.level = 1;
         this.cooldown = 0;
         this._shards = null; // orbit-only
+        // Powers with a `duration` are temporary: they run out and must be
+        // re-picked at level-up to refill.
+        this.timeLeft = def.duration ?? Infinity;
+        this._expired = false;
     }
 
     levelUp() {
         this.level++;
+        if (this.def.duration) {
+            this.timeLeft = this.def.duration;
+            this._expired = false;
+        }
+    }
+
+    isExpired() {
+        return !!this.def.duration && this.timeLeft <= 0;
     }
 
     isEvolved() {
@@ -37,6 +49,18 @@ export class Weapon {
     }
 
     update(dt, player, game) {
+        if (this.def.duration) {
+            this.timeLeft -= dt;
+            if (this.timeLeft <= 0) {
+                this.timeLeft = 0;
+                if (!this._expired) {
+                    this._expired = true;
+                    this._shards = null;
+                    game?.onPowerExpired?.(this);
+                }
+                return;
+            }
+        }
         // Orbit weapon ticks every frame (maintains shards), but re-fires on cooldown
         // to refresh damage state. Everything else fires on its cooldown.
         if (this.def.type === 'orbit') {

@@ -30,7 +30,7 @@ export const CONFIG = {
     SPAWN_RADIUS: 900,
     DESPAWN_RADIUS: 1200,
     EXP_ORB_LIFETIME: 30, // seconds
-    INVINCIBILITY_TIME: 0.5, // seconds
+    INVINCIBILITY_TIME: 0.4, // seconds -- shorter mercy window, so crowds bite
     PICKUP_DISTANCE: 24,
     MAGNET_BASE: 120,
     MAX_WEAPONS: 6,
