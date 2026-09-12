@@ -61,7 +61,7 @@ export const STAGES = Object.freeze({
         name: 'The Cul-de-Sac',
         icon: '🏘️',
         description: 'Your street on Halloween night. A balanced mix of neighbors.',
-        background: { fill: '#1a1a2e', gridAlpha: 0.04 },
+        background: { fill: '#241236', gridAlpha: 0.05 },
         musicStyle: 'forest',
         poolOverrides: {},
         extraEnemies: [],
@@ -72,7 +72,7 @@ export const STAGES = Object.freeze({
         name: 'The Haunted House',
         icon: '🎃',
         description: 'Darker. More egg throwers. The Lawn Guy rushes you at 4:00.',
-        background: { fill: '#0c0816', gridAlpha: 0.025 },
+        background: { fill: '#160a1f', gridAlpha: 0.03 },
         musicStyle: 'crypt',
         // Bias spawns: more mages and illusionists, fewer melee chasers.
         poolOverrides: {
@@ -118,7 +118,7 @@ export const STAGES = Object.freeze({
         name: 'Area 51',
         icon: '🛸',
         description: 'Slick floors (-10% speed), tougher neighbors (+20% HP), creeping cold.',
-        background: { fill: '#2a3a4f', gridAlpha: 0.05 },
+        background: { fill: '#1e2b26', gridAlpha: 0.06 },
         musicStyle: 'forest',
         poolOverrides: {
             // Wolves and golems thrive in snow, mages and bats less so.

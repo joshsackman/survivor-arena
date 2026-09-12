@@ -1,9 +1,9 @@
 /* Survivor — open-source roguelite styles */
 :root {
-    --bg: #0a0a12;
+    --bg: #0c0713;
     --card: rgba(6, 8, 16, 0.92);
-    --accent: #ffd24d;
-    --accent-strong: #ffb400;
+    --accent: #ffa53d;
+    --accent-strong: #ff7518;
     /* iter-10 a11y: --primary darkened from #3388ff (3.43:1 vs white) to
        #1d6fe0 (~4.66:1) so primary buttons clear the WCAG AA 4.5:1 bar
        at the existing 15px weight 600 on white text. */
@@ -28,7 +28,7 @@ body {
     height: 100vh;
     height: 100svh;
     height: 100dvh;
-    background: radial-gradient(ellipse at top, #1b1330 0%, #0a0a12 70%);
+    background: radial-gradient(ellipse at top, #2a1140 0%, #0c0713 70%);
     color: var(--text);
     font-family:
         system-ui,
@@ -96,7 +96,7 @@ body {
 canvas {
     display: block;
     border: 1px solid #222;
-    background: #1a1a2e;
+    background: #241236;
     width: 100%;
     height: 100%;
     image-rendering: crisp-edges;

@@ -327,7 +327,7 @@ export const ENEMIES = {
         speed: 110,
         damage: 10,
         exp: 10,
-        color: '#8844ff',
+        color: '#ffb703',
         size: 12
     },
     ZOMBIE: {
@@ -338,7 +338,7 @@ export const ENEMIES = {
         speed: 70,
         damage: 15,
         exp: 15,
-        color: '#44aa44',
+        color: '#5b8fd9',
         size: 18
     },
     SKELETON: {
@@ -349,7 +349,7 @@ export const ENEMIES = {
         speed: 95,
         damage: 12,
         exp: 12,
-        color: '#dddddd',
+        color: '#e26fa8',
         size: 14
     },
     WOLF: {
@@ -364,7 +364,7 @@ export const ENEMIES = {
         speed: 150,
         damage: 20,
         exp: 20,
-        color: '#aa6644',
+        color: '#b06a2c',
         size: 16
     },
     GOLEM: {
@@ -378,7 +378,7 @@ export const ENEMIES = {
         speed: 45,
         damage: 30,
         exp: 50,
-        color: '#888888',
+        color: '#cbbfe0',
         size: 28
     },
     GHOST: {
@@ -389,7 +389,7 @@ export const ENEMIES = {
         speed: 130,
         damage: 18,
         exp: 18,
-        color: '#88ccff',
+        color: '#f2f0e6',
         size: 15,
         ghost: true
     },
@@ -408,7 +408,7 @@ export const ENEMIES = {
         speed: 70,
         damage: 8,
         exp: 22,
-        color: '#cc44cc',
+        color: '#8a6fd6',
         size: 14
     },
     SLIME: {
@@ -421,7 +421,7 @@ export const ENEMIES = {
         speed: 65,
         damage: 14,
         exp: 24,
-        color: '#33cc88',
+        color: '#ff7518',
         size: 20
     },
     SLIMELING: {
@@ -432,7 +432,7 @@ export const ENEMIES = {
         speed: 105,
         damage: 8,
         exp: 6,
-        color: '#66ddaa',
+        color: '#ffa24d',
         size: 10
     },
     // --- v2.4 additions: bomber (self-destructs) + illusionist (clone) ---
@@ -449,7 +449,7 @@ export const ENEMIES = {
         speed: 120,
         damage: 10,
         exp: 28,
-        color: '#ff6644',
+        color: '#f7e7a1',
         size: 14
     },
     ILLUSIONIST: {
@@ -463,7 +463,7 @@ export const ENEMIES = {
         speed: 95,
         damage: 12,
         exp: 30,
-        color: '#cc88ff',
+        color: '#9be8c9',
         size: 15
     }
 };
@@ -483,7 +483,7 @@ export const BOSSES = {
         speed: 80,
         damage: 40,
         exp: 500,
-        color: '#220033',
+        color: '#35502e',
         size: 48,
         boss: true,
         ability: 'summon',
@@ -496,7 +496,7 @@ export const BOSSES = {
         speed: 60,
         damage: 60,
         exp: 1200,
-        color: '#550077',
+        color: '#4a2d1f',
         size: 64,
         boss: true,
         ability: 'charge',
@@ -510,7 +510,7 @@ export const BOSSES = {
         speed: 70,
         damage: 50,
         exp: 850,
-        color: '#3a1a4a',
+        color: '#5b1f3f',
         size: 54,
         boss: true,
         ability: 'summon',
@@ -523,7 +523,7 @@ export const BOSSES = {
         speed: 55,
         damage: 75,
         exp: 2000,
-        color: '#0b2a4a',
+        color: '#2b3a1c',
         size: 72,
         boss: true,
         ability: 'charge',
@@ -541,7 +541,7 @@ export const BOSSES = {
         speed: 55,
         damage: 60,
         exp: 1300,
-        color: '#88ccff',
+        color: '#7cf2b0',
         size: 66,
         boss: true,
         ability: 'charge',
