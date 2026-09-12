@@ -841,6 +841,21 @@ export const BOSSES = {
         ability: 'charge',
         spawnAt: 600 // 10 minutes
     },
+    LIL_TIMMY: {
+        id: 'lil_timmy',
+        name: 'Lil Timmy',
+        // A wooden block with a face. Heavy and slow: he tips over and slides
+        // at you rather than chasing.
+        hp: 2200,
+        speed: 58,
+        damage: 38,
+        exp: 450,
+        color: '#C89A5E',
+        size: 40,
+        boss: true,
+        ability: 'charge',
+        spawnAt: 240
+    },
     OWEN: {
         id: 'owen',
         name: 'Owen the Animator',

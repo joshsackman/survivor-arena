@@ -69,6 +69,9 @@ const C = {
     jaGold: '#FFC72C',
     rust: '#8A4B2A',
     cactus: '#4E8C3A',
+    wood: '#C89A5E',
+    woodGrain: '#8A6636',
+    nose: '#E8453B',
     cactusDark: '#2F5E24',
     feather: '#4A3B3B',
     featherLite: '#6B5757',
@@ -809,6 +812,38 @@ const SPRITES = {
 
     // Kid in a Cardboard Box: the plainest costume on the street, and the
     // one every kid has worn at least once.
+    lil_timmy: {
+        rows: [
+            '....................',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WGGWWWWWWWWWWGGW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WWKKWWWWWWWWKKWW..',
+            '..WWKKWWWWWWWWKKWW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WWWWWWRRRRWWWWWW..',
+            '..WWWWWWRRRRWWWWWW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WWWMWWWWWWWWMWWW..',
+            '..WWWWMMMMMMMMWWWW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '..WGGWWWWWWWWWWGGW..',
+            '..WWWWWWWWWWWWWWWW..',
+            '....LL........LL....',
+            '...SSS........SSS...'
+        ],
+        palette: {
+            W: C.wood,
+            G: C.woodGrain,
+            K: C.eye,
+            R: C.nose,
+            M: C.eye,
+            L: C.pants,
+            S: C.shoe
+        }
+    },
+
     owen: {
         rows: [
             '................',

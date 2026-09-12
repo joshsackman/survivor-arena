@@ -397,6 +397,7 @@ export class AudioEngine {
         if (/vulture/.test(id)) return 'screech';
         if (/snake/.test(id)) return 'hiss';
         if (/cactus/.test(id)) return 'grandma';
+        if (/lil_timmy/.test(id)) return 'kid';
         if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|pitchy_patchy|ghost|mage/.test(id)) return 'kid';
         return null;
     }
