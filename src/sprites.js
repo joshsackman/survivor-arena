@@ -812,6 +812,66 @@ const SPRITES = {
 
     // Kid in a Cardboard Box: the plainest costume on the street, and the
     // one every kid has worn at least once.
+    player_zombie: {
+        rows: [
+            '................',
+            '.....ZZZZZZ.....',
+            '....ZZZZZZZZ....',
+            '...ZFFFFFFFFZ...',
+            '...ZFKKFFKKFZ...',
+            '...ZFKKFFKKFZ...',
+            '...ZFFFFFFFFZ...',
+            '...ZFFMMMMFFZ...',
+            '..ZZZZZZZZZZZZ..',
+            '.ZZZZZZZZZZZZZZ.',
+            '.ZZZZZZZZZZZZZZ.',
+            '..ZZZZZZZZZZZZ..',
+            '...ZZZ....ZZZ...',
+            '...WWW....WWW...'
+        ],
+        palette: { Z: C.bean, F: C.beanLite, K: C.eye, M: C.eye, W: C.shoe }
+    },
+
+    player_robot: {
+        rows: [
+            '................',
+            '.......AA.......',
+            '....RRRRRRRR....',
+            '....RRRRRRRR....',
+            '....RVVRRVVR....',
+            '....RRRRRRRR....',
+            '....RMMMMMMR....',
+            '..RRRRRRRRRRRR..',
+            '.RRRRRRRRRRRRRR.',
+            '.RRRRVVVVVVRRRR.',
+            '.RRRRRRRRRRRRRR.',
+            '..RRRRRRRRRRRR..',
+            '...RRR....RRR...',
+            '...WWW....WWW...'
+        ],
+        palette: { R: C.metal, A: C.warn, V: C.visor, M: C.oil, W: C.steelDark }
+    },
+
+    player_ghost: {
+        rows: [
+            '................',
+            '.....GGGGGG.....',
+            '....GGGGGGGG....',
+            '...GGGGGGGGGG...',
+            '...GGKKGGKKGG...',
+            '...GGKKGGKKGG...',
+            '...GGGGGGGGGG...',
+            '..GGGGGGGGGGGG..',
+            '.GGGGGGGGGGGGGG.',
+            '.GGGGGGGGGGGGGG.',
+            '.GGGGGGGGGGGGGG.',
+            '.GGGGGGGGGGGGGG.',
+            '.GG.GG..GG.GGG..',
+            '.G...G..G...G...'
+        ],
+        palette: { G: C.sheet, K: C.eye }
+    },
+
     lil_timmy: {
         rows: [
             '....................',

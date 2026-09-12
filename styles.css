@@ -1530,3 +1530,12 @@ body.cb-mode .exp-fill {
     border-radius: 6px;
     font-weight: 700;
 }
+
+/* The costume's bonus, called out on its card in the picker. */
+.skin-perk {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    margin: 2px 0 4px;
+}

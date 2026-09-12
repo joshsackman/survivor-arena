@@ -25,6 +25,7 @@ import {
     Player,
     findEnemyDef,
     registerWeaponClass,
+    setEnemySpeedMult,
     Callout
 } from './entities.js';
 import { Weapon } from './weapons.js';
@@ -58,6 +59,7 @@ import {
     getWavesFor,
     pickWeighted
 } from './stages.js';
+import { getSkin, DEFAULT_SKIN_ID } from './skins.js';
 import { dailyChallenge, saveDailyResult } from './daily.js';
 import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
@@ -189,6 +191,7 @@ export class Game {
         // they last picked. Re-derived in start() so a stage swap mid-session
         // takes effect on the next run.
         this.stageId = this.save?.settings?.stage || DEFAULT_STAGE_ID;
+        this.skinId = this.save?.settings?.skin || DEFAULT_SKIN_ID;
         this.stageWaves = getWavesFor(this.stageId);
         this.stageBosses = getBossesFor(this.stageId);
         this.currentWave = this.stageWaves[0] || WAVES[0];
@@ -222,6 +225,7 @@ export class Game {
         // iter-13: paint the Stage chip on the main menu so a returning
         // player sees which map their next Start Run would launch.
         this.ui.updateStageChip(this.stageId);
+        this.ui.updateSkinChip?.(this.skinId);
 
         // iter-15: tutorial state machine + replay bookkeeping. Both are
         // inert until explicitly engaged by the player (via Try Tutorial /
@@ -520,6 +524,7 @@ export class Game {
             this.startSpeedrun();
         });
         q('btnStage')?.addEventListener('click', () => this.openStagePicker());
+        q('btnSkin')?.addEventListener('click', () => this.openSkinPicker());
         q('btnDaily')?.addEventListener('click', () => {
             this.audio.unlock();
             this.startDaily();
@@ -646,7 +651,7 @@ export class Game {
         const W = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
         const H = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
         const midY = H * 0.5;
-        this.player = new Player(W * 0.3, midY);
+        this.player = new Player(W * 0.3, midY, this.skinId);
         this._updateCamera();
 
         // Neighbours start at their houses and step out into the road.
@@ -775,6 +780,11 @@ export class Game {
         this._bossesSpawned.clear();
         this._bossReturnAt = {};
         this._bossReturns = {};
+        // Trick-doorbell penalties must not follow you into the next run.
+        this._penaltyHpMult = 1;
+        this._penaltyDmgMult = 1;
+        this._penaltySpeedMult = 1;
+        setEnemySpeedMult(1);
         // v2.8: the names are half the joke, so each neighbour gets introduced
         // the first time you meet them in a run.
         this._metNeighbours = new Set();
@@ -820,7 +830,8 @@ export class Game {
 
         this.player = new Player(
             (CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH) / 2,
-            (CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT) / 2
+            (CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT) / 2,
+            this.skinId
         );
         this.player.weapons.push(new Weapon(WEAPONS.WHIP));
         // Snap camera to player at run start so the first frame doesn't show
@@ -904,6 +915,15 @@ export class Game {
     }
 
     /** Show the stage picker overlay; persists the choice via `save.settings.stage`. */
+    openSkinPicker() {
+        this.ui.showSkinPicker?.(this.skinId, (id) => {
+            this.skinId = id;
+            this.save.settings.skin = id;
+            saveSave(this.save);
+            this.ui.updateSkinChip?.(id);
+        });
+    }
+
     openStagePicker() {
         this.ui.showStagePicker(this.stageId, (newStageId) => {
             this.stageId = newStageId;
@@ -1582,10 +1602,14 @@ export class Game {
         // (waves, splitter children, bosses) inherits the +20% on tundra
         // without each call site reaching back into stages.js.
         const stageHpMult = this.stageMods?.enemyHpMult ?? 1;
+        // Trick doorbells stack persistent penalties; they live here so the
+        // per-frame recompute cannot wipe them.
+        const pHp = this._penaltyHpMult || 1;
+        const pDmg = this._penaltyDmgMult || 1;
         return {
             diff,
-            hpMult: diff.hpMult * timeDiff * stageHpMult,
-            dmgMult: diff.dmgMult * timeDiff
+            hpMult: diff.hpMult * timeDiff * stageHpMult * pHp,
+            dmgMult: diff.dmgMult * timeDiff * pDmg
         };
     }
 
@@ -2110,9 +2134,57 @@ export class Game {
         }
     }
 
+    /** Some doorbells are a trick: they make the night worse instead. */
+    _trickDoorbell(bell) {
+        const tricks = [
+            {
+                text: 'OUCH! LESS HEALTH',
+                run: () => {
+                    // Never below 60: a trick should sting, not end the run.
+                    this.player.baseMaxHp = Math.max(60, this.player.baseMaxHp - 15);
+                    this.player.recalculateStats();
+                    this.player.hp = Math.min(this.player.hp, this.player.maxHp);
+                }
+            },
+            {
+                text: 'THEY GOT FASTER!',
+                run: () => {
+                    // Capped at 1.35x: past that the neighbours outrun you and
+                    // there is no way to play around it.
+                    this._penaltySpeedMult = Math.min(
+                        1.35,
+                        (this._penaltySpeedMult || 1) * 1.12
+                    );
+                    setEnemySpeedMult(this._penaltySpeedMult);
+                }
+            },
+            {
+                text: 'THEY GOT STRONGER!',
+                run: () => {
+                    this._penaltyDmgMult = Math.min(1.5, (this._penaltyDmgMult || 1) * 1.12);
+                    this._penaltyHpMult = Math.min(1.4, (this._penaltyHpMult || 1) * 1.1);
+                }
+            }
+        ];
+        const t = tricks[Math.floor(Math.random() * tricks.length)];
+        t.run();
+        this.callouts ??= [];
+        this.callouts.push(
+            new Callout(t.text, bell.x, bell.y - 40, { accent: '#FF6B6B', life: 2.2 })
+        );
+        this.audio.play?.('powerdown');
+        this.shake?.(4);
+        this._announce(`Trick doorbell: ${t.text}`);
+    }
+
     /** A random upgrade from the same pool the level-up screen uses. */
     _ringDoorbell(bell) {
         this.audio.play?.('doorbell');
+        // Roughly one in three is a trick, so ringing one is a gamble.
+        if (Math.random() < 0.34) {
+            this._trickDoorbell(bell);
+            return;
+        }
         const pool = buildUpgradePool(this.player).filter((u) => isUpgradeLive(this.player, u));
         const choice = pickN(pool, 1)[0];
         if (!choice) {

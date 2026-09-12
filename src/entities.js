@@ -16,20 +16,36 @@
  */
 
 import { CONFIG } from './config.js';
+import { getSkin } from './skins.js';
+
+/**
+ * Global enemy speed multiplier, set by main.js. Trick doorbells raise it so
+ * every enemy spawned afterwards is quicker. Lives here because Enemy fixes
+ * its speed at construction and the constructor has no game reference.
+ */
+let _enemySpeedMult = 1;
+export function setEnemySpeedMult(v) {
+    _enemySpeedMult = Number(v) > 0 ? Number(v) : 1;
+}
 import { ENEMIES } from './data.js';
 import { drawSprite } from './sprites.js';
 
 export class Player {
-    constructor(x, y) {
+    constructor(x, y, skinId) {
         this.x = x;
         this.y = y;
         this.size = CONFIG.PLAYER_SIZE;
-        this.baseMaxHp = 100;
+        const skin = getSkin(skinId);
+        this.skin = skin;
+        this.spriteKey = skin.sprite || 'player';
+        this.skinDamageMult = skin.damageMult || 1;
+        this.skinDodge = skin.dodgeBonus || 0;
+        this.baseMaxHp = 100 + (skin.maxHpBonus || 0);
         this.maxHp = this.baseMaxHp;
         this.hp = this.baseMaxHp;
         this.level = 1;
         this.exp = 0;
-        this.expToNext = 50;
+        this.expToNext = 80;
         this.weapons = [];
         this.passives = Object.create(null);
         this.invincible = false;
@@ -117,7 +133,7 @@ export class Player {
     }
 
     getDamageMult() {
-        return this._passiveMult('damageMult');
+        return this._passiveMult('damageMult') * this.skinDamageMult;
     }
     getAreaMult() {
         return this._passiveMult('areaMult');
@@ -159,7 +175,7 @@ export class Player {
      * immortality would break the late-game balance entirely.
      */
     getDodgeChance() {
-        return Math.min(0.6, this._passiveSum('dodgeChance'));
+        return Math.min(0.6, this._passiveSum('dodgeChance') + this.skinDodge);
     }
     /**
      * iter-14: percentage damage reduction (Bulwark). Multiplies *after*
@@ -175,7 +191,7 @@ export class Player {
         while (this.exp >= this.expToNext) {
             this.exp -= this.expToNext;
             this.level++;
-            this.expToNext = Math.floor(this.expToNext * 1.2);
+            this.expToNext = Math.floor(this.expToNext * 1.32);
             this.hp = Math.min(this.hp + 20, this.maxHp);
             levelUps.push(this.level);
         }
@@ -235,7 +251,7 @@ export class Player {
 
         // v2.8: pixel-art kid in a homemade alien costume. The circles below
         // are the fallback for as long as any character lacks art.
-        if (!drawSprite(ctx, 'player', this.x, this.y, this.size * 2.8)) {
+        if (!drawSprite(ctx, this.spriteKey || 'player', this.x, this.y, this.size * 2.8)) {
             ctx.fillStyle = '#9ed98d';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -277,7 +293,7 @@ export class Enemy {
         this.size = type.size;
         this.maxHp = type.hp * hpMult;
         this.hp = this.maxHp;
-        this.speed = type.speed;
+        this.speed = type.speed * _enemySpeedMult;
         this.damage = type.damage * dmgMult;
         this.expValue = type.exp;
         this.color = type.color;

@@ -17,6 +17,7 @@ import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
 import { getStage, listStages } from './stages.js';
+import { getSkin, listSkins } from './skins.js';
 import { buildShareText, dailyStreakSummary, loadDailyHistory } from './daily.js';
 import {
     DEFAULT_KEYMAP,
@@ -67,7 +68,9 @@ export class UI {
             'streakScreen',
             'helpScreen',
             'howToPlayScreen',
-            'btnStageChip'
+            'skinPickerScreen',
+            'btnStageChip',
+            'btnSkinChip'
         ];
         for (const id of ids) this.els[id] = document.getElementById(id);
         // iter-20: harden ARIA on the dynamic overlay hosts. The static
@@ -142,6 +145,51 @@ export class UI {
                 close();
             })
         );
+    }
+
+    /** Costume picker. Same shape as the stage picker so it behaves the same. */
+    showSkinPicker(currentId, onPick) {
+        const m = this.els.skinPickerScreen;
+        if (!m) return;
+        const skins = listSkins();
+        m.innerHTML = `
+            <div class="overlay-card stage-picker-card">
+                <h2>Pick your costume</h2>
+                <div class="stage-grid">
+                    ${skins
+                        .map(
+                            (s) => `
+                            <button class="stage-card ${s.id === currentId ? 'active' : ''}" data-skin="${s.id}">
+                                <div class="stage-icon">${s.icon}</div>
+                                <div class="stage-name">${s.name}</div>
+                                <div class="skin-perk">${s.perk}</div>
+                                <div class="stage-desc">${s.blurb}</div>
+                            </button>`
+                        )
+                        .join('')}
+                </div>
+                <div class="btn-row">
+                    <button id="skinClose" class="btn primary">${t('close')}</button>
+                </div>
+            </div>`;
+        m.style.display = 'flex';
+        const close = () => {
+            m.style.display = 'none';
+        };
+        m.querySelector('#skinClose')?.addEventListener('click', close);
+        m.querySelectorAll('.stage-card').forEach((btn) =>
+            btn.addEventListener('click', () => {
+                onPick && onPick(btn.dataset.skin);
+                close();
+            })
+        );
+    }
+
+    updateSkinChip(id) {
+        if (!this.els.btnSkinChip) return;
+        const s = getSkin(id);
+        this.els.btnSkinChip.textContent = `${s.icon} ${s.name}`;
+        this.els.btnSkinChip.dataset.skin = s.id;
     }
 
     hideStagePicker() {
