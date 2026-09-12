@@ -491,6 +491,22 @@ export const ENEMIES = {
         color: '#E8720C',
         size: 17
     },
+    BULLY: {
+        id: 'bully',
+        name: 'The Big Bully',
+        archetype: 'chaser',
+        // Deliberately NOT in any wave pool: pools pick close to uniformly,
+        // which would make him common. main.js spawns one rarely, on a timer,
+        // and only ever one at a time.
+        hp: 260,
+        // Slow enough to outrun, which is the kids' escape hatch for him.
+        speed: 52,
+        damage: 18,
+        exp: 70,
+        stealsCandy: 2,
+        color: '#B44D4D',
+        size: 30
+    },
     GHOST: {
         id: 'ghost',
         name: 'Kid in a Sheet',

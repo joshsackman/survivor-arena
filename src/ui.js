@@ -313,6 +313,7 @@ export class UI {
             'wolf',
             'pet_cat',
             'pet_chase',
+            'bully',
             'golem',
             'grandma_knit'
         ];

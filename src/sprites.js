@@ -526,6 +526,30 @@ const SPRITES = {
         palette: { G: C.realAlien, K: C.eye, A: C.realGlow }
     },
 
+    // The Big Bully: the one neighbour who takes your candy. Twice the size
+    // of the kids, cap on backwards, already smirking.
+    bully: {
+        rows: [
+            '....CCCCCCCC....',
+            '...CCCCCCCCCC...',
+            '....FFFFFFFF....',
+            '....FKFFFFKF....',
+            '....FFFFFFFF....',
+            '....F.MMMM.F....',
+            '..HHHHHHHHHHHH..',
+            '.HHHHHHHHHHHHHH.',
+            '.HHHHHHHHHHHHHH.',
+            '.HHHHHHHHHHHHHH.',
+            '..HHHHHHHHHHHH..',
+            '...HHHHHHHHHH...',
+            '...PP......PP...',
+            '...PP......PP...',
+            '..WWW......WWW..',
+            '................'
+        ],
+        palette: { C: C.shirt, F: C.neighbourSkin, K: C.eye, M: C.eye, H: C.pants, P: C.hoodie, W: C.shoe }
+    },
+
     // Candy: what the neighbours drop. Three wrappers so a street full of
     // pickups doesn't read as one repeated shape.
     candy1: {

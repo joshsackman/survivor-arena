@@ -31,7 +31,7 @@ import { AudioEngine } from './audio.js';
 import { InputManager } from './input.js';
 import { HapticEngine } from './haptics.js';
 import { loadKeymap, saveKeymap } from './keymap.js';
-import { UI } from './ui.js';
+import { UI, buildUpgradePool, isUpgradeLive, pickN } from './ui.js';
 import { FpsMeter, ShakeCamera } from './systems.js';
 import { SpatialHash } from './spatial-hash.js';
 import { Pool, resetFloatingText, resetParticle } from './pool.js';
@@ -743,6 +743,8 @@ export class Game {
         // the first time you meet them in a run.
         this._metNeighbours = new Set();
         this.callouts = [];
+        this._bullyTimer = 0;
+        this._buildDoorbells();
         this._bossWarnedAt.clear();
         this._spawnAccumulator = 0;
         this._lastAnnouncedWave = null;
@@ -1456,6 +1458,7 @@ export class Game {
         this._updateEnemyProjectiles(dt);
         this._updateMines(dt);
         this._updateExpOrbs(dt);
+        this._updateDoorbells(dt);
         this._maybeTriggerLevelUp();
         this._updateParticlesAndText(dt);
         if (this.callouts?.length) {
@@ -1578,6 +1581,7 @@ export class Game {
             const dy = e.y - this.player.y;
             const d = Math.hypot(dx, dy);
             if (d < e.size + this.player.size && !this.player.invincible) {
+                if (e.type?.stealsCandy) this._stealCandy(e);
                 this.player.takeDamage(e.damage, this);
                 this.createFloatingText(
                     Math.round(e.damage),
@@ -1863,6 +1867,23 @@ export class Game {
             this._spawnOne(wave.pool, hpMult, dmgMult);
         }
 
+        // v2.8: the Big Bully. Deliberately not in any wave pool -- pools pick
+        // near-uniformly, which would make "one huge rare bully" common. One
+        // at a time, first appearing a couple of minutes in.
+        this._bullyTimer = (this._bullyTimer || 0) + dt;
+        if (this.gameTime > 120 && this._bullyTimer > 70 && !this.enemies.some((e) => e.id === 'bully')) {
+            this._bullyTimer = 0;
+            const def = findEnemyDef('bully');
+            if (def) {
+                const a = Math.random() * Math.PI * 2;
+                const aw = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+                const ah = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+                const bx = Math.max(24, Math.min(aw - 24, this.player.x + Math.cos(a) * 620));
+                const by = Math.max(24, Math.min(ah - 24, this.player.y + Math.sin(a) * 620));
+                this.enemies.push(new Enemy(bx, by, def, hpMult, dmgMult));
+            }
+        }
+
         // Boss triggers (warning 5s before). Use the per-stage boss list so
         // stage-specific timing overrides (e.g. crypt's earlier Reaper) fire.
         const bossList =
@@ -1919,6 +1940,135 @@ export class Game {
         const voice = this.audio.voiceFor?.(type.id);
         if (voice) this.audio.play?.(voice);
         this._announce(`${type.name} ahead`);
+    }
+
+    /**
+     * The Big Bully knocks candy out of your pillowcase. It is not deleted --
+     * it scatters back onto the street, so it stings but you can chase it
+     * down, which keeps him annoying rather than punishing.
+     */
+    _stealCandy(bully) {
+        const pieces = bully.type.stealsCandy || 2;
+        const each = 12;
+        const taken = Math.min(this.player.exp, pieces * each);
+        this.player.exp = Math.max(0, this.player.exp - taken);
+        for (let i = 0; i < pieces; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const d = 90 + Math.random() * 70;
+            this.dropExp(this.player.x + Math.cos(a) * d, this.player.y + Math.sin(a) * d, each);
+        }
+        this.createFloatingText('CANDY!', this.player.x, this.player.y - 52, '#FF4B4B', {
+            size: 18,
+            crit: true,
+            life: 1.2
+        });
+        this.audio.play?.('bully');
+        this.haptics?.hurt?.();
+    }
+
+    /**
+     * v2.8: doorbells. One per porch, one ring each -- ring it and you get a
+     * random upgrade, never shown in advance. Positions mirror the house
+     * layout in _drawStreet so a bell always sits on a real doorstep.
+     */
+    _buildDoorbells() {
+        const W = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+        const H = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+        const roadTop = H * 0.28;
+        const roadH = H * 0.44;
+        const roadBottom = roadTop + roadH;
+        const walk = 26;
+        const spacing = 330;
+        const hw = 230;
+        const hh = 150;
+        const bells = [];
+        for (let i = 0; i * spacing + 44 <= W - 140; i++) {
+            const hx = i * spacing + 44;
+            for (const side of [0, 1]) {
+                const top = side === 0 ? roadTop - walk - 54 - hh : roadBottom + walk + 54;
+                const front = side === 0 ? top + hh : top;
+                const doorY = side === 0 ? front - 31 : front + 45;
+                bells.push({ x: hx + hw / 2 + 34, y: doorY, used: false, t: Math.random() * 6 });
+            }
+        }
+        this.doorbells = bells;
+    }
+
+    /**
+     * A lit button on every porch, pulsing so it reads as "press me". Once a
+     * house has been rung it goes dark, which is how you see at a glance
+     * which doors are left.
+     */
+    _renderDoorbells(ctx) {
+        if (!this.doorbells?.length) return;
+        const cx = this.camera.worldX;
+        const cy = this.camera.worldY;
+        const vw = CONFIG.CANVAS_WIDTH;
+        const vh = CONFIG.CANVAS_HEIGHT;
+        for (const b of this.doorbells) {
+            if (b.x < cx - 40 || b.x > cx + vw + 40 || b.y < cy - 40 || b.y > cy + vh + 40) continue;
+            if (b.used) {
+                ctx.fillStyle = 'rgba(120,130,160,0.5)';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                continue;
+            }
+            const pulse = 0.5 + Math.sin(b.t * 3) * 0.5;
+            const glow = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 26);
+            glow.addColorStop(0, `rgba(255,200,48,${0.25 + pulse * 0.25})`);
+            glow.addColorStop(1, 'rgba(255,200,48,0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(b.x - 26, b.y - 26, 52, 52);
+            ctx.fillStyle = '#1A1F3A';
+            ctx.fillRect(b.x - 7, b.y - 9, 14, 18);
+            ctx.fillStyle = pulse > 0.5 ? '#FFF04D' : '#FFC830';
+            ctx.fillRect(b.x - 4, b.y - 5, 8, 8);
+        }
+    }
+
+    /** Ring when the player reaches a porch, once per house. */
+    _updateDoorbells(dt) {
+        if (!this.doorbells?.length || !this.player) return;
+        for (const b of this.doorbells) {
+            b.t += dt;
+            if (b.used) continue;
+            const dx = b.x - this.player.x;
+            const dy = b.y - this.player.y;
+            if (dx * dx + dy * dy > 46 * 46) continue;
+            b.used = true;
+            this._ringDoorbell(b);
+        }
+    }
+
+    /** A random upgrade from the same pool the level-up screen uses. */
+    _ringDoorbell(bell) {
+        this.audio.play?.('doorbell');
+        const pool = buildUpgradePool(this.player).filter((u) => isUpgradeLive(this.player, u));
+        const choice = pickN(pool, 1)[0];
+        if (!choice) {
+            this.player.hp = Math.min(this.player.maxHp, this.player.hp + 25);
+            this.createFloatingText('+25 HP', bell.x, bell.y - 30, '#8EE06B', { size: 16, crit: true });
+            return;
+        }
+        this._applyUpgradeSilently(choice);
+        this.callouts ??= [];
+        this.callouts.push(
+            new Callout(`${choice.data.icon || ''} ${choice.data.name}!`.trim(), bell.x, bell.y - 40, {
+                accent: '#FFC830',
+                life: 2.2
+            })
+        );
+        this.audio.play?.('pickupRare');
+        this.effects.levelUp?.(bell.x, bell.y);
+        this._announce(`Doorbell: ${choice.data.name}`);
+    }
+
+    /** _applyUpgrade closes the level-up dialog; the doorbell has none. */
+    _applyUpgradeSilently(choice) {
+        const prevState = this.state;
+        this._applyUpgrade(choice);
+        this.state = prevState;
     }
 
     _spawnOne(pool, hpMult, dmgMult) {
@@ -2089,6 +2239,7 @@ export class Game {
         ctx.translate(-this.camera.worldX + this.camera.x, -this.camera.worldY + this.camera.y);
 
         this._drawStreet();
+        this._renderDoorbells(ctx);
 
         for (const o of this.expOrbs) o.render(ctx);
         for (const m of this.mines) m.render(ctx);
