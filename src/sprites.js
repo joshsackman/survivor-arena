@@ -1176,6 +1176,17 @@ export function spriteDataUrl(key, targetH = 64) {
 }
 
 /** Every character that currently has art, for the roster screen. */
+/**
+ * Raw pixel data for a sprite: the row strings and the resolved palette.
+ * Used by tools/make-og-image.mjs to draw the share card outside a browser.
+ * @returns {{rows: string[], palette: Record<string,string>}|null}
+ */
+export function spriteData(key) {
+    const s = SPRITES[key];
+    if (!s) return null;
+    return { rows: s.rows.slice(), palette: { ...s.palette } };
+}
+
 export function spriteKeys() {
     return Object.keys(SPRITES);
 }
