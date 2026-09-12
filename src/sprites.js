@@ -22,31 +22,39 @@
 // Shared costume palette. Kept small on purpose: a handful of colours across
 // every character reads as one world.
 const C = {
-    alien: '#9ed98d',
-    alienDark: '#6aa25f',
-    eye: '#0c0a12',
-    sheet: '#f4f1e4',
-    hairBrown: '#6b4a2f',
-    hairGrey: '#d6cfe4',
-    skin: '#e8b48c',
-    dadBlue: '#5b8fd9',
-    momPink: '#e26fa8',
-    wine: '#8e1d3f',
-    cardigan: '#b9a7d6',
-    metal: '#9aa0ad',
-    shoe: '#f2f0e6',
-    kidYellow: '#ffb703',
-    mask: '#d9d2c4',
-    glass: '#2b2b33',
-    hoodie: '#8a6fd6',
-    dogBrown: '#b06a2c',
-    dogSnout: '#f2e3cf',
-    eggShirt: '#6fae6a',
-    egg: '#f7e7a1',
-    pumpkin: '#ff7518',
-    pumpkinDark: '#c94f08',
-    stem: '#5f8a3a',
-    inflate: '#9be8c9'
+    // Brand palette from the art direction sheet.
+    alien: '#8EE06B',
+    alienShadow: '#3E7F3B',
+    alienGlow: '#A7FFEB',
+    skin: '#FBD7B7',
+    skinShadow: '#C68F6F',
+    hairBrown: '#4E2F1E',
+    hairGrey: '#C8CCD6',
+    eye: '#1A1F3A',
+    sheet: '#F8F8F8',
+    shoe: '#F8F8F8',
+    neighbourSkin: '#F1D0C6',
+    shirt: '#B44D4D',
+    pants: '#3B3B3B',
+    flashlight: '#FFEE9C',
+    rake: '#C47A2F',
+    momPink: '#E8709E',
+    wine: '#8B1E2D',
+    cardigan: '#9B5CFF',
+    metal: '#C8CCD6',
+    glass: '#1A1F3A',
+    hoodie: '#49577A',
+    dogBrown: '#C47A2F',
+    dogSnout: '#FBD7B7',
+    eggShirt: '#3E7F3B',
+    egg: '#FFEE9C',
+    pumpkin: '#E8720C',
+    pumpkinDark: '#A8460A',
+    stem: '#3E7F3B',
+    inflate: '#A7FFEB',
+    kidYellow: '#FFC830',
+    mask: '#F1D0C6',
+    dadBlue: '#B44D4D'
 };
 
 /** rows: one string per pixel row (all the same length). */
@@ -55,25 +63,26 @@ const SPRITES = {
     // head is too big and the arms don't match, because it was made in a garage.
     player: {
         rows: [
-            '.....GGGGGG.....',
+            '..A........A....',
+            '...A......A.....',
             '....GGGGGGGG....',
             '...GGGGGGGGGG...',
-            '...GGKKGGKKGG...',
-            '...GGKKGGKKGG...',
-            '...GGGGGGGGGG...',
+            '...GGFFFFFFGG...',
+            '...GGFKFFKFGG...',
+            '...GGFFFFFFGG...',
             '....GGGGGGGG....',
-            '......GGGG......',
-            '...G..GGGG..G...',
-            '..GG.GGGGGG.GG..',
-            '...G.GGGGGG.G...',
-            '.....GGGGGG.....',
-            '.....GG..GG.....',
-            '.....GG..GG.....',
-            '....WWW..WWW....',
+            '...GGGGGGGGGG...',
+            '..GGGGGGGGGGGG..',
+            '..GGGGGGGGGGGG..',
+            '...GGGGGGGGGG...',
+            '....GG....GG....',
+            '....GG....GG....',
+            '...WWW....WWW...',
             '................'
         ],
-        palette: { G: C.alien, K: C.eye, W: C.shoe }
+        palette: { A: C.alienGlow, G: C.alien, F: C.skin, K: C.eye, W: C.shoe }
     },
+
 
     // Grandma (golem): slow, hunched, unstoppable. The walker is the tell.
     golem: {
@@ -271,7 +280,7 @@ const SPRITES = {
             '..WBBBBBW..',
             '...W...W...'
         ],
-        palette: { W: '#ffe9a8', B: '#e8354f', C: '#ff8fa0' }
+        palette: { W: '#FFEE9C', B: '#FF5E5E', C: '#FFC9C9' }
     },
     candy2: {
         rows: [
@@ -282,7 +291,7 @@ const SPRITES = {
             '..WBBBBBW..',
             '...W...W...'
         ],
-        palette: { W: '#ffe9a8', B: '#ff7518', C: '#ffc16b' }
+        palette: { W: '#FFEE9C', B: '#FFC830', C: '#FFF04D' }
     },
     candy3: {
         rows: [
@@ -293,7 +302,7 @@ const SPRITES = {
             '..WBBBBBW..',
             '...W...W...'
         ],
-        palette: { W: '#ffe9a8', B: '#7b3fc4', C: '#c39bf0' }
+        palette: { W: '#FFEE9C', B: '#9B5CFF', C: '#C9A8FF' }
     },
 
     // Kid in a Sheet (ghost): two eye holes, ragged hem.

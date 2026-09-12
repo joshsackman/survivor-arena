@@ -32,9 +32,9 @@ test('iter14 stages: tundra is registered and exposed by listStages', () => {
     assert.equal(STAGES.TUNDRA.id, 'tundra');
 });
 
-test('iter14 stages: tundra background uses cold green-grey palette #1e2b26', () => {
+test('iter14 stages: tundra background uses brand Area 51 palette #0D1A16', () => {
     const bg = getBackgroundFor('tundra');
-    assert.equal(bg.fill.toLowerCase(), '#1e2b26');
+    assert.equal(bg.fill.toLowerCase(), '#0D1A16');
     assert.ok(bg.gridAlpha > 0 && bg.gridAlpha < 0.2);
 });
 

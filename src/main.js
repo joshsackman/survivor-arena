@@ -589,7 +589,13 @@ export class Game {
     start() {
         this.state = GameState.PLAYING;
         // v2.8: tell the player why the whole street is chasing them.
-        this.ui.showStreetShout?.('NICE COSTUME, KID! GET THE ALIEN!');
+        this.ui.showStreetShout?.('NICE COSTUME, KID!', 1400);
+        clearTimeout(this._openingBeat);
+        this._openingBeat = setTimeout(() => {
+            if (this.state === GameState.PLAYING) {
+                this.ui.showStreetShout?.("WAIT - THAT'S NOT A COSTUME!", 2600);
+            }
+        }, 1450);
         this.gameTime = 0;
         this.kills = 0;
         this.enemies = [];
@@ -1907,13 +1913,15 @@ export class Game {
         const vh = CONFIG.CANVAS_HEIGHT;
         const area51 = this.stageId === 'tundra';
 
+        // Environment ramp from the art direction sheet: night sky, deep
+        // shadow, asphalt, sidewalk, house, window light.
         const P = area51
-            ? { lawn: '#1b2620', walk: '#33403a', road: '#232b28', line: '#63786b',
-                walls: ['#28332f', '#2f3a35', '#243029'], roof: '#1b2422',
-                win: '#9be8c9', dark: '#1a2320', door: '#1f2a26', pumpkin: '#7cf2b0' }
-            : { lawn: '#1d2a1c', walk: '#3a3145', road: '#2a2233', line: '#6b5a7a',
-                walls: ['#33264a', '#3d2a42', '#2b2340'], roof: '#1d1529',
-                win: '#ffb703', dark: '#241b33', door: '#4a2d1f', pumpkin: '#ff7518' };
+            ? { lawn: '#12201C', walk: '#3A5A50', road: '#22332C', line: '#5E8A78',
+                walls: ['#2C4A40', '#365648', '#243B34'], roof: '#16241F',
+                win: '#A7FFEB', dark: '#16241F', door: '#1C2E28', pumpkin: '#8EE06B' }
+            : { lawn: '#1A1F3A', walk: '#49577A', road: '#2E3556', line: '#6B7DA0',
+                walls: ['#6B7DA0', '#5A6B8C', '#7A8CB0'], roof: '#1A1F3A',
+                win: '#FFD37A', dark: '#2E3556', door: '#4E2F1E', pumpkin: '#E8720C' };
 
         // Lawn under everything, covering exactly the visible window.
         ctx.fillStyle = P.lawn;
