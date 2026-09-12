@@ -829,6 +829,9 @@ export const BOSSES = {
         boss: true,
         // Throws heavy scrap that explodes where it lands.
         ability: 'scrap',
+        // He comes back every two minutes, tougher each time. Without this a
+        // boss spawns once per run and is never seen again.
+        repeatEvery: 120,
         spawnAt: 630
     },
     // --- v2.4 mid/late bosses --------------------------------------------

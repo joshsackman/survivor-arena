@@ -178,6 +178,8 @@ export class Game {
         this.achievements = new AchievementTracker(this.save);
 
         this._bossesSpawned = new Set();
+        this._bossReturnAt = {};
+        this._bossReturns = {};
         this._spawnAccumulator = 0;
         this._bossWarnedAt = new Set();
         this._lastAnnouncedWave = null;
@@ -770,6 +772,8 @@ export class Game {
         this.floatingTexts = [];
         this.mines = [];
         this._bossesSpawned.clear();
+        this._bossReturnAt = {};
+        this._bossReturns = {};
         // v2.8: the names are half the joke, so each neighbour gets introduced
         // the first time you meet them in a run.
         this._metNeighbours = new Set();
@@ -1932,6 +1936,21 @@ export class Game {
             }
             if (this.gameTime >= boss.spawnAt && !this._bossesSpawned.has(boss.id)) {
                 this._bossesSpawned.add(boss.id);
+                this._bossReturnAt[boss.id] = boss.repeatEvery
+                    ? this.gameTime + boss.repeatEvery
+                    : 0;
+                this._spawnBoss(boss, hpMult, dmgMult);
+            } else if (
+                boss.repeatEvery &&
+                this._bossesSpawned.has(boss.id) &&
+                this._bossReturnAt[boss.id] &&
+                this.gameTime >= this._bossReturnAt[boss.id]
+            ) {
+                // No extra multiplier here: hpMult already carries the
+                // engine's time ramp, so each return is stiffer than the last
+                // on its own. Stacking a second scalar made him unkillable.
+                this._bossReturns[boss.id] = (this._bossReturns[boss.id] || 0) + 1;
+                this._bossReturnAt[boss.id] = this.gameTime + boss.repeatEvery;
                 this._spawnBoss(boss, hpMult, dmgMult);
             }
         }

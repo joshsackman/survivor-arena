@@ -203,7 +203,9 @@ export const STAGES = Object.freeze({
             ghost: 0.4
         },
         extraEnemies: ['rusty_bot', 'scrap_drone'],
-        bossOffsets: {},
+        // Rob is the reason you came to the junkyard, so he arrives at 3:00
+        // instead of inheriting the 10-minute slot nobody ever reached.
+        bossOffsets: { void_lord: -420 },
         bossOverrides: { void_lord: 'robot_rob' }
     })
 });
