@@ -442,7 +442,7 @@ export class Game {
         const scale = getTouchButtonScale(this.save);
         const base = 140;
         const knob = 58;
-        const special = 96;
+        const special = 60;
         const root = document.documentElement.style;
         root.setProperty('--touch-button-size', `${Math.round(base * scale)}px`);
         root.setProperty('--touch-knob-size', `${Math.round(knob * scale)}px`);

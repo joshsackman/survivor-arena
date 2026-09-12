@@ -566,15 +566,17 @@ canvas {
 /* Special-skill button — mirrors the joystick on the bottom-right. */
 .special-skill-btn {
     position: absolute;
-    bottom: 100px;
-    right: 30px;
+    /* v2.8: smaller, fainter and tucked lower so it stops competing with the
+       playfield now that the canvas goes edge-to-edge on touch. */
+    bottom: 26px;
+    right: 18px;
     width: var(--touch-special-size);
     height: var(--touch-special-size);
     border-radius: 50%;
-    background: rgba(120, 80, 200, 0.25);
-    color: #fff;
-    border: 2px solid rgba(180, 140, 255, 0.55);
-    font-size: 36px;
+    background: rgba(120, 80, 200, 0.12);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(180, 140, 255, 0.22);
+    font-size: 20px;
     line-height: 1;
     display: none;
     pointer-events: auto;
@@ -582,7 +584,7 @@ canvas {
     cursor: pointer;
 }
 .special-skill-btn:active {
-    background: rgba(160, 110, 240, 0.4);
+    background: rgba(160, 110, 240, 0.3);
 }
 
 @media (hover: none) and (pointer: coarse) {

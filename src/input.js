@@ -217,7 +217,16 @@ export class InputManager {
         };
         const start = (e) => {
             if (dragId !== null) return;
-            if (e.target?.closest?.('button, .special-skill-btn, .pwa-install-prompt')) return;
+            // Never hijack a touch that lands on UI: `.overlay` covers every
+            // menu (start, level-up, pause, help), so tapping an upgrade card
+            // still produces a real click instead of being preventDefault'ed
+            // into a movement drag.
+            if (
+                e.target?.closest?.(
+                    '.overlay, button, a, input, select, label, [role="menuitem"], .upgrade-option, .special-skill-btn, .pwa-install-prompt'
+                )
+            )
+                return;
             const t = e.changedTouches[0];
             if (!t) return;
             dragId = t.identifier;
