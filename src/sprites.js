@@ -1017,19 +1017,19 @@ const SPRITES = {
             '..BBBBBBBBBB..',
             '.BBBBBBBBBBBB.',
             '.BBBBBBBBBBBB.',
-            '.BB.EE..EE.BB.',
-            '.BB.EE..EE.BB.',
-            '.BBBBBBBBBBBB.',
-            '.BB.M....M.BB.',
-            '.BB..MMMM..BB.',
+            '.BBEEBBBBEEBB.',
+            '.BBEEBBBBEEBB.',
             '.BBBBBBBBBBBB.',
             '.BBBBBBBBBBBB.',
+            '.BBM......MBB.',
+            '.BBMM....MMBB.',
+            '.BB.MMMMMM.BB.',
             '.BBBBBBBBBBBB.',
             '..BBBBBBBBBB..',
             '...LL....LL...',
             '..WWW....WWW..'
         ],
-        palette: { B: C.rake, E: C.bark, M: C.bark, L: C.pants, W: C.shoe }
+        palette: { B: C.rake, E: C.eye, M: C.eye, L: C.pants, W: C.shoe }
     },
 
 
