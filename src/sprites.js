@@ -562,6 +562,27 @@ const SPRITES = {
         palette: { W: '#FFEE9C', B: '#9B5CFF', C: '#C9A8FF' }
     },
 
+    // Kid in a Cardboard Box: the plainest costume on the street, and the
+    // one every kid has worn at least once.
+    box_kid: {
+        rows: [
+            '....FFFF....',
+            '...FKFFKF...',
+            '....FFFF....',
+            '..BBBBBBBB..',
+            '.BBBBBBBBBB.',
+            '.BBBBBBBBBB.',
+            '.BBTTTTTTBB.',
+            '.BBBBBBBBBB.',
+            '.BBBBBBBBBB.',
+            '..BBBBBBBB..',
+            '...LL..LL...',
+            '...LL..LL...',
+            '..WWW..WWW..'
+        ],
+        palette: { F: C.neighbourSkin, K: C.eye, B: C.rake, T: C.bark, L: C.pants, W: C.shoe }
+    },
+
     // Kid in a Sheet (ghost): two eye holes, ragged hem.
     ghost: {
         rows: [

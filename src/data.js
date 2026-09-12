@@ -469,6 +469,17 @@ export const ENEMIES = {
         color: '#9B5CFF',
         size: 26
     },
+    BOX_KID: {
+        id: 'box_kid',
+        name: 'Kid in a Cardboard Box',
+        archetype: 'chaser',
+        hp: 24,
+        speed: 74,
+        damage: 12,
+        exp: 14,
+        color: '#C47A2F',
+        size: 16
+    },
     GHOST: {
         id: 'ghost',
         name: 'Kid in a Sheet',
@@ -572,7 +583,7 @@ export const BOSSES = {
         damage: 40,
         exp: 500,
         color: '#35502e',
-        size: 48,
+        size: 36,
         boss: true,
         ability: 'summon',
         spawnAt: 300 // 5 minutes
@@ -585,7 +596,7 @@ export const BOSSES = {
         damage: 60,
         exp: 1200,
         color: '#4a2d1f',
-        size: 64,
+        size: 46,
         boss: true,
         ability: 'charge',
         spawnAt: 600 // 10 minutes
@@ -599,7 +610,7 @@ export const BOSSES = {
         damage: 50,
         exp: 850,
         color: '#5b1f3f',
-        size: 54,
+        size: 40,
         boss: true,
         ability: 'summon',
         spawnAt: 450 // 7:30
@@ -612,7 +623,7 @@ export const BOSSES = {
         damage: 75,
         exp: 2000,
         color: '#2b3a1c',
-        size: 72,
+        size: 50,
         boss: true,
         ability: 'charge',
         spawnAt: 720 // 12:00
@@ -630,7 +641,7 @@ export const BOSSES = {
         damage: 60,
         exp: 1300,
         color: '#7cf2b0',
-        size: 66,
+        size: 44,
         boss: true,
         ability: 'charge',
         // Listed at 660 to keep the BOSSES timeline strictly ascending
@@ -649,8 +660,8 @@ export const BOSSES = {
 // back to the final entry once gameTime exceeds the last window.
 // ---------------------------------------------------------------------------
 export const WAVES = [
-    { from: 0, to: 30, pool: ['bat', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
-    { from: 30, to: 60, pool: ['bat', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
+    { from: 0, to: 30, pool: ['bat', 'box_kid', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
+    { from: 30, to: 60, pool: ['bat', 'box_kid', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
     {
         from: 60,
         to: 90,

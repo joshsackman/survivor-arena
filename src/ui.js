@@ -700,10 +700,16 @@ export class UI {
         }, ms);
     }
 
-    showBossBanner() {
+    /**
+     * v2.8: name the boss. "A boss approaches" wastes the best joke in the
+     * game; "THE LAWN GUY IS HERE" does not. Falls back to the generic line
+     * when no name is passed.
+     */
+    showBossBanner(name) {
         if (!this.els.bossBanner) return;
-        this._activeBannerKey = 'bossIncoming';
-        this.els.bossBanner.textContent = t('bossIncoming');
+        this._activeBannerKey = name ? null : 'bossIncoming';
+        this.els.bossBanner.classList.remove('shout');
+        this.els.bossBanner.textContent = name ? `${String(name).toUpperCase()} IS HERE` : t('bossIncoming');
         this.els.bossBanner.classList.add('visible');
         clearTimeout(this._bannerTimer);
         this._bannerTimer = setTimeout(() => {

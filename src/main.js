@@ -1707,8 +1707,15 @@ export class Game {
         if (this._metNeighbours.has(type.id)) return;
         this._metNeighbours.add(type.id);
         const boss = !!type.boss;
-        // Keep the nameplate inside the viewport: a boss spawning near an
-        // arena edge would otherwise have its name drawn off-screen.
+        // Bosses get the banner ("THE LAWN GUY IS HERE"), which says it
+        // louder and in a place that never collides with the HUD. A second
+        // floating nameplate for them was redundant, and when a boss spawned
+        // off-camera the clamp parked it on top of the kill counter.
+        if (boss) {
+            this._announce(`${type.name} is here`);
+            return;
+        }
+        // Keep the nameplate inside the viewport for neighbours.
         const vw = CONFIG.CANVAS_WIDTH;
         const vh = CONFIG.CANVAS_HEIGHT;
         const pad = boss ? 150 : 90;
@@ -1758,7 +1765,7 @@ export class Game {
         const y = this.player.y + Math.sin(angle) * d;
         this.enemies.push(new Enemy(x, y, bossDef, hpMult, dmgMult));
         this._introduceNeighbour(bossDef, x, y);
-        this.ui.showBossBanner();
+        this.ui.showBossBanner(bossDef.name);
         this.audio.bossSpawn();
         this.effects.bossSpawn();
         // iter-15 polish: bump boss-spawn camera shake by +50% (0.8 → 1.2).
