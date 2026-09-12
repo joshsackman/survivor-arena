@@ -181,6 +181,30 @@ export const STAGES = Object.freeze({
         },
         extraEnemies: ['duppy', 'pitchy_patchy'],
         bossOffsets: {}
+    }),
+    // ----------------------------------------------------------------------
+    // Robot Junkyard — screws instead of candy, and Robot Rob at the end.
+    // Rob replaces the 10-minute boss here only, the same mechanism the Ice
+    // Queen uses on Area 51, so he never turns up on another stage.
+    // ----------------------------------------------------------------------
+    JUNKYARD: Object.freeze({
+        id: 'junkyard',
+        name: 'Robot Junkyard',
+        icon: '🤖',
+        description: 'Crushed cars and screws underfoot. Robot Rob runs this scrapyard.',
+        background: { fill: '#2A2B30', gridAlpha: 0.07 },
+        musicStyle: 'junkyard',
+        poolOverrides: {
+            rusty_bot: 2.2,
+            scrap_drone: 2.0,
+            bat: 0.5,
+            zombie: 0.5,
+            skeleton: 0.5,
+            ghost: 0.4
+        },
+        extraEnemies: ['rusty_bot', 'scrap_drone'],
+        bossOffsets: {},
+        bossOverrides: { void_lord: 'robot_rob' }
     })
 });
 
@@ -197,7 +221,7 @@ export function getStage(id) {
 
 /** Stable ordering for the stage picker UI. */
 export function listStages() {
-    return [STAGES.FOREST, STAGES.CRYPT, STAGES.TUNDRA, STAGES.JAMAICA];
+    return [STAGES.FOREST, STAGES.CRYPT, STAGES.TUNDRA, STAGES.JAMAICA, STAGES.JUNKYARD];
 }
 
 /**
@@ -269,7 +293,7 @@ export function getBossesFor(id) {
     // and never on their own. Currently just IceQueen (tundra-exclusive).
     // Skipping these on stages that don't override into them keeps the
     // forest/crypt boss timelines pristine.
-    const overrideOnlyIds = new Set(['ice_queen']);
+    const overrideOnlyIds = new Set(['ice_queen', 'robot_rob']);
 
     const out = [];
     for (const b of Object.values(BOSSES)) {

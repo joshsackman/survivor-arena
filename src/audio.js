@@ -381,6 +381,7 @@ export class AudioEngine {
         if (/^pet_cat$/.test(id)) return 'cat';
         if (/wolf|pet_/.test(id)) return 'dog';
         if (/duppy/.test(id)) return 'grandma';
+        if (/rusty_bot|scrap_drone|robot_rob/.test(id)) return 'ufo';
         if (/bat|box_kid|pumpkin_kid|bean_always|freddy|jump_scare|owen|pitchy_patchy|ghost|mage/.test(id)) return 'kid';
         return null;
     }
@@ -462,15 +463,37 @@ export class AudioEngine {
                 bass: [0, 0, 0, 0, -2, -2, -2, -2, -4, -4, -4, -4, -2, -2, -2, -2],
                 turnaround: [12, 7, 3, 0]
             },
-            // Jamaica: offbeat skank. The chord stabs fall on the off beats
-            // (steps 2, 6, 10, 14) and the bass walks underneath them.
+            // Jamaica: the skank. What makes reggae recognisable is a CHORD
+            // landing on the off beat while beat one is left open, over a bass
+            // that carries the tune. Its own root (196, a fourth below the
+            // other stages) and a square lead keep it clear of the triangle
+            // bass, so it doesn't blur into the Halloween themes.
             jamaica: {
-                stepMs: 116,
-                root: 262,
-                wave: 'triangle',
-                melody: [null, 7, null, 4, null, 7, null, 12, null, 9, null, 7, null, 4, null, 7],
-                bass: [0, null, null, 0, -5, null, null, -5, -3, null, null, -3, -5, null, -5, null],
-                turnaround: [7, 5, 4, 0]
+                stepMs: 122,
+                root: 196,
+                wave: 'square',
+                // Beat one stays open; the melody answers between the stabs.
+                melody: [null, null, 12, null, null, null, 10, 12, null, null, 15, null, null, null, 12, 10],
+                // Three-note stabs on every off beat -- the skank itself.
+                chord: [
+                    null, [0, 4, 7], null, [0, 4, 7],
+                    null, [0, 3, 7], null, [0, 3, 7],
+                    null, [-2, 2, 5], null, [-2, 2, 5],
+                    null, [0, 4, 7], null, [0, 4, 7]
+                ],
+                // The bass is the lead voice: round, walking, always moving.
+                bass: [0, null, 0, 7, 5, null, 5, 0, -2, null, -2, 5, 3, null, 0, 2],
+                turnaround: [12, 10, 7, 0]
+            },
+            // Robot Junkyard: machinery. A low square drone with a clanking
+            // two-note riff on top -- mechanical and repetitive on purpose.
+            junkyard: {
+                stepMs: 108,
+                root: 147,
+                wave: 'square',
+                melody: [0, 12, 0, 7, null, 12, 0, 7, 0, 15, 0, 10, null, 15, 10, 7],
+                bass: [0, 0, null, 0, -5, -5, null, -5, -3, -3, null, -3, 0, 0, 0, 0],
+                turnaround: [15, 12, 7, 0]
             },
             boss: {
                 stepMs: 92,
@@ -547,6 +570,16 @@ export class AudioEngine {
 
             // Layer 1 (always): melody + bass.
             note(T.melody[step % len], { vol: 0.05, dur: T.stepMs / 1000 + 0.04 });
+            // Offbeat chord stabs, for themes that define them (Jamaica's
+            // skank). Short and quiet so they punctuate rather than drone.
+            if (T.chord) {
+                const stab = T.chord[step % T.chord.length];
+                if (stab) {
+                    for (const semi of stab) {
+                        note(semi, { vol: 0.03, dur: 0.085, wave: 'square' });
+                    }
+                }
+            }
             note(T.bass[step % T.bass.length], {
                 root: T.root / 2,
                 wave: 'triangle',

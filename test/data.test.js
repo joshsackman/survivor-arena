@@ -64,7 +64,7 @@ test('data: v2.4 bosses are on a strictly increasing timeline', () => {
     }
     // Reaper 300, Owen 375, Necromancer 450, Void Lord 600, IceQueen 660
     // (iter-14 tundra-only), Chrono Lich 720.
-    assert.deepEqual(spawns, [300, 375, 450, 600, 660, 720]);
+    assert.deepEqual(spawns, [300, 375, 450, 600, 630, 660, 720]);
 });
 
 test('data: every boss has hp/damage/exp/size/color and boss flag', () => {

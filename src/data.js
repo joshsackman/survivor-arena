@@ -443,6 +443,36 @@ export const ENEMIES = {
         color: '#3B3B3B',
         size: 13
     },
+    RUSTY_BOT: {
+        id: 'rusty_bot',
+        name: 'Rusty Bot',
+        archetype: 'chaser',
+        hp: 44,
+        speed: 70,
+        damage: 16,
+        exp: 22,
+        color: '#8A4B2A',
+        size: 16
+    },
+    SCRAP_DRONE: {
+        id: 'scrap_drone',
+        name: 'Scrap Drone',
+        archetype: 'ranged',
+        // Hangs back and throws bolts at you.
+        ranged: true,
+        firingRange: 330,
+        keepDistance: 210,
+        projectileSpeed: 290,
+        projectileDamage: 9,
+        projectileKind: 'bolt',
+        fireCooldown: 2.3,
+        hp: 26,
+        speed: 150,
+        damage: 7,
+        exp: 24,
+        color: '#8A8F98',
+        size: 14
+    },
     DUPPY: {
         id: 'duppy',
         name: 'Duppy',
@@ -499,7 +529,7 @@ export const ENEMIES = {
     },
     FREDDY: {
         id: 'freddy',
-        name: 'Freddy',
+        name: 'Freddie',
         archetype: 'ranged',
         // Quick on the board, and sprays from a distance rather than touching
         // you -- so you have to keep moving instead of tanking him.
@@ -784,6 +814,22 @@ export const BOSSES = {
         // Drops pixels around the street that hurt to stand in.
         ability: 'pixels',
         spawnAt: 375 // 6:15
+    },
+    ROBOT_ROB: {
+        id: 'robot_rob',
+        name: 'Robot Rob',
+        // The hardest boss in the game: more HP and more damage than the
+        // Giant Tree, which was the previous ceiling.
+        hp: 14000,
+        speed: 66,
+        damage: 90,
+        exp: 2000,
+        color: '#8A8F98',
+        size: 52,
+        boss: true,
+        // Throws heavy scrap that explodes where it lands.
+        ability: 'scrap',
+        spawnAt: 630
     },
     // --- v2.4 mid/late bosses --------------------------------------------
     NECROMANCER: {

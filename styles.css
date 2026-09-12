@@ -1512,3 +1512,13 @@ body.cb-mode .exp-fill {
 .roster-card.boss {
     border-color: var(--accent);
 }
+
+/* The kids who designed the game, on the home screen. */
+.designers {
+    margin: 14px 0 0;
+    text-align: center;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-size: 0.86rem;
+}

@@ -685,8 +685,11 @@ export class EnemyProjectile {
 
     /** Yolk everywhere, and a small blast that hurts if you are standing in it. */
     _splat(game) {
-        if (this.kind !== 'egg' && this.kind !== 'paint') return;
-        if (this.kind === 'paint') {
+        if (this.kind !== 'egg' && this.kind !== 'paint' && this.kind !== 'bolt') return;
+        if (this.kind === 'bolt') {
+            game.createParticles?.(this.x, this.y, '#8A8F98', 12);
+            game.createParticles?.(this.x, this.y, '#FFC72C', 6);
+        } else if (this.kind === 'paint') {
             game.createParticles?.(this.x, this.y, '#FF4FD8', 12);
             game.createParticles?.(this.x, this.y, '#4FC3F7', 6);
         } else {
@@ -700,8 +703,10 @@ export class EnemyProjectile {
         const d = Math.hypot(this.x - p.x, this.y - p.y);
         if (d <= this.splatRadius) {
             p.takeDamage(this.splatDamage, game);
-            const word = this.kind === 'paint' ? 'SPRAYED!' : 'SPLAT!';
-            const hue = this.kind === 'paint' ? '#FF4FD8' : '#FFEE9C';
+            const word =
+                this.kind === 'bolt' ? 'CLANG!' : this.kind === 'paint' ? 'SPRAYED!' : 'SPLAT!';
+            const hue =
+                this.kind === 'bolt' ? '#FFC72C' : this.kind === 'paint' ? '#FF4FD8' : '#FFEE9C';
             game.createFloatingText(word, p.x, p.y - 46, hue, {
                 size: 15,
                 crit: true,
@@ -719,6 +724,18 @@ export class EnemyProjectile {
             ctx.fillRect(-5, -7, 10, 14);
             ctx.fillStyle = '#FFEE9C';
             ctx.fillRect(-3, -7, 6, 4);
+            ctx.restore();
+            return;
+        }
+        if (this.kind === 'bolt') {
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.spin + this.life * 7);
+            ctx.fillStyle = '#8A8F98';
+            ctx.fillRect(-7, -3, 14, 6);
+            ctx.fillStyle = '#5A6069';
+            ctx.fillRect(-7, -3, 5, 6);
+            ctx.fillStyle = '#FFC72C';
+            ctx.fillRect(4, -2, 3, 4);
             ctx.restore();
             return;
         }

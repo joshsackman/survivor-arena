@@ -312,6 +312,8 @@ export class UI {
             'jump_scare',
             'duppy',
             'pitchy_patchy',
+            'rusty_bot',
+            'scrap_drone',
             'slime',
             'slimeling',
             'illusionist',

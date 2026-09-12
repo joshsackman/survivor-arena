@@ -67,6 +67,12 @@ const C = {
     wheel: '#E8E8E8',
     realAlien: '#3FD6C5',
     jaGold: '#FFC72C',
+    rust: '#8A4B2A',
+    steel: '#8A8F98',
+    steelDark: '#5A6069',
+    visor: '#4FC3F7',
+    oil: '#22252B',
+    warn: '#FFC72C',
     jaGreen: '#009B3A',
     jaBlack: '#101820',
     patty: '#E8A317',
@@ -655,6 +661,51 @@ const SPRITES = {
 
     // Candy: what the neighbours drop. Three wrappers so a street full of
     // pickups doesn't read as one repeated shape.
+    screw: {
+        rows: [
+            '..SSSSSSS..',
+            '..SNNNNNS..',
+            '..SSSSSSS..',
+            '...SSSSS...',
+            '....SSS....',
+            '.....S.....'
+        ],
+        palette: { S: C.steel, N: C.steelDark }
+    },
+    bolt: {
+        rows: [
+            '...BBBBB...',
+            '..BBBBBBB..',
+            '..BB...BB..',
+            '..BB...BB..',
+            '..BBBBBBB..',
+            '...BBBBB...'
+        ],
+        palette: { B: C.steel }
+    },
+    gear: {
+        rows: [
+            '..G.G.G.G..',
+            '.GGGGGGGGG.',
+            '..GGG.GGG..',
+            '..GG...GG..',
+            '.GGGGGGGGG.',
+            '..G.G.G.G..'
+        ],
+        palette: { G: C.rust }
+    },
+    battery: {
+        rows: [
+            '....TT.....',
+            '..EEEEEEE..',
+            '..EYYYYYE..',
+            '..EYYYYYE..',
+            '..EEEEEEE..',
+            '...........'
+        ],
+        palette: { T: C.steel, E: C.steelDark, Y: C.warn }
+    },
+
     patty: {
         rows: [
             '...........',
@@ -701,12 +752,14 @@ const SPRITES = {
     },
     ja_flag: {
         rows: [
-            'GGGKKKKKGGG',
-            'YGGGKKKGGGY',
-            'YYGGGKGGGYY',
-            'YYGGGKGGGYY',
-            'YGGGKKKGGGY',
-            'GGGKKKKKGGG'
+            'YYGGGGGGGGGGGGYY',
+            'KKYYGGGGGGGGYYKK',
+            'KKKKYYGGGGYYKKKK',
+            'KKKKKKYYYYKKKKKK',
+            'KKKKKKYYYYKKKKKK',
+            'KKKKYYGGGGYYKKKK',
+            'KKYYGGGGGGGGYYKK',
+            'YYGGGGGGGGGGGGYY'
         ],
         palette: { G: C.jaGreen, K: C.jaBlack, Y: C.jaGold }
     },
@@ -774,6 +827,70 @@ const SPRITES = {
             L: C.pants,
             W: C.shoe
         }
+    },
+
+    rusty_bot: {
+        rows: [
+            '................',
+            '.......TT.......',
+            '....RRRRRRRR....',
+            '....RRRRRRRR....',
+            '....RVVRRVVR....',
+            '....RRRRRRRR....',
+            '....RMMMMMMR....',
+            '..RRRRRRRRRRRR..',
+            '..RRRRRRRRRRRR..',
+            '..RRRVVVVVVRRR..',
+            '..RRRRRRRRRRRR..',
+            '....RRRRRRRR....',
+            '....RR....RR....',
+            '...WWW....WWW...'
+        ],
+        palette: { R: C.rust, T: C.steel, V: C.visor, M: C.oil, W: C.steelDark }
+    },
+
+    scrap_drone: {
+        rows: [
+            '................',
+            '..P..........P..',
+            '.PPPP......PPPP.',
+            '..P..........P..',
+            '....PPPPPPPP....',
+            '.....DDDDDD.....',
+            '....DDDDDDDD....',
+            '....DVVDDVVD....',
+            '....DDDDDDDD....',
+            '.....DDDDDD.....',
+            '......DDDD......',
+            '.......DD.......',
+            '................',
+            '................'
+        ],
+        palette: { P: C.steel, D: C.steelDark, V: C.visor }
+    },
+
+    robot_rob: {
+        rows: [
+            '....................',
+            '.........TT.........',
+            '......RRRRRRRR......',
+            '.....RRRRRRRRRR.....',
+            '.....RVVVVVVVVR.....',
+            '.....RRRRRRRRRR.....',
+            '......RMMMMMMR......',
+            '...RRRRRRRRRRRRRR...',
+            '..RRRRRRRRRRRRRRRR..',
+            '..RRRRRVVVVRRRRRRR..',
+            '..RRRRRVVVVRRRRRRR..',
+            '..RRRRRRRRRRRRRRRR..',
+            '...RRRRRRRRRRRRRR...',
+            '......RRRRRRRR......',
+            '.....RRRR..RRRR.....',
+            '.....RRRR..RRRR.....',
+            '....WWWWW..WWWWW....',
+            '....................'
+        ],
+        palette: { R: C.steel, T: C.warn, V: C.visor, M: C.oil, W: C.rust }
     },
 
     duppy: {

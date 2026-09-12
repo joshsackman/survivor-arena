@@ -607,6 +607,7 @@ export class Game {
         if (this.stageId === 'crypt') return 'haunted';
         if (this.stageId === 'tundra') return 'area51';
         if (this.stageId === 'jamaica') return 'jamaica';
+        if (this.stageId === 'junkyard') return 'junkyard';
         return 'street';
     }
 
@@ -2180,6 +2181,7 @@ export class Game {
     }
     /** What the drops look like on this stage. Jamaica hands out real food. */
     _dropArt() {
+        if (this.stageId === 'junkyard') return ['screw', 'bolt', 'gear', 'battery'];
         if (this.stageId !== 'jamaica') return null;
         // The flag turns up now and then among the food.
         return Math.random() < 0.12
@@ -2262,6 +2264,22 @@ export class Game {
                 );
             }
             this.createParticles(boss.x, boss.y, '#aa33ff', 20);
+        } else if (boss.ability === 'scrap') {
+            // A fan of heavy scrap flung at the player. Each piece explodes.
+            const base = Math.atan2(this.player.y - boss.y, this.player.x - boss.x);
+            for (let i = -2; i <= 2; i++) {
+                const a = base + i * 0.22;
+                this.enemyProjectiles.push(
+                    new EnemyProjectile(boss.x, boss.y, a, 250, 26 * (this.enemyDmgMult || 1), {
+                        kind: 'bolt',
+                        splatRadius: 78,
+                        splatDamage: 20 * (this.enemyDmgMult || 1)
+                    })
+                );
+            }
+            this.createParticles(boss.x, boss.y, '#8A8F98', 18);
+            this.audio?.play?.('shoot');
+            this.shake?.(5);
         } else if (boss.ability === 'pixels') {
             // Scatters pixels around himself that hurt to stand in.
             for (let i = 0; i < 7; i++) {
@@ -2389,6 +2407,7 @@ export class Game {
         const area51 = stage === 'tundra';
         const haunted = stage === 'crypt';
         const jamaica = stage === 'jamaica';
+        const junkyard = stage === 'junkyard';
 
         // Same layout everywhere -- the road, its edges and the turning circle
         // are the arena the gameplay is tuned around. What changes per stage is
@@ -2414,6 +2433,12 @@ export class Game {
                 lawn: '#1B5E3A', walk: '#E8DCC0', road: '#6E6F78', line: '#FFC72C',
                 walls: ['#E8720C', '#00A6A6', '#FFC72C'], roof: '#8A9BA8',
                 win: '#FFF1B8', dark: '#2A3A33', door: '#7A3B1E', trim: '#009B3A'
+            },
+            // Robot Junkyard: oil-stained dirt, stacks of crushed cars.
+            junkyard: {
+                lawn: '#3A3227', walk: '#5A5A5F', road: '#4A4A50', line: '#FFC72C',
+                walls: ['#8A4B2A', '#5A6069', '#7A6A4A'], roof: '#8A8F98',
+                win: '#4FC3F7', dark: '#22252B', door: '#3A3F45', trim: '#FFC72C'
             },
             // Area 51: bunkers dug into the property, not houses.
             tundra: {
@@ -2569,6 +2594,40 @@ export class Game {
                         ctx.strokeStyle = '#0E7A3C';
                         ctx.stroke();
                     }
+                } else if (junkyard) {
+                    // A stack of crushed cars instead of a house: three
+                    // squashed slabs, an oil drum and a hanging work light.
+                    const slabH = Math.floor(hh / 3);
+                    for (let s2 = 0; s2 < 3; s2++) {
+                        const sw = hw - s2 * 26;
+                        const sx = hx + s2 * 13;
+                        const sy = top + s2 * slabH;
+                        ctx.fillStyle = P.walls[(hash + s2) % P.walls.length];
+                        ctx.fillRect(sx, sy, sw, slabH - 5);
+                        // Squashed windows down the side of each wreck.
+                        ctx.fillStyle = P.dark;
+                        for (let k = 0; k < 4; k++) {
+                            ctx.fillRect(sx + 14 + k * (sw / 4.4), sy + 5, sw / 8, slabH - 18);
+                        }
+                    }
+                    // Oil drum on the kerb.
+                    const dx2 = hx + hw - 34;
+                    const dy2 = side === 0 ? front + 10 : front - 56;
+                    ctx.fillStyle = P.trim;
+                    ctx.fillRect(dx2, dy2, 26, 44);
+                    ctx.fillStyle = P.dark;
+                    ctx.fillRect(dx2, dy2 + 12, 26, 5);
+                    ctx.fillRect(dx2, dy2 + 28, 26, 5);
+                    // Work light on a pole, washing the scrap.
+                    const lx = hx + 26;
+                    const ly = side === 0 ? front + 8 : front - 8;
+                    ctx.fillStyle = P.walk;
+                    ctx.fillRect(lx, side === 0 ? front - 70 : front + 12, 5, 62);
+                    const g3 = ctx.createRadialGradient(lx, ly, 0, lx, ly, 120);
+                    g3.addColorStop(0, 'rgba(79,195,247,0.16)');
+                    g3.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = g3;
+                    ctx.fillRect(lx - 120, ly - 120, 240, 240);
                 } else if (area51) {
                     // A bunker: low concrete, blast door, hazard stripes and a
                     // floodlight washing the apron in front of it.
