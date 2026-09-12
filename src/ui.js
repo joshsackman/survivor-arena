@@ -420,10 +420,7 @@ export class UI {
                         }
                     </div>
                 </section>
-                <textarea id="lbJson" class="lb-json" rows="4" aria-label="${t('paste')}" placeholder='${t('paste')}'></textarea>
                 <div class="btn-row">
-                    <button id="lbExport" class="btn ghost">${t('export')}</button>
-                    <button id="lbImport" class="btn ghost">${t('import')}</button>
                     <button id="lbClose" class="btn primary">${t('close')}</button>
                 </div>
             </div>`;
@@ -433,22 +430,6 @@ export class UI {
             onClose && onClose();
         };
         m.querySelector('#lbClose')?.addEventListener('click', close);
-        const ta = m.querySelector('#lbJson');
-        m.querySelector('#lbExport')?.addEventListener('click', () => {
-            if (ta) ta.value = JSON.stringify({ normal: normalScores, speedrun: speedrunScores });
-        });
-        m.querySelector('#lbImport')?.addEventListener('click', () => {
-            if (!ta?.value?.trim()) return;
-            try {
-                const parsed = JSON.parse(ta.value);
-                // Caller wires the merge into storage; here we just fire an event.
-                const ev = new CustomEvent('vs-leaderboard-import', { detail: parsed });
-                window.dispatchEvent(ev);
-            } catch (err) {
-                console.warn('[ui] Import JSON parse failed', err);
-                ta.value = 'Invalid JSON: ' + err.message;
-            }
-        });
     }
 
     hideLeaderboard() {
