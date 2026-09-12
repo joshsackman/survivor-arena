@@ -54,7 +54,14 @@ const C = {
     inflate: '#A7FFEB',
     kidYellow: '#FFC830',
     mask: '#F1D0C6',
-    dadBlue: '#B44D4D'
+    dadBlue: '#B44D4D',
+    mower: '#B44D4D',
+    mowerDark: '#8B1E2D',
+    bark: '#4E2F1E',
+    leaves: '#3E7F3B',
+    realAlien: '#3FD6C5',
+    realAlienDark: '#0F8B8A',
+    realGlow: '#A7FFEB'
 };
 
 /** rows: one string per pixel row (all the same length). */
@@ -397,6 +404,126 @@ const SPRITES = {
             '..............'
         ],
         palette: { V: C.hairGrey, F: C.neighbourSkin, G: C.glass, C: C.cardigan, N: C.momPink, L: C.pants, W: C.shoe }
+    },
+
+    // ---- Bosses -------------------------------------------------------
+    // The Lawn Guy: it is the mower that makes him frightening.
+    reaper: {
+        rows: [
+            '.......CCCCCC.......',
+            '......CCCCCCCC......',
+            '.......FFFFFF.......',
+            '.......FKFFKF.......',
+            '.......FFFFFF.......',
+            '......SSSSSSSS......',
+            '.....SSSSSSSSSS.....',
+            '.....SSSSSSSSSS.....',
+            '......PPPPPPPP......',
+            '......PP....PP......',
+            '......PP....PP......',
+            '.....WWW....WWW.....',
+            '....................',
+            '..MMMMMMMMMMMMMMMM..',
+            '..MMMMMMMMMMMMMMMM..',
+            '..MGGGGGGGGGGGGGGM..',
+            '..MMMMMMMMMMMMMMMM..',
+            '...TT..........TT...'
+        ],
+        palette: { C: C.shirt, F: C.neighbourSkin, K: C.eye, S: C.eggShirt, P: C.pants, W: C.shoe, M: C.mower, G: C.metal, T: C.eye }
+    },
+
+    // The Big Dog: not a pet. Takes up the whole street.
+    void_lord: {
+        rows: [
+            '..EE..............EE..',
+            '..EEEE..........EEEE..',
+            '..BBBBBBBBBBBBBBBBBB..',
+            '..BYYBBBBBBBBBBBBYYB..',
+            '..BBBBBWWWWWWBBBBBBB..',
+            '.BBBBBBBWWWWBBBBBBBBB.',
+            'BBBBBBBBBBBBBBBBBBBBBB',
+            'BBBBBBBBBBBBBBBBBBBBBB',
+            'BBBBBBBBBBBBBBBBBBBBBB',
+            '.BBBBBBBBBBBBBBBBBBBB.',
+            '.BBB...BBB..BBB...BBB.',
+            '.BBB...BBB..BBB...BBB.',
+            '......................'
+        ],
+        palette: { E: C.bark, B: C.bark, Y: '#FFF04D', W: C.sheet }
+    },
+
+    // Book Club President: sash, big hair, glass raised the entire fight.
+    necromancer: {
+        rows: [
+            '......DDDDDD......',
+            '.....DDDDDDDD.....',
+            '.....DFFFFFFD.....',
+            '.....FKFFKF.......',
+            '.....FFFFFF.......',
+            '....PPPPPPPP..RR..',
+            '...PPPPPPPPPP.RR..',
+            '...PPPPPPPPPP..R..',
+            '...PPPPPPPPPP.....',
+            '....PPPPPPPP......',
+            '....PP....PP......',
+            '....PP....PP......',
+            '...WWW....WWW.....',
+            '..................'
+        ],
+        palette: { D: C.hairBrown, F: C.neighbourSkin, K: C.eye, P: C.momPink, R: C.wine, W: C.shoe }
+    },
+
+    // The Giant Tree: the yard tree, awake, with a face in the bark.
+    chrono_lich: {
+        rows: [
+            '....LLLLLLLLLLLL....',
+            '..LLLLLLLLLLLLLLLL..',
+            '.LLLLLLLLLLLLLLLLLL.',
+            '.LLLLLLLLLLLLLLLLLL.',
+            '..LLLLLLLLLLLLLLLL..',
+            '....LLLLLLLLLLLL....',
+            '.......TTTTTT.......',
+            '.......TKTTKT.......',
+            '.......TTTTTT.......',
+            '.....TTTTTTTTTT.....',
+            '.B...TTTTTTTTTT...B.',
+            '.BB..TTTTTTTTTT..BB.',
+            '..B..TTTTTTTTTT..B..',
+            '.....TTTTTTTTTT.....',
+            '.....TTTTTTTTTT.....',
+            '....TTTTTTTTTTTT....',
+            '...TTTTTTTTTTTTTT...',
+            '..TTTTTTTTTTTTTTTT..'
+        ],
+        palette: { L: C.leaves, T: C.bark, K: '#FFF04D', B: C.bark }
+    },
+
+    // THE REAL ALIEN: tall, smooth and wrong. Nothing like the kid's lumpy
+    // homemade suit -- that contrast is the whole ending.
+    ice_queen: {
+        rows: [
+            '.......GGGG.......',
+            '.....GGGGGGGG.....',
+            '....GGGGGGGGGG....',
+            '...GGGGGGGGGGGG...',
+            '...GGKKKGGKKKGG...',
+            '...GGKKKGGKKKGG...',
+            '...GGKKKGGKKKGG...',
+            '....GGGGGGGGGG....',
+            '.....GGGGGGGG.....',
+            '.......GGGG.......',
+            '.......GGGG.......',
+            '....A..GGGG..A....',
+            '...AA.GGGGGG.AA...',
+            '..AA..GGGGGG..AA..',
+            '......GGGGGG......',
+            '......GGGGGG......',
+            '......GG..GG......',
+            '......GG..GG......',
+            '.....GGG..GGG.....',
+            '..................'
+        ],
+        palette: { G: C.realAlien, K: C.eye, A: C.realGlow }
     },
 
     // Candy: what the neighbours drop. Three wrappers so a street full of

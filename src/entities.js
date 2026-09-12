@@ -515,23 +515,25 @@ export class Enemy {
             // iter-14: IceQueen wears a frosty cyan halo + a faint inner ring
             // so she reads as "the ice variant" at a glance even from across
             // the arena. Other bosses keep the original magenta crown.
+            // v2.8: bosses are pixel characters now, so a ring centred on
+            // them cut straight across the face. The marker sits at their
+            // feet instead -- still unmistakable, no longer covering the art.
+            const footY = this.y + this.size * 1.15;
+            const rx = this.size * 1.1;
+            const ry = Math.max(3, this.size * 0.34);
+            const ringFor = (stroke, width, scale) => {
+                ctx.strokeStyle = stroke;
+                ctx.lineWidth = width;
+                ctx.beginPath();
+                ctx.ellipse(this.x, footY, rx * scale, ry * scale, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            };
             if (this.type?.iceQueen) {
-                ctx.strokeStyle = 'rgba(170,220,255,0.85)';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.strokeStyle = 'rgba(220,240,255,0.45)';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size + 10, 0, Math.PI * 2);
-                ctx.stroke();
+                ringFor('rgba(167,255,235,0.9)', 3, 1);
+                ringFor('rgba(63,214,197,0.45)', 1.5, 1.22);
             } else {
-                ctx.strokeStyle = '#ff33aa';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size + 4, 0, Math.PI * 2);
-                ctx.stroke();
+                ringFor('rgba(255,75,75,0.85)', 3, 1);
+                ringFor('rgba(255,75,75,0.35)', 1.5, 1.22);
             }
         }
         ctx.restore();

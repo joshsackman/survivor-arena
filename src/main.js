@@ -606,6 +606,9 @@ export class Game {
         this.floatingTexts = [];
         this.mines = [];
         this._bossesSpawned.clear();
+        // v2.8: the names are half the joke, so each neighbour gets introduced
+        // the first time you meet them in a run.
+        this._metNeighbours = new Set();
         this._bossWarnedAt.clear();
         this._spawnAccumulator = 0;
         this._lastAnnouncedWave = null;
@@ -1694,6 +1697,38 @@ export class Game {
         }
     }
 
+    /**
+     * v2.8: name a neighbour the first time they turn up in a run. Bosses get
+     * their own banner already, so they are announced bigger and higher.
+     */
+    _introduceNeighbour(type, x, y) {
+        if (!type?.name) return;
+        this._metNeighbours ??= new Set();
+        if (this._metNeighbours.has(type.id)) return;
+        this._metNeighbours.add(type.id);
+        const boss = !!type.boss;
+        // Keep the nameplate inside the viewport: a boss spawning near an
+        // arena edge would otherwise have its name drawn off-screen.
+        const vw = CONFIG.CANVAS_WIDTH;
+        const vh = CONFIG.CANVAS_HEIGHT;
+        const pad = boss ? 150 : 90;
+        const cx = Math.min(
+            Math.max(x, this.camera.worldX + pad),
+            this.camera.worldX + vw - pad
+        );
+        const cy = Math.min(
+            Math.max(y - (type.size || 16) - 18, this.camera.worldY + 46),
+            this.camera.worldY + vh - 40
+        );
+        this.createFloatingText(type.name, cx, cy, boss ? '#FF4B4B' : '#FFC830', {
+            life: boss ? 2.6 : 2.1,
+            vy: -18,
+            size: boss ? 26 : 17,
+            crit: true
+        });
+        this._announce(`${type.name} ahead`);
+    }
+
     _spawnOne(pool, hpMult, dmgMult) {
         // Speedrun + Daily both want determinism; either uses speedrunRng.
         const rng =
@@ -1713,6 +1748,7 @@ export class Game {
         const x = Math.max(24, Math.min(aw - 24, this.player.x + Math.cos(angle) * dist));
         const y = Math.max(24, Math.min(ah - 24, this.player.y + Math.sin(angle) * dist));
         this.enemies.push(new Enemy(x, y, type, hpMult, dmgMult));
+        this._introduceNeighbour(type, x, y);
     }
 
     _spawnBoss(bossDef, hpMult, dmgMult) {
@@ -1721,6 +1757,7 @@ export class Game {
         const x = this.player.x + Math.cos(angle) * d;
         const y = this.player.y + Math.sin(angle) * d;
         this.enemies.push(new Enemy(x, y, bossDef, hpMult, dmgMult));
+        this._introduceNeighbour(bossDef, x, y);
         this.ui.showBossBanner();
         this.audio.bossSpawn();
         this.effects.bossSpawn();
