@@ -687,12 +687,12 @@ export const BOSSES = {
 // back to the final entry once gameTime exceeds the last window.
 // ---------------------------------------------------------------------------
 export const WAVES = [
-    { from: 0, to: 30, pool: ['bat', 'box_kid', 'pumpkin_kid', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
-    { from: 30, to: 60, pool: ['bat', 'box_kid', 'pumpkin_kid', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
+    { from: 0, to: 30, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost'], spawnMult: 1.0, label: 'Opening' },
+    { from: 30, to: 60, pool: ['bat', 'box_kid', 'pumpkin_kid', 'ghost', 'zombie'], spawnMult: 1.1, label: 'Wave 2' },
     {
         from: 60,
         to: 90,
-        pool: ['zombie', 'dad_rake', 'skeleton', 'mom_workout', 'mage'],
+        pool: ['zombie', 'dad_polo', 'dad_rake', 'skeleton', 'mom_workout', 'mage', 'box_kid'],
         spawnMult: 1.15,
         label: 'Teens'
     },

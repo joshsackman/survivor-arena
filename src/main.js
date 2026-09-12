@@ -2317,17 +2317,36 @@ export class Game {
         const cy = this.camera.worldY;
         const vw = CONFIG.CANVAS_WIDTH;
         const vh = CONFIG.CANVAS_HEIGHT;
-        const area51 = this.stageId === 'tundra';
+        const stage = this.stageId;
+        const area51 = stage === 'tundra';
+        const haunted = stage === 'crypt';
 
-        // Environment ramp from the art direction sheet: night sky, deep
-        // shadow, asphalt, sidewalk, house, window light.
-        const P = area51
-            ? { lawn: '#12201C', walk: '#3A5A50', road: '#22332C', line: '#5E8A78',
-                walls: ['#2C4A40', '#365648', '#243B34'], roof: '#16241F',
-                win: '#A7FFEB', dark: '#16241F', door: '#1C2E28', pumpkin: '#8EE06B' }
-            : { lawn: '#1A1F3A', walk: '#49577A', road: '#2E3556', line: '#6B7DA0',
+        // Same layout everywhere -- the road, its edges and the turning circle
+        // are the arena the gameplay is tuned around. What changes per stage is
+        // what lines the sides of it.
+        const PALETTES = {
+            forest: {
+                lawn: '#1A1F3A', walk: '#49577A', road: '#2E3556', line: '#6B7DA0',
                 walls: ['#6B7DA0', '#5A6B8C', '#7A8CB0'], roof: '#1A1F3A',
-                win: '#FFD37A', dark: '#2E3556', door: '#4E2F1E', pumpkin: '#E8720C' };
+                win: '#FFD37A', dark: '#2E3556', door: '#4E2F1E', trim: '#E8720C'
+            },
+            // Inside the haunted house: a corridor with rooms off it.
+            crypt: {
+                // Lifted well above the stage fill: at the first values the
+                // rooms sank into the floor and the corridor read as a black
+                // band with nothing either side of it.
+                lawn: '#241733', walk: '#3A2547', road: '#4A3528', line: '#7A5C42',
+                walls: ['#5A3F6B', '#6B4A7D', '#4C3459'], roof: '#2A1B38',
+                win: '#FFB703', dark: '#2A1B38', door: '#7A4A22', trim: '#9B5CFF'
+            },
+            // Area 51: bunkers dug into the property, not houses.
+            tundra: {
+                lawn: '#12201C', walk: '#3A5A50', road: '#2A3A33', line: '#5E8A78',
+                walls: ['#33443D', '#3D5049', '#2B3A34'], roof: '#1B2B26',
+                win: '#A7FFEB', dark: '#16241F', door: '#1C2E28', trim: '#8EE06B'
+            }
+        };
+        const P = PALETTES[stage] || PALETTES.forest;
 
         // Lawn under everything, covering exactly the visible window.
         ctx.fillStyle = P.lawn;
@@ -2347,9 +2366,11 @@ export class Game {
         ctx.fillRect(cx, roadTop, vw, roadH);
 
         // Turning circle at the closed end.
-        const bulbX = W - H * 0.26;
+        // The bulb is a turning circle, not a plaza: at 0.26 of arena height
+        // it filled half the viewport.
+        const bulbX = W - H * 0.16;
         const bulbY = roadTop + roadH / 2;
-        const bulbR = H * 0.26;
+        const bulbR = H * 0.15;
         if (bulbX + bulbR + walk > cx && bulbX - bulbR - walk < cx + vw) {
             ctx.fillStyle = P.walk;
             ctx.beginPath();
@@ -2389,67 +2410,129 @@ export class Game {
                 const front = side === 0 ? top + hh : top;
                 if (top + hh + 60 < cy || top - 60 > cy + vh) continue;
 
-                // Driveway from the porch to the sidewalk.
-                ctx.fillStyle = P.walk;
-                const driveX = hx + hw - 70;
-                if (side === 0) ctx.fillRect(driveX, front, 54, 54);
-                else ctx.fillRect(driveX, front - 54, 54, 54);
-
-                // Porch light pooling on the lawn.
-                const lightY = side === 0 ? front + 30 : front - 30;
-                const glow = ctx.createRadialGradient(hx + 60, lightY, 0, hx + 60, lightY, 130);
-                glow.addColorStop(0, area51 ? 'rgba(155,232,201,0.22)' : 'rgba(255,183,3,0.20)');
-                glow.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = glow;
-                ctx.fillRect(hx + 60 - 130, lightY - 130, 260, 260);
-
-                // Walls.
-                ctx.fillStyle = wall;
-                ctx.fillRect(hx, top, hw, hh);
-
-                // Gable roof, pitched away from the street.
-                ctx.fillStyle = P.roof;
-                ctx.beginPath();
-                if (side === 0) {
-                    ctx.moveTo(hx - 16, top);
-                    ctx.lineTo(hx + hw + 16, top);
-                    ctx.lineTo(hx + hw / 2, top - 54);
-                } else {
-                    ctx.moveTo(hx - 16, top + hh);
-                    ctx.lineTo(hx + hw + 16, top + hh);
-                    ctx.lineTo(hx + hw / 2, top + hh + 54);
-                }
-                ctx.closePath();
-                ctx.fill();
-
-                // Chimney on some houses.
-                if ((hash & 4) === 0) {
-                    ctx.fillRect(hx + hw - 56, side === 0 ? top - 46 : top + hh + 18, 22, 30);
-                }
-
-                // Windows, lit or dark, fixed per house. Cross frames keep
-                // them reading as windows at a glance.
-                for (let wI = 0; wI < 2; wI++) {
-                    const lit = ((hash >> (wI + 1)) & 1) === 1;
-                    const wx = hx + 24 + wI * 118;
-                    const wy = side === 0 ? top + 30 : top + hh - 78;
-                    ctx.fillStyle = lit ? P.win : P.dark;
-                    ctx.fillRect(wx, wy, 62, 48);
-                    ctx.fillStyle = P.roof;
-                    ctx.fillRect(wx + 28, wy, 6, 48);
-                    ctx.fillRect(wx, wy + 21, 62, 6);
-                }
-
-                // Door on the street-facing wall, with a step and pumpkins.
                 const doorX = hx + hw / 2 - 24;
                 const doorY = side === 0 ? front - 62 : front + 14;
-                ctx.fillStyle = P.door;
-                ctx.fillRect(doorX, doorY, 48, 62);
-                ctx.fillStyle = P.win;
-                ctx.fillRect(doorX + 36, doorY + 30, 6, 6);
-                ctx.fillStyle = P.pumpkin;
-                ctx.fillRect(doorX - 26, doorY + 40, 20, 20);
-                ctx.fillRect(doorX + 56, doorY + 44, 14, 14);
+
+                if (haunted) {
+                    // A room off the corridor: papered wall, a dark doorway,
+                    // a candle in the window and a cobweb in one corner.
+                    ctx.fillStyle = wall;
+                    ctx.fillRect(hx, top, hw, hh);
+                    ctx.fillStyle = P.roof;
+                    ctx.fillRect(hx, side === 0 ? top : top + hh - 10, hw, 10);
+                    // Wallpaper stripes.
+                    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                    for (let k = 0; k < 6; k++) ctx.fillRect(hx + 12 + k * 38, top + 14, 10, hh - 28);
+                    // Candlelight through the gap.
+                    const lit = (hash & 1) === 1;
+                    ctx.fillStyle = lit ? P.win : P.dark;
+                    ctx.fillRect(hx + 28, side === 0 ? top + 34 : top + hh - 74, 44, 40);
+                    if (lit) {
+                        const g2 = ctx.createRadialGradient(hx + 50, side === 0 ? top + 54 : top + hh - 54, 0, hx + 50, side === 0 ? top + 54 : top + hh - 54, 90);
+                        g2.addColorStop(0, 'rgba(255,183,3,0.18)');
+                        g2.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = g2;
+                        ctx.fillRect(hx - 40, top - 40, hw + 80, hh + 80);
+                    }
+                    // Cobweb in the upper corner.
+                    ctx.strokeStyle = 'rgba(244,241,228,0.18)';
+                    ctx.lineWidth = 1.5;
+                    for (let r = 10; r <= 30; r += 10) {
+                        ctx.beginPath();
+                        ctx.arc(hx + hw - 8, side === 0 ? top + 8 : top + hh - 8, r, 0, Math.PI / 2);
+                        ctx.stroke();
+                    }
+                    // Doorway into the corridor.
+                    ctx.fillStyle = P.dark;
+                    ctx.fillRect(doorX - 6, doorY, 60, 62);
+                    ctx.fillStyle = P.door;
+                    ctx.fillRect(doorX, doorY, 48, 62);
+                    ctx.fillStyle = P.trim;
+                    ctx.fillRect(doorX + 36, doorY + 30, 6, 6);
+                } else if (area51) {
+                    // A bunker: low concrete, blast door, hazard stripes and a
+                    // floodlight washing the apron in front of it.
+                    const bh = hh - 26;
+                    const btop = side === 0 ? top + 26 : top;
+                    ctx.fillStyle = P.walk;
+                    ctx.fillRect(hx - 10, btop - 8, hw + 20, bh + 16);
+                    ctx.fillStyle = wall;
+                    ctx.fillRect(hx, btop, hw, bh);
+                    ctx.fillStyle = P.roof;
+                    ctx.fillRect(hx, side === 0 ? btop : btop + bh - 14, hw, 14);
+                    // Hazard stripes along the front lip.
+                    for (let k = 0; k < 8; k++) {
+                        ctx.fillStyle = k % 2 ? P.trim : P.dark;
+                        ctx.fillRect(hx + 8 + k * 27, side === 0 ? btop + bh - 12 : btop + 2, 22, 8);
+                    }
+                    // Floodlight cone onto the apron.
+                    const fy = side === 0 ? btop + bh + 30 : btop - 30;
+                    const g2 = ctx.createRadialGradient(hx + hw / 2, fy, 0, hx + hw / 2, fy, 150);
+                    g2.addColorStop(0, 'rgba(167,255,235,0.16)');
+                    g2.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = g2;
+                    ctx.fillRect(hx + hw / 2 - 150, fy - 150, 300, 300);
+                    // Blast door, split down the middle.
+                    ctx.fillStyle = P.door;
+                    ctx.fillRect(doorX - 4, doorY, 56, 62);
+                    ctx.fillStyle = P.dark;
+                    ctx.fillRect(doorX + 22, doorY, 4, 62);
+                    ctx.fillStyle = P.win;
+                    ctx.fillRect(doorX + 40, doorY + 26, 6, 10);
+                } else {
+                    // The cul-de-sac: houses, porches, pumpkins.
+                    ctx.fillStyle = P.walk;
+                    const driveX = hx + hw - 70;
+                    if (side === 0) ctx.fillRect(driveX, front, 54, 54);
+                    else ctx.fillRect(driveX, front - 54, 54, 54);
+
+                    const lightY = side === 0 ? front + 30 : front - 30;
+                    const glow = ctx.createRadialGradient(hx + 60, lightY, 0, hx + 60, lightY, 130);
+                    glow.addColorStop(0, 'rgba(255,183,3,0.20)');
+                    glow.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = glow;
+                    ctx.fillRect(hx + 60 - 130, lightY - 130, 260, 260);
+
+                    ctx.fillStyle = wall;
+                    ctx.fillRect(hx, top, hw, hh);
+
+                    ctx.fillStyle = P.roof;
+                    ctx.beginPath();
+                    if (side === 0) {
+                        ctx.moveTo(hx - 16, top);
+                        ctx.lineTo(hx + hw + 16, top);
+                        ctx.lineTo(hx + hw / 2, top - 54);
+                    } else {
+                        ctx.moveTo(hx - 16, top + hh);
+                        ctx.lineTo(hx + hw + 16, top + hh);
+                        ctx.lineTo(hx + hw / 2, top + hh + 54);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+
+                    if ((hash & 4) === 0) {
+                        ctx.fillRect(hx + hw - 56, side === 0 ? top - 46 : top + hh + 18, 22, 30);
+                    }
+
+                    for (let wI = 0; wI < 2; wI++) {
+                        const lit = ((hash >> (wI + 1)) & 1) === 1;
+                        const wx = hx + 24 + wI * 118;
+                        const wy = side === 0 ? top + 30 : top + hh - 78;
+                        ctx.fillStyle = lit ? P.win : P.dark;
+                        ctx.fillRect(wx, wy, 62, 48);
+                        ctx.fillStyle = P.roof;
+                        ctx.fillRect(wx + 28, wy, 6, 48);
+                        ctx.fillRect(wx, wy + 21, 62, 6);
+                    }
+
+                    ctx.fillStyle = P.door;
+                    ctx.fillRect(doorX, doorY, 48, 62);
+                    ctx.fillStyle = P.win;
+                    ctx.fillRect(doorX + 36, doorY + 30, 6, 6);
+                    ctx.fillStyle = P.trim;
+                    ctx.fillRect(doorX - 26, doorY + 40, 20, 20);
+                    ctx.fillRect(doorX + 56, doorY + 44, 14, 14);
+                }
             }
         }
     }
