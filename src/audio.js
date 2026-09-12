@@ -485,15 +485,20 @@ export class AudioEngine {
                 bass: [0, null, 0, 7, 5, null, 5, 0, -2, null, -2, 5, 3, null, 0, 2],
                 turnaround: [12, 10, 7, 0]
             },
-            // Robot Junkyard: machinery. A low square drone with a clanking
-            // two-note riff on top -- mechanical and repetitive on purpose.
+            // Robot Junkyard: a machine, not a tune. A buzzing sawtooth cell
+            // hammered over and over like a stamping press, a motor that
+            // never stops underneath it, and metal struck on the offbeat.
             junkyard: {
-                stepMs: 108,
-                root: 147,
-                wave: 'square',
-                melody: [0, 12, 0, 7, null, 12, 0, 7, 0, 15, 0, 10, null, 15, 10, 7],
-                bass: [0, 0, null, 0, -5, -5, null, -5, -3, -3, null, -3, 0, 0, 0, 0],
-                turnaround: [15, 12, 7, 0]
+                stepMs: 100,
+                root: 110,
+                wave: 'sawtooth',
+                // The same four-step cell, repeated. Machines don't improvise.
+                melody: [0, 0, 12, 0, 0, 0, 12, 0, 3, 3, 15, 3, 3, 3, 15, 3],
+                // One low note on every single step: the motor.
+                bass: [0, 0, 0, 0, 0, 0, 0, 0, -2, -2, -2, -2, -2, -2, -2, -2],
+                // Hammer falls.
+                clank: [0, 4, 6, 8, 12, 14],
+                turnaround: [12, 12, 0, 0]
             },
             boss: {
                 stepMs: 92,
@@ -563,6 +568,22 @@ export class AudioEngine {
             src.stop(now + 0.06);
         };
 
+        // Struck metal: noise plus a short ringing ping.
+        const clank = (vol) => {
+            drum(vol);
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = 1150 + Math.random() * 250;
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(vol * 0.45, now + 0.004);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+            osc.connect(gain).connect(this.musicGain);
+            osc.start(now);
+            osc.stop(now + 0.09);
+        };
+
         const tick = () => {
             if (!this.ctx) return;
             const I = this._intensity || 0;
@@ -586,6 +607,10 @@ export class AudioEngine {
                 vol: 0.055,
                 dur: 0.2
             });
+
+            // Theme-defined metal percussion, on from the first bar rather
+            // than gated behind intensity -- it IS the junkyard.
+            if (T.clank && T.clank.includes(step % len)) clank(0.045 + I * 0.03);
 
             // Layer 2 (medium): noise percussion on the backbeat.
             if (I > 0.33 && step % 4 === 2) drum(0.05 + I * 0.05);
