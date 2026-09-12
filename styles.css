@@ -1380,3 +1380,65 @@ body.cb-mode .exp-fill {
         padding: 12px 26px;
     }
 }
+
+/* v2.8: controls differ by device, so say the right one. Touch devices get
+   the drag hint; everything else gets the keys. */
+.hint-touch { display: none; }
+.hint-keys { display: inline; }
+@media (hover: none) and (pointer: coarse) {
+    .hint-touch { display: inline; }
+    .hint-keys { display: none; }
+}
+
+/* v2.8: logo treatment from the brand sheet -- cream "Nice" with a pink
+   outline against a green slime "Costume". The reference letterforms are
+   hand-drawn pixel art; this gets the colour and weight of it in type. */
+.start-card h1.logo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.18em;
+    font-size: clamp(38px, 11vw, 68px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 0.95;
+    margin: 2px 0 0;
+}
+.logo-nice {
+    color: #fdf6e3;
+    text-shadow:
+        3px 0 0 #ff70e6,
+        -3px 0 0 #ff70e6,
+        0 3px 0 #ff70e6,
+        0 -3px 0 #ff70e6,
+        3px 3px 0 #ff70e6,
+        -3px -3px 0 #ff70e6,
+        3px -3px 0 #ff70e6,
+        -3px 3px 0 #ff70e6,
+        0 8px 0 rgba(0, 0, 0, 0.55);
+}
+.logo-costume {
+    color: #8ee06b;
+    text-shadow:
+        3px 0 0 #2c5e22,
+        -3px 0 0 #2c5e22,
+        0 3px 0 #2c5e22,
+        0 -3px 0 #2c5e22,
+        3px 3px 0 #2c5e22,
+        -3px -3px 0 #2c5e22,
+        /* the drip */ 0 10px 0 #3e7f3b,
+        0 16px 0 rgba(62, 127, 59, 0.65),
+        0 22px 0 rgba(62, 127, 59, 0.3);
+}
+.logo-sub {
+    color: #8ee06b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 14px;
+}
+.start-eyebrow {
+    font-weight: 700;
+}

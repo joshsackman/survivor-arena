@@ -565,15 +565,22 @@ export const ENEMIES = {
     BOMBER: {
         id: 'bomber',
         name: 'Egg Thrower',
-        archetype: 'bomber',
-        bomber: true,
-        fuseRange: 80, // begins countdown when within this distance
-        fuseTime: 1.4, // seconds before detonation
-        blastRadius: 120,
-        blastDamage: 40,
+        // v2.8: he used to charge in and detonate like a bomb, which made no
+        // sense for a kid with a carton. He hangs back and throws now, and
+        // the eggs splatter on impact.
+        archetype: 'ranged',
+        ranged: true,
+        firingRange: 380,
+        keepDistance: 230,
+        projectileSpeed: 260,
+        projectileDamage: 12,
+        projectileKind: 'egg',
+        splatRadius: 70,
+        splatDamage: 8,
+        fireCooldown: 2.1,
         hp: 35,
-        speed: 120,
-        damage: 10,
+        speed: 110,
+        damage: 8,
         exp: 28,
         color: '#f7e7a1',
         size: 14

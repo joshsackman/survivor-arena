@@ -407,7 +407,12 @@ export class Enemy {
                         this.y,
                         ang,
                         pspeed,
-                        this.type.projectileDamage * (game.enemyDmgMult || 1)
+                        this.type.projectileDamage * (game.enemyDmgMult || 1),
+                        {
+                            kind: this.type.projectileKind,
+                            splatRadius: this.type.splatRadius,
+                            splatDamage: (this.type.splatDamage || 0) * (game.enemyDmgMult || 1)
+                        }
                     )
                 );
                 this.fireTimer = this.type.fireCooldown || 2;
@@ -620,7 +625,7 @@ export class Callout {
 // EnemyProjectile (fired by ranged archetypes). Simple straight-line shot.
 // ---------------------------------------------------------------------------
 export class EnemyProjectile {
-    constructor(x, y, angle, speed, damage) {
+    constructor(x, y, angle, speed, damage, opts = {}) {
         this.x = x;
         this.y = y;
         this.vx = Math.cos(angle) * speed;
@@ -629,6 +634,13 @@ export class EnemyProjectile {
         this.life = 3;
         this.size = 6;
         this.shouldRemove = false;
+        // v2.8: eggs. They splatter on impact and catch anyone standing close,
+        // so the Egg Thrower is a threat you have to move away from rather
+        // than a dot you can tank.
+        this.kind = opts.kind || 'bolt';
+        this.splatRadius = opts.splatRadius || 0;
+        this.splatDamage = opts.splatDamage || 0;
+        this.spin = Math.random() * Math.PI;
     }
     update(dt, game) {
         this.x += this.vx * dt;
@@ -645,11 +657,46 @@ export class EnemyProjectile {
                 p.takeDamage(this.damage, game);
                 game.createFloatingText(Math.round(this.damage), p.x, p.y - 30, '#ff6644');
             }
+            this._splat(game);
             this.shouldRemove = true;
+            return;
+        }
+        // An egg that lands near the player still catches them.
+        if (this.kind === 'egg' && this.life < 0.05) this._splat(game);
+    }
+
+    /** Yolk everywhere, and a small blast that hurts if you are standing in it. */
+    _splat(game) {
+        if (this.kind !== 'egg') return;
+        game.createParticles?.(this.x, this.y, '#FFEE9C', 10);
+        game.createParticles?.(this.x, this.y, '#F8F8F8', 6);
+        game.audio?.play?.('impact');
+        if (!this.splatRadius || !this.splatDamage) return;
+        const p = game.player;
+        if (!p || p.invincible) return;
+        const d = Math.hypot(this.x - p.x, this.y - p.y);
+        if (d <= this.splatRadius) {
+            p.takeDamage(this.splatDamage, game);
+            game.createFloatingText('SPLAT!', p.x, p.y - 46, '#FFEE9C', {
+                size: 15,
+                crit: true,
+                life: 1
+            });
         }
     }
     render(ctx) {
         ctx.save();
+        if (this.kind === 'egg') {
+            // A tumbling egg: white shell, yolk-coloured end.
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.spin + this.life * 6);
+            ctx.fillStyle = '#F8F8F8';
+            ctx.fillRect(-5, -7, 10, 14);
+            ctx.fillStyle = '#FFEE9C';
+            ctx.fillRect(-3, -7, 6, 4);
+            ctx.restore();
+            return;
+        }
         ctx.fillStyle = '#ff44aa';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);

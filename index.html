@@ -160,8 +160,13 @@
             >
                 <div class="overlay-card start-card">
                     <div class="start-hero">
-                        <p class="start-eyebrow">Halloween night · your own street</p>
-                        <h1 id="startTitle" data-i18n="title">NICE COSTUME</h1>
+                        <p class="start-eyebrow">Same street. Worse people.</p>
+                        <h1 id="startTitle" class="logo" data-i18n="title">
+                            <span class="logo-nice">Nice</span><span class="logo-costume"
+                                >Costume</span
+                            >
+                        </h1>
+                        <p class="logo-sub">Just a kid. Totally human. Right?</p>
                         <p class="start-hook">
                             Your alien costume is <em>too</em> good. The whole cul-de-sac
                             thinks a real one got loose &mdash; and there&rsquo;s only one
@@ -187,7 +192,7 @@
 
                     <div class="btn-row start-secondary">
                         <button id="btnHowTo" class="btn ghost" data-i18n="howToPlayBtn">
-                            Who&rsquo;s out there
+                            The Neighborhood Gang
                         </button>
                         <button id="btnLeaderboard" class="btn ghost" data-i18n="leaderboard">
                             World Board
@@ -198,9 +203,10 @@
                     </div>
 
                     <div class="hotkey-hint" aria-hidden="true">
-                        <span data-i18n="hotkeyHint"
-                            >Drag or <kbd>WASD</kbd> to run · <kbd>P</kbd> pause ·
-                            <kbd>M</kbd> mute</span
+                        <span class="hint-touch">Drag anywhere to run · tap to pause</span>
+                        <span class="hint-keys"
+                            ><kbd>WASD</kbd> or <kbd>&larr;&uarr;&darr;&rarr;</kbd> to run ·
+                            <kbd>P</kbd> pause · <kbd>M</kbd> mute</span
                         >
                     </div>
                 </div>
