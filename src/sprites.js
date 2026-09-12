@@ -37,7 +37,16 @@ const C = {
     shoe: '#f2f0e6',
     kidYellow: '#ffb703',
     mask: '#d9d2c4',
-    glass: '#2b2b33'
+    glass: '#2b2b33',
+    hoodie: '#8a6fd6',
+    dogBrown: '#b06a2c',
+    dogSnout: '#f2e3cf',
+    eggShirt: '#6fae6a',
+    egg: '#f7e7a1',
+    pumpkin: '#ff7518',
+    pumpkinDark: '#c94f08',
+    stem: '#5f8a3a',
+    inflate: '#9be8c9'
 };
 
 /** rows: one string per pixel row (all the same length). */
@@ -146,6 +155,147 @@ const SPRITES = {
         palette: { M: C.mask, K: C.eye, Y: C.kidYellow, W: C.shoe }
     },
 
+    // Teen With a Pillowcase (mage): hood up, loot bag swinging.
+    mage: {
+        rows: [
+            '....HHHH....',
+            '...HHHHHH...',
+            '...HFFFFH...',
+            '...FKFFKF...',
+            '...HFFFFH...',
+            '..HHHHHHHH..',
+            '.HHHHHHHHHH.',
+            '.HHHHHHHHPP.',
+            '..HHHHHHHPP.',
+            '...HHHHHH...',
+            '...HH..HH...',
+            '...HH..HH...',
+            '..WWW..WWW..'
+        ],
+        palette: { H: C.hoodie, F: C.skin, K: C.eye, P: C.sheet, W: C.shoe }
+    },
+
+    // Ferocious Pet (wolf): off the leash, low and quick.
+    wolf: {
+        rows: [
+            '..BB......BB..',
+            '..BBBBBBBBBB..',
+            '..BKBBBBBBKB..',
+            '..BBBWWWWBBB..',
+            '.BBBBBBBBBBBB.',
+            '.BBBBBBBBBBBB.',
+            '.BB.BB..BB.BB.',
+            '.BB.BB..BB.BB.',
+            '..............'
+        ],
+        palette: { B: C.dogBrown, K: C.eye, W: C.dogSnout }
+    },
+
+    // Egg Thrower (bomber): egg already cocked back.
+    bomber: {
+        rows: [
+            '....EE......',
+            '...EEEE.....',
+            '....HHHH....',
+            '...FFFFFF...',
+            '...FKFFKF...',
+            '...FFFFFF...',
+            '..GGGGGGGG..',
+            '.GGGGGGGGGG.',
+            '..GGGGGGGG..',
+            '...GG..GG...',
+            '...GG..GG...',
+            '..WWW..WWW..'
+        ],
+        palette: { E: C.egg, H: C.hairBrown, F: C.skin, K: C.eye, G: C.eggShirt, W: C.shoe }
+    },
+
+    // Smashed Pumpkin (slime): a jack-o'-lantern that has seen better nights.
+    slime: {
+        rows: [
+            '.....SS.....',
+            '...OOOOOO...',
+            '..OOOOOOOO..',
+            '.OOKKOOKKOO.',
+            '.OOOOOOOOOO.',
+            '.OKKKKKKKKO.',
+            '..OOOOOOOO..',
+            '...DDDDDD...',
+            '............'
+        ],
+        palette: { S: C.stem, O: C.pumpkin, K: C.eye, D: C.pumpkinDark }
+    },
+
+    // Pumpkin Chunk (slimeling): what is left after the smash.
+    slimeling: {
+        rows: [
+            '..OOOO..',
+            '.OOOOOO.',
+            '.OOKKOO.',
+            '.OOOOOO.',
+            '..DDDD..',
+            '........'
+        ],
+        palette: { O: C.pumpkin, K: C.eye, D: C.pumpkinDark }
+    },
+
+    // The Inflatable (illusionist): the giant blow-up yard decoration, awake.
+    illusionist: {
+        rows: [
+            '....IIIIII....',
+            '...IIIIIIII...',
+            '..IIIIIIIIII..',
+            '..IIKKIIKKII..',
+            '..IIKKIIKKII..',
+            '..IIIIIIIIII..',
+            '..IIIIIIIIII..',
+            '.IIIIIIIIIIII.',
+            '.IIIIIIIIIIII.',
+            '.IIIIIIIIIIII.',
+            '.IIIIIIIIIIII.',
+            '..IIIIIIIIII..',
+            '..II..II..II..',
+            '..............'
+        ],
+        palette: { I: C.inflate, K: C.eye }
+    },
+
+    // Candy: what the neighbours drop. Three wrappers so a street full of
+    // pickups doesn't read as one repeated shape.
+    candy1: {
+        rows: [
+            '...W...W...',
+            '..WBBBBBW..',
+            '.WBBCCCBBW.',
+            '.WBBCCCBBW.',
+            '..WBBBBBW..',
+            '...W...W...'
+        ],
+        palette: { W: '#ffe9a8', B: '#e8354f', C: '#ff8fa0' }
+    },
+    candy2: {
+        rows: [
+            '...W...W...',
+            '..WBBBBBW..',
+            '.WBBCCCBBW.',
+            '.WBBCCCBBW.',
+            '..WBBBBBW..',
+            '...W...W...'
+        ],
+        palette: { W: '#ffe9a8', B: '#ff7518', C: '#ffc16b' }
+    },
+    candy3: {
+        rows: [
+            '...W...W...',
+            '..WBBBBBW..',
+            '.WBBCCCBBW.',
+            '.WBBCCCBBW.',
+            '..WBBBBBW..',
+            '...W...W...'
+        ],
+        palette: { W: '#ffe9a8', B: '#7b3fc4', C: '#c39bf0' }
+    },
+
     // Kid in a Sheet (ghost): two eye holes, ragged hem.
     ghost: {
         rows: [
@@ -175,10 +325,14 @@ function rasterise(spr, scale, tint) {
     const h = rows.length;
     const w = rows[0].length;
     const canvas = document.createElement('canvas');
+    // Not every document is a browser: test stubs and server-side DOMs hand
+    // back plain elements with no 2d context. Fail to null so callers draw
+    // their fallback instead of throwing halfway through building a screen.
+    if (!canvas || typeof canvas.getContext !== 'function') return null;
     canvas.width = w * scale;
     canvas.height = h * scale;
     const g = canvas.getContext('2d');
-    if (!g) return null;
+    if (!g || typeof g.fillRect !== 'function') return null;
     for (let y = 0; y < h; y++) {
         const row = rows[y];
         for (let x = 0; x < w; x++) {
@@ -188,6 +342,24 @@ function rasterise(spr, scale, tint) {
             g.fillRect(x * scale, y * scale, scale, scale);
         }
     }
+    // v2.8 legibility: trace a 1px dark edge around the drawn pixels. On the
+    // night street an untraced sprite has no silhouette and reads as a blob.
+    if (spr.outline !== false) {
+        const edge = spr.outlineColor || 'rgba(10,8,16,0.85)';
+        g.fillStyle = edge;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                if (rows[y][x] !== '.') continue;
+                const touches =
+                    (y > 0 && rows[y - 1][x] !== '.') ||
+                    (y < h - 1 && rows[y + 1][x] !== '.') ||
+                    (x > 0 && rows[y][x - 1] !== '.') ||
+                    (x < w - 1 && rows[y][x + 1] !== '.');
+                if (touches) g.fillRect(x * scale, y * scale, scale, scale);
+            }
+        }
+    }
+
     if (tint) {
         // source-atop keeps the tint inside the drawn pixels, so a hit flash
         // follows the character's shape instead of flashing a square.
@@ -226,4 +398,25 @@ export function drawSprite(ctx, key, cx, cy, targetH, opts = {}) {
     ctx.drawImage(img, Math.round(cx - img.width / 2), Math.round(cy - img.height / 2));
     ctx.imageSmoothingEnabled = prevSmoothing;
     return true;
+}
+
+/**
+ * A character as a data URL, for showing one in the DOM (the roster screen).
+ * Returns '' where there is no art or no canvas.
+ */
+export function spriteDataUrl(key, targetH = 64) {
+    const spr = SPRITES[key];
+    if (!spr || typeof document === 'undefined') return '';
+    try {
+        const scale = Math.max(1, Math.round(targetH / spr.rows.length));
+        const canvas = rasterise(spr, scale, '');
+        return canvas && typeof canvas.toDataURL === 'function' ? canvas.toDataURL() : '';
+    } catch {
+        return '';
+    }
+}
+
+/** Every character that currently has art, for the roster screen. */
+export function spriteKeys() {
+    return Object.keys(SPRITES);
 }

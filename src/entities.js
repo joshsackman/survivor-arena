@@ -860,6 +860,9 @@ export class ExpOrb {
         this.y = y;
         this.value = value;
         this.size = 4 + Math.log(value + 1) * 1.5;
+        // v2.8: the drops are candy now. The wrapper is picked once, here, so
+        // a pickup keeps the same look for its whole life on the ground.
+        this.art = 'candy' + (1 + Math.floor(Math.random() * 3));
         this.shouldRemove = false;
         this.magnetSpeed = 0;
         this.life = CONFIG.EXP_ORB_LIFETIME;
@@ -879,7 +882,7 @@ export class ExpOrb {
 
         if (d < CONFIG.PICKUP_DISTANCE) {
             p.gainExp(this.value);
-            game.createFloatingText(`+${this.value}XP`, p.x, p.y - 40, '#66bbff');
+            game.createFloatingText(`+${this.value}`, p.x, p.y - 40, '#ffb703');
             game.audio.pickup();
             if (game.run) game.run.orbsCollected = (game.run.orbsCollected || 0) + 1;
             this.shouldRemove = true;
@@ -897,12 +900,19 @@ export class ExpOrb {
         ctx.save();
         ctx.globalAlpha = a;
         const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.2);
-        g.addColorStop(0, 'rgba(100,180,255,0.55)');
-        g.addColorStop(1, 'rgba(100,180,255,0)');
+        g.addColorStop(0, 'rgba(255,183,3,0.45)');
+        g.addColorStop(1, 'rgba(255,183,3,0)');
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
         ctx.fill();
+
+        // Bigger drops are bigger candy. Falls through to the old orb below
+        // if the art is unavailable.
+        if (drawSprite(ctx, this.art, this.x, this.y, Math.max(12, this.size * 2.6))) {
+            ctx.restore();
+            return;
+        }
         ctx.fillStyle = '#7ab8ff';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);

@@ -100,9 +100,9 @@ const STRINGS = {
         helpKeyConfirm: 'Confirm / fire',
         howToTitle: 'How to play',
         howToBody1:
-            'You are auto-attacking. Move with WASD or arrow keys; weapons fire on their own.',
-        howToBody2: 'Pick up green orbs to gain XP. Each level lets you choose one upgrade.',
-        howToBody3: 'Survive long enough and a boss appears every few minutes.',
+            'Everyone thinks you are a real alien. Run! Move with WASD, the arrow keys, or drag a finger on a tablet.',
+        howToBody2: 'Grab the candy they drop. Enough candy levels you up and you pick a new trick.',
+        howToBody3: 'Keep going and the scary ones turn up: the Lawn Guy, the Big Dog, Grandma.',
         howToBody4: 'Hit P or Esc to pause, M to mute, H to see this list any time.',
         gotIt: 'Got it',
         // iter-15: tutorial / replay / critical flash

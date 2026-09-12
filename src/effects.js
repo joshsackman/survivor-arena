@@ -61,7 +61,9 @@ export class RingPulse {
             ctx.strokeStyle = `rgb(${p.color})`;
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            // A backwards frame step can drive r below zero; arc() throws on
+            // a negative radius and kills the whole frame.
+            ctx.arc(p.x, p.y, Math.max(0, p.r), 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
         }
@@ -93,7 +95,7 @@ export class HitBursts {
             ctx.strokeStyle = `rgb(${b.color})`;
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.arc(b.x, b.y, Math.max(0, b.r), 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
         }

@@ -12,7 +12,8 @@
  *   - totalAchievements()    convenience for tests / badges
  */
 
-import { ACHIEVEMENTS, PASSIVES, WEAPONS } from './data.js';
+import { ACHIEVEMENTS, ENEMIES, PASSIVES, WEAPONS } from './data.js';
+import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
 import { getStage, listStages } from './stages.js';
@@ -271,6 +272,8 @@ export class UI {
                     <li>${t('howToBody3')}</li>
                     <li>${t('howToBody4')}</li>
                 </ol>
+                <h3 class="roster-title">Who's out there</h3>
+                <div class="roster">${this._rosterHtml()}</div>
                 <div class="btn-row">
                     <button id="howtoClose" class="btn primary">${t('gotIt')}</button>
                 </div>
@@ -281,6 +284,48 @@ export class UI {
             onClose && onClose();
         };
         m.querySelector('#howtoClose')?.addEventListener('click', close);
+    }
+
+    /**
+     * v2.8: the neighbours, with their pixel art beside their names. Pixel
+     * characters are hard to read at gameplay size, so this is where you find
+     * out who is chasing you. Names come from data.js, so renaming a
+     * neighbour there updates this list too.
+     */
+    _rosterHtml() {
+        // Easy ones first, scary ones last — the order they turn up in.
+        const order = [
+            'bat',
+            'zombie',
+            'skeleton',
+            'ghost',
+            'mage',
+            'bomber',
+            'slime',
+            'slimeling',
+            'illusionist',
+            'wolf',
+            'golem'
+        ];
+        const byId = Object.create(null);
+        for (const def of Object.values(ENEMIES)) byId[def.id] = def;
+        const cards = [];
+        for (const id of order) {
+            const def = byId[id];
+            if (!def || !hasSprite(id)) continue;
+            const art = spriteDataUrl(id, 56);
+            const img = art
+                ? `<img class="roster-art" src="${art}" alt="" width="56" height="56">`
+                : `<span class="roster-art roster-dot" style="background:${def.color}"></span>`;
+            cards.push(
+                `<div class="roster-card">${img}<span class="roster-name">${def.name}</span></div>`
+            );
+        }
+        if (!cards.length) return '';
+        return (
+            cards.join('') +
+            '<div class="roster-card roster-more"><span class="roster-name">Bosses are still in the garage</span></div>'
+        );
     }
 
     hideHowToPlay() {
@@ -630,6 +675,22 @@ export class UI {
 
     hideLevelUp() {
         this.els.levelUpMenu.style.display = 'none';
+    }
+
+    /**
+     * v2.8: a shout across the street. Reuses the boss banner element but in
+     * the warm palette, so the opening line reads as a neighbour yelling
+     * rather than a danger warning.
+     */
+    showStreetShout(text, ms = 2800) {
+        if (!this.els.bossBanner) return;
+        this._activeBannerKey = null;
+        this.els.bossBanner.textContent = text;
+        this.els.bossBanner.classList.add('visible', 'shout');
+        clearTimeout(this._bannerTimer);
+        this._bannerTimer = setTimeout(() => {
+            this.els.bossBanner.classList.remove('visible', 'shout');
+        }, ms);
     }
 
     showBossBanner() {

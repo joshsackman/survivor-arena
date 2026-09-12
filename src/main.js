@@ -588,6 +588,8 @@ export class Game {
 
     start() {
         this.state = GameState.PLAYING;
+        // v2.8: tell the player why the whole street is chasing them.
+        this.ui.showStreetShout?.('NICE COSTUME, KID! GET THE ALIEN!');
         this.gameTime = 0;
         this.kills = 0;
         this.enemies = [];
@@ -1190,7 +1192,12 @@ export class Game {
         if (this.state !== GameState.PLAYING && this.state !== GameState.LEVEL_UP) return;
         // Clamp dt so that (a) a paused+resumed tab does not nuke the sim in
         // one step, and (b) frame-rate spikes don't create tunneling bugs.
-        const dt = Math.min((now - this.lastTime) / 1000, CONFIG.DT_CLAMP);
+        // `now` is the rAF timestamp, but lastTime is captured from
+        // performance.now() on start/resume/unpause. The rAF timestamp can be
+        // slightly OLDER than that, which made dt negative and ran timers and
+        // effect radii backwards (arc() then threw on a negative radius and
+        // killed the frame). Clamp the bottom as well as the top.
+        const dt = Math.max(0, Math.min((now - this.lastTime) / 1000, CONFIG.DT_CLAMP));
         this.lastTime = now;
         // iter-14: pull the gamepad once per frame so axes + button edges
         // are fresh by the time update() reads `getMoveVector`. Safe no-op
@@ -1902,31 +1909,34 @@ export class Game {
 
         const P = area51
             ? { lawn: '#1b2620', walk: '#33403a', road: '#232b28', line: '#63786b',
-                house: '#28332f', roof: '#1b2422', win: '#9be8c9', pumpkin: '#7cf2b0' }
+                walls: ['#28332f', '#2f3a35', '#243029'], roof: '#1b2422',
+                win: '#9be8c9', dark: '#1a2320', door: '#1f2a26', pumpkin: '#7cf2b0' }
             : { lawn: '#1d2a1c', walk: '#3a3145', road: '#2a2233', line: '#6b5a7a',
-                house: '#2e2340', roof: '#201730', win: '#ffb703', pumpkin: '#ff7518' };
+                walls: ['#33264a', '#3d2a42', '#2b2340'], roof: '#1d1529',
+                win: '#ffb703', dark: '#241b33', door: '#4a2d1f', pumpkin: '#ff7518' };
 
         // Lawn under everything, covering exactly the visible window.
         ctx.fillStyle = P.lawn;
         ctx.fillRect(cx, cy, vw, vh);
 
-        const roadTop = H * 0.36;
-        const roadH = H * 0.28;
+        // A wide street: the road is the play space, so it takes most of the
+        // arena and the houses frame it.
+        const roadTop = H * 0.28;
+        const roadH = H * 0.44;
         const roadBottom = roadTop + roadH;
-        const walk = 22;
+        const walk = 26;
 
-        // Sidewalks, then the road on top of them.
         ctx.fillStyle = P.walk;
         ctx.fillRect(cx, roadTop - walk, vw, walk);
         ctx.fillRect(cx, roadBottom, vw, walk);
         ctx.fillStyle = P.road;
         ctx.fillRect(cx, roadTop, vw, roadH);
 
-        // Turning circle at the closed end of the street.
-        const bulbX = W - H * 0.30;
+        // Turning circle at the closed end.
+        const bulbX = W - H * 0.26;
         const bulbY = roadTop + roadH / 2;
-        const bulbR = H * 0.30;
-        if (bulbX + bulbR > cx && bulbX - bulbR < cx + vw) {
+        const bulbR = H * 0.26;
+        if (bulbX + bulbR + walk > cx && bulbX - bulbR - walk < cx + vw) {
             ctx.fillStyle = P.walk;
             ctx.beginPath();
             ctx.arc(bulbX, bulbY, bulbR + walk, 0, Math.PI * 2);
@@ -1937,57 +1947,95 @@ export class Game {
             ctx.fill();
         }
 
-        // Dashed centre line, stopping where the circle begins.
         ctx.fillStyle = P.line;
-        const dash = 44;
+        const dash = 46;
         const startDash = Math.floor(cx / (dash * 2)) * (dash * 2);
         for (let x = startDash; x < cx + vw; x += dash * 2) {
             if (x > bulbX - bulbR) break;
             ctx.fillRect(x, bulbY - 3, dash, 6);
         }
 
-        // Houses along both sides. Only the ones in shot are drawn.
-        const spacing = 340;
-        const hw = 250;
-        const hh = 190;
+        // Houses. Each one is a body, a gable roof, lit windows, a porch with
+        // a door and pumpkins, and a driveway running down to the sidewalk.
+        const spacing = 330;
+        const hw = 230;
+        const hh = 150;
         const first = Math.max(0, Math.floor((cx - hw) / spacing));
         const last = Math.ceil((cx + vw) / spacing);
         for (let i = first; i <= last; i++) {
-            const hx = i * spacing + 40;
-            if (hx > W - 120) continue;
+            const hx = i * spacing + 44;
+            if (hx > W - 140) continue;
             const hash = (i * 2654435761) >>> 0;
+            const wall = P.walls[hash % P.walls.length];
+
             for (const side of [0, 1]) {
-                const hy = side === 0 ? roadTop - walk - 40 - hh : roadBottom + walk + 40;
-                if (hy + hh < cy || hy > cy + vh) continue;
+                // side 0 sits above the road and faces down; side 1 is below
+                // the road and faces up. `front` is the edge facing the street.
+                const top = side === 0 ? roadTop - walk - 54 - hh : roadBottom + walk + 54;
+                const front = side === 0 ? top + hh : top;
+                if (top + hh + 60 < cy || top - 60 > cy + vh) continue;
+
+                // Driveway from the porch to the sidewalk.
+                ctx.fillStyle = P.walk;
+                const driveX = hx + hw - 70;
+                if (side === 0) ctx.fillRect(driveX, front, 54, 54);
+                else ctx.fillRect(driveX, front - 54, 54, 54);
 
                 // Porch light pooling on the lawn.
-                const lightY = side === 0 ? hy + hh + 26 : hy - 26;
-                const glow = ctx.createRadialGradient(hx + hw / 2, lightY, 0, hx + hw / 2, lightY, 120);
-                glow.addColorStop(0, area51 ? 'rgba(155,232,201,0.20)' : 'rgba(255,183,3,0.18)');
+                const lightY = side === 0 ? front + 30 : front - 30;
+                const glow = ctx.createRadialGradient(hx + 60, lightY, 0, hx + 60, lightY, 130);
+                glow.addColorStop(0, area51 ? 'rgba(155,232,201,0.22)' : 'rgba(255,183,3,0.20)');
                 glow.addColorStop(1, 'rgba(0,0,0,0)');
                 ctx.fillStyle = glow;
-                ctx.fillRect(hx + hw / 2 - 120, lightY - 120, 240, 240);
+                ctx.fillRect(hx + 60 - 130, lightY - 130, 260, 260);
 
-                ctx.fillStyle = P.house;
-                ctx.fillRect(hx, hy, hw, hh);
+                // Walls.
+                ctx.fillStyle = wall;
+                ctx.fillRect(hx, top, hw, hh);
+
+                // Gable roof, pitched away from the street.
                 ctx.fillStyle = P.roof;
-                if (side === 0) ctx.fillRect(hx - 12, hy + hh - 26, hw + 24, 26);
-                else ctx.fillRect(hx - 12, hy, hw + 24, 26);
+                ctx.beginPath();
+                if (side === 0) {
+                    ctx.moveTo(hx - 16, top);
+                    ctx.lineTo(hx + hw + 16, top);
+                    ctx.lineTo(hx + hw / 2, top - 54);
+                } else {
+                    ctx.moveTo(hx - 16, top + hh);
+                    ctx.lineTo(hx + hw + 16, top + hh);
+                    ctx.lineTo(hx + hw / 2, top + hh + 54);
+                }
+                ctx.closePath();
+                ctx.fill();
 
-                // Windows: lit or dark, fixed per house.
-                for (let wI = 0; wI < 3; wI++) {
-                    const lit = ((hash >> wI) & 1) === 1;
-                    ctx.fillStyle = lit ? P.win : P.roof;
-                    ctx.fillRect(hx + 26 + wI * 74, hy + (side === 0 ? 40 : 62), 42, 40);
+                // Chimney on some houses.
+                if ((hash & 4) === 0) {
+                    ctx.fillRect(hx + hw - 56, side === 0 ? top - 46 : top + hh + 18, 22, 30);
                 }
 
-                // Door, and a pumpkin beside it.
-                const doorX = hx + hw / 2 - 20;
-                const doorY = side === 0 ? hy + hh - 80 : hy + 52;
-                ctx.fillStyle = P.roof;
-                ctx.fillRect(doorX, doorY, 40, 56);
+                // Windows, lit or dark, fixed per house. Cross frames keep
+                // them reading as windows at a glance.
+                for (let wI = 0; wI < 2; wI++) {
+                    const lit = ((hash >> (wI + 1)) & 1) === 1;
+                    const wx = hx + 24 + wI * 118;
+                    const wy = side === 0 ? top + 30 : top + hh - 78;
+                    ctx.fillStyle = lit ? P.win : P.dark;
+                    ctx.fillRect(wx, wy, 62, 48);
+                    ctx.fillStyle = P.roof;
+                    ctx.fillRect(wx + 28, wy, 6, 48);
+                    ctx.fillRect(wx, wy + 21, 62, 6);
+                }
+
+                // Door on the street-facing wall, with a step and pumpkins.
+                const doorX = hx + hw / 2 - 24;
+                const doorY = side === 0 ? front - 62 : front + 14;
+                ctx.fillStyle = P.door;
+                ctx.fillRect(doorX, doorY, 48, 62);
+                ctx.fillStyle = P.win;
+                ctx.fillRect(doorX + 36, doorY + 30, 6, 6);
                 ctx.fillStyle = P.pumpkin;
-                ctx.fillRect(doorX + 52, doorY + 38, 18, 18);
+                ctx.fillRect(doorX - 26, doorY + 40, 20, 20);
+                ctx.fillRect(doorX + 56, doorY + 44, 14, 14);
             }
         }
     }
