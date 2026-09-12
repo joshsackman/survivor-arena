@@ -62,7 +62,7 @@ import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
 import { KonamiDetector } from './konami.js';
 import { submitScore, fetchTopScores, checkInitials, normaliseInitials } from './leaderboard.js';
-import { drawSprite, hasSprite } from './sprites.js';
+import { drawSprite, hasSprite, spriteDataUrl } from './sprites.js';
 
 registerWeaponClass(Weapon);
 
@@ -538,6 +538,7 @@ export class Game {
         q('btnMenu')?.addEventListener('click', () => {
             this.ui.hideGameOver();
             this.ui.showStart();
+        this._paintStartScene();
         this.audio.play?.('titleSting');
             this.state = GameState.MENU;
             this.speedrunMode = false;
@@ -547,6 +548,7 @@ export class Game {
             this.state = GameState.MENU;
             this.ui.hidePause();
             this.ui.showStart();
+        this._paintStartScene();
             cancelAnimationFrame(this.raf);
             this.audio.stopMusic();
         });
@@ -594,6 +596,25 @@ export class Game {
      * manhunt. Runs in its own state so nothing spawns or collides mid-scene,
      * and any key or tap skips straight to the run -- kids replay constantly.
      */
+    /**
+     * v2.8: fill the start screen's scene strip with the real cast -- the kid
+     * out front and the mob closing in behind him. Built from the same sprite
+     * art the game uses, so the menu can never drift from what you meet.
+     */
+    _paintStartScene() {
+        const host = document.getElementById('startScene');
+        if (!host) return;
+        const chasers = ['zombie', 'skeleton', 'wolf', 'golem', 'bat', 'mage', 'pumpkin_kid'];
+        const hero = spriteDataUrl('player', 96);
+        const parts = [];
+        if (hero) parts.push(`<img class="hero-sprite" src="${hero}" alt="" width="64" height="64">`);
+        for (const key of chasers) {
+            const url = spriteDataUrl(key, 80);
+            if (url) parts.push(`<img class="chaser" src="${url}" alt="" width="56" height="56">`);
+        }
+        host.innerHTML = parts.join('');
+    }
+
     playIntro() {
         if (this.save.settings.reducedMotion) return this.start();
         this.ui.hideStart();
@@ -1050,6 +1071,7 @@ export class Game {
         this.audio.stopMusic();
         this.ui.hideGameOver();
         this.ui.showStart();
+        this._paintStartScene();
     }
 
     togglePause() {
@@ -2640,6 +2662,10 @@ Player.prototype.gainExp = function (amount) {
 export function boot() {
     const g = new Game();
     window.__vsGame = g;
+    // The menu is already on screen at boot -- nothing calls showStart() for
+    // the first view -- so the cast strip has to be painted here or the very
+    // first thing a player sees is an empty box where the mob should be.
+    g._paintStartScene?.();
     // Dev-only debug hooks. Gated on hostname so they never fire on the
     // GitHub Pages build; the smoke harness loads from localhost so it
     // does. Used by scripts/runtime-smoke.js to fast-forward to bosses,
