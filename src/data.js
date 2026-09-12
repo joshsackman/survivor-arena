@@ -480,6 +480,17 @@ export const ENEMIES = {
         color: '#C47A2F',
         size: 16
     },
+    PUMPKIN_KID: {
+        id: 'pumpkin_kid',
+        name: "Kid in a Jack-o'-Lantern",
+        archetype: 'chaser',
+        hp: 30,
+        speed: 68,
+        damage: 13,
+        exp: 15,
+        color: '#E8720C',
+        size: 17
+    },
     GHOST: {
         id: 'ghost',
         name: 'Kid in a Sheet',
@@ -660,8 +671,8 @@ export const BOSSES = {
 // back to the final entry once gameTime exceeds the last window.
 // ---------------------------------------------------------------------------
 export const WAVES = [
-    { from: 0, to: 30, pool: ['bat', 'box_kid', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
-    { from: 30, to: 60, pool: ['bat', 'box_kid', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
+    { from: 0, to: 30, pool: ['bat', 'box_kid', 'pumpkin_kid', 'zombie', 'dad_polo'], spawnMult: 1.0, label: 'Opening' },
+    { from: 30, to: 60, pool: ['bat', 'box_kid', 'pumpkin_kid', 'zombie', 'dad_polo', 'skeleton'], spawnMult: 1.1, label: 'Wave 2' },
     {
         from: 60,
         to: 90,

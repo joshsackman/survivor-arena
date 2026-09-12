@@ -541,6 +541,82 @@ export class Enemy {
 }
 
 // ---------------------------------------------------------------------------
+// Callout — the "who is this?" nameplate used when a neighbour first walks
+// into view. Drawn as a proper panel with a pointer down to the character so
+// it reads as a game callout rather than floating damage text.
+// ---------------------------------------------------------------------------
+export class Callout {
+    constructor(text, x, y, opts = {}) {
+        this.text = String(text || '');
+        this.x = x;
+        this.y = y;
+        this.life = opts.life ?? 2.4;
+        this.maxLife = this.life;
+        this.accent = opts.accent || '#FFC830';
+        this.big = !!opts.big;
+        this.shouldRemove = false;
+    }
+
+    update(dt) {
+        this.life -= dt;
+        // Drift up gently so it separates from the character.
+        this.y -= 14 * dt;
+        if (this.life <= 0) this.shouldRemove = true;
+    }
+
+    render(ctx) {
+        if (this.life <= 0) return;
+        const t = this.life / this.maxLife;
+        // Pop in over the first 15%, fade out over the last 25%.
+        const grow = Math.min(1, (1 - t) / 0.15);
+        const fade = Math.min(1, t / 0.25);
+        const scale = 0.82 + 0.18 * Math.min(1, grow);
+
+        const fs = this.big ? 20 : 15;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, fade);
+        ctx.translate(this.x, this.y);
+        ctx.scale(scale, scale);
+        ctx.font = `800 ${fs}px system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const padX = 12;
+        const w = Math.ceil(ctx.measureText(this.text).width) + padX * 2;
+        const h = fs + 14;
+        const r = 6;
+
+        // Panel
+        ctx.fillStyle = 'rgba(11,16,32,0.92)';
+        ctx.strokeStyle = this.accent;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h / 2, w, h, r);
+        ctx.fill();
+        ctx.stroke();
+
+        // Pointer down toward the character
+        ctx.beginPath();
+        ctx.moveTo(-7, h / 2);
+        ctx.lineTo(7, h / 2);
+        ctx.lineTo(0, h / 2 + 9);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(11,16,32,0.92)';
+        ctx.fill();
+        ctx.strokeStyle = this.accent;
+        ctx.beginPath();
+        ctx.moveTo(-7, h / 2);
+        ctx.lineTo(0, h / 2 + 9);
+        ctx.lineTo(7, h / 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#F8F8F8';
+        ctx.fillText(this.text, 0, 0);
+        ctx.restore();
+    }
+}
+
+// ---------------------------------------------------------------------------
 // EnemyProjectile (fired by ranged archetypes). Simple straight-line shot.
 // ---------------------------------------------------------------------------
 export class EnemyProjectile {
@@ -939,6 +1015,7 @@ export class Particle {
         this.vx = Math.cos(a) * s;
         this.vy = Math.sin(a) * s;
         this.friction = opts.friction ?? 0.2;
+        this.confetti = !!opts.confetti;
     }
     update(dt) {
         this.x += this.vx * dt;
@@ -952,9 +1029,20 @@ export class Particle {
         if (this.life <= 0) return;
         ctx.globalAlpha = Math.max(0, this.life);
         ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        if (this.confetti) {
+            // v2.8: confetti is little tumbling squares, not dots. The spin
+            // comes from life so it costs no extra state.
+            const s = Math.max(1, this.size);
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.life * 9 + this.vx * 0.01);
+            ctx.fillRect(-s, -s * 0.6, s * 2, s * 1.2);
+            ctx.restore();
+        } else {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.globalAlpha = 1;
     }
 }

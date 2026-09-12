@@ -23,7 +23,8 @@ import {
     Particle,
     Player,
     findEnemyDef,
-    registerWeaponClass
+    registerWeaponClass,
+    Callout
 } from './entities.js';
 import { Weapon } from './weapons.js';
 import { AudioEngine } from './audio.js';
@@ -609,6 +610,7 @@ export class Game {
         // v2.8: the names are half the joke, so each neighbour gets introduced
         // the first time you meet them in a run.
         this._metNeighbours = new Set();
+        this.callouts = [];
         this._bossWarnedAt.clear();
         this._spawnAccumulator = 0;
         this._lastAnnouncedWave = null;
@@ -1295,6 +1297,13 @@ export class Game {
         this._updateExpOrbs(dt);
         this._maybeTriggerLevelUp();
         this._updateParticlesAndText(dt);
+        if (this.callouts?.length) {
+            for (let i = this.callouts.length - 1; i >= 0; i--) {
+                const c = this.callouts[i];
+                c.update(dt);
+                if (c.shouldRemove) this.callouts.splice(i, 1);
+            }
+        }
 
         this._spawnLogic(dt, hpMult, dmgMult, diff.spawnMult);
 
@@ -1397,6 +1406,13 @@ export class Game {
             const e = this.enemies[i];
             e.update(dt, this);
 
+            // v2.8: name a neighbour the first time the player can actually
+            // SEE them. Spawns happen ~900px off-camera, so introducing at
+            // spawn named people who were not on screen yet.
+            if (this._metNeighbours && !this._metNeighbours.has(e.id) && this._isOnScreen(e)) {
+                this._introduceNeighbour(e.type, e.x, e.y);
+            }
+
             const dx = e.x - this.player.x;
             const dy = e.y - this.player.y;
             const d = Math.hypot(dx, dy);
@@ -1424,7 +1440,7 @@ export class Game {
 
     _onEnemyKilled(e, hpMult, dmgMult) {
         this.kills++;
-        this.createParticles(e.x, e.y, e.color, e.boss ? 40 : 8);
+        this.createConfetti(e.x, e.y, e.boss ? 40 : 12);
         this.effects.hit(e.x, e.y, this._rgbFromHex(e.color));
         this.dropExp(e.x, e.y, e.expValue);
         if (e.boss) {
@@ -1701,43 +1717,38 @@ export class Game {
      * v2.8: name a neighbour the first time they turn up in a run. Bosses get
      * their own banner already, so they are announced bigger and higher.
      */
+    /** True when `e` is inside the visible viewport (small inset so the
+     *  nameplate appears with the character, not as they clip the edge). */
+    _isOnScreen(e) {
+        // A central band, not the whole viewport: introducing someone the
+        // instant they clip the edge puts the callout where nobody is
+        // looking (and off the side of the screen).
+        const vw = CONFIG.CANVAS_WIDTH;
+        const vh = CONFIG.CANVAS_HEIGHT;
+        const insetX = vw * 0.2;
+        const insetY = vh * 0.22;
+        return (
+            e.x >= this.camera.worldX + insetX &&
+            e.x <= this.camera.worldX + vw - insetX &&
+            e.y >= this.camera.worldY + insetY &&
+            e.y <= this.camera.worldY + vh - insetY
+        );
+    }
+
     _introduceNeighbour(type, x, y) {
         if (!type?.name) return;
         this._metNeighbours ??= new Set();
         if (this._metNeighbours.has(type.id)) return;
         this._metNeighbours.add(type.id);
+        this.callouts ??= [];
         const boss = !!type.boss;
-        // Bosses get the banner ("THE LAWN GUY IS HERE"), which says it
-        // louder and in a place that never collides with the HUD. A second
-        // floating nameplate for them was redundant, and when a boss spawned
-        // off-camera the clamp parked it on top of the kill counter.
-        if (boss) {
-            this._announce(`${type.name} is here`);
-            return;
-        }
-        // Keep the nameplate inside the viewport AND clear of the HUD: the
-        // level/time block sits top-left, kills top-right, and the HP bar and
-        // weapon chips run along the bottom. Clamping to the raw viewport put
-        // names straight through them.
-        const vw = CONFIG.CANVAS_WIDTH;
-        const vh = CONFIG.CANVAS_HEIGHT;
-        const padX = 110;
-        const hudTop = 96;
-        const hudBottom = 104;
-        const cx = Math.min(
-            Math.max(x, this.camera.worldX + padX),
-            this.camera.worldX + vw - padX
+        this.callouts.push(
+            new Callout(type.name, x, y - (type.size || 16) - 26, {
+                accent: boss ? '#FF4B4B' : '#FFC830',
+                big: boss,
+                life: boss ? 2.8 : 2.2
+            })
         );
-        const cy = Math.min(
-            Math.max(y - (type.size || 16) - 18, this.camera.worldY + hudTop),
-            this.camera.worldY + vh - hudBottom
-        );
-        this.createFloatingText(type.name, cx, cy, boss ? '#FF4B4B' : '#FFC830', {
-            life: boss ? 2.6 : 2.1,
-            vy: -18,
-            size: boss ? 26 : 17,
-            crit: true
-        });
         this._announce(`${type.name} ahead`);
     }
 
@@ -1760,7 +1771,6 @@ export class Game {
         const x = Math.max(24, Math.min(aw - 24, this.player.x + Math.cos(angle) * dist));
         const y = Math.max(24, Math.min(ah - 24, this.player.y + Math.sin(angle) * dist));
         this.enemies.push(new Enemy(x, y, type, hpMult, dmgMult));
-        this._introduceNeighbour(type, x, y);
     }
 
     _spawnBoss(bossDef, hpMult, dmgMult) {
@@ -1769,7 +1779,6 @@ export class Game {
         const x = this.player.x + Math.cos(angle) * d;
         const y = this.player.y + Math.sin(angle) * d;
         this.enemies.push(new Enemy(x, y, bossDef, hpMult, dmgMult));
-        this._introduceNeighbour(bossDef, x, y);
         this.ui.showBossBanner(bossDef.name);
         this.audio.bossSpawn();
         this.effects.bossSpawn();
@@ -1814,6 +1823,28 @@ export class Game {
     dropExp(x, y, amount) {
         this.expOrbs.push(new ExpOrb(x, y, amount));
     }
+    /**
+     * v2.8: a burst of confetti every time a neighbour goes down -- small,
+     * fast, colourful, gone in half a second. Replaces the old puff of dots
+     * in the enemy's own colour.
+     */
+    createConfetti(x, y, n) {
+        const colours = ['#FFC830', '#FF5E5E', '#9B5CFF', '#00D1FF', '#8EE06B', '#FF70E6'];
+        if (this.save.settings.reducedMotion) n = Math.min(n, 3);
+        for (let i = 0; i < n; i++) {
+            this.particles.push(
+                this.pools.particle.acquire(x, y, colours[(Math.random() * colours.length) | 0], {
+                    confetti: true,
+                    size: 2 + Math.random() * 2,
+                    life: 0.5 + Math.random() * 0.3,
+                    decay: 1.6 + Math.random(),
+                    speed: 120 + Math.random() * 220,
+                    friction: 0.08
+                })
+            );
+        }
+    }
+
     createParticles(x, y, color, n) {
         if (this.save.settings.reducedMotion) n = Math.min(n, 2);
         for (let i = 0; i < n; i++) {
@@ -1897,6 +1928,7 @@ export class Game {
         for (const ep of this.enemyProjectiles) ep.render(ctx);
         for (const p of this.particles) p.render(ctx);
         for (const t of this.floatingTexts) t.render(ctx);
+        if (this.callouts) for (const c of this.callouts) c.render(ctx);
 
         ctx.restore();
 

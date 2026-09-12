@@ -296,6 +296,8 @@ export class UI {
         // Easy ones first, scary ones last — the order they turn up in.
         const order = [
             'bat',
+            'box_kid',
+            'pumpkin_kid',
             'zombie',
             'dad_rake',
             'dad_polo',

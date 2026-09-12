@@ -585,6 +585,28 @@ const SPRITES = {
     },
 
 
+    // Kid in a Jack-o'-Lantern: a giant carved pumpkin with legs. Like the
+    // cardboard box, you never see the kid inside.
+    pumpkin_kid: {
+        rows: [
+            '......SS......',
+            '.....SSSS.....',
+            '...OOOOOOOO...',
+            '..OOOOOOOOOO..',
+            '.OOOOOOOOOOOO.',
+            '.OOKKOOOOKKOO.',
+            '.OOKKOOOOKKOO.',
+            '.OOOOOOOOOOOO.',
+            '.OOKOOOOOOKOO.',
+            '.OOOKKKKKKOOO.',
+            '..OOOOOOOOOO..',
+            '...OOOOOOOO...',
+            '....LL..LL....',
+            '...WWW..WWW...'
+        ],
+        palette: { S: C.stem, O: C.pumpkin, K: C.eye, L: C.pants, W: C.shoe }
+    },
+
     // Kid in a Sheet (ghost): two eye holes, ragged hem.
     ghost: {
         rows: [

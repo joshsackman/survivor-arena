@@ -115,6 +115,9 @@ export function resetParticle(obj, x, y, color, opts = {}) {
     obj.vx = Math.cos(a) * s;
     obj.vy = Math.sin(a) * s;
     obj.friction = opts.friction ?? 0.2;
+    // Pooled particles are recycled, so this flag has to be reset every time
+    // or a confetti square stays confetti for the rest of the run.
+    obj.confetti = !!opts.confetti;
 }
 
 export function resetEnemyProjectile(obj, x, y, angle, speed, damage) {
