@@ -510,7 +510,7 @@ export class Game {
             this.audio.unlock();
             this.speedrunMode = false;
             this.dailyMode = false;
-            this.start();
+            this.playIntro();
         });
         q('btnSpeedrun')?.addEventListener('click', () => {
             this.audio.unlock();
@@ -538,6 +538,7 @@ export class Game {
         q('btnMenu')?.addEventListener('click', () => {
             this.ui.hideGameOver();
             this.ui.showStart();
+        this.audio.play?.('titleSting');
             this.state = GameState.MENU;
             this.speedrunMode = false;
         });
@@ -587,16 +588,147 @@ export class Game {
         container.style.height = `${CONFIG.CANVAS_HEIGHT * scale}px`;
     }
 
-    start() {
-        this.state = GameState.PLAYING;
-        // v2.8: tell the player why the whole street is chasing them.
-        this.ui.showStreetShout?.('NICE COSTUME, KID!', 1400);
-        clearTimeout(this._openingBeat);
-        this._openingBeat = setTimeout(() => {
-            if (this.state === GameState.PLAYING) {
-                this.ui.showStreetShout?.("WAIT - THAT'S NOT A COSTUME!", 2600);
+    /**
+     * v2.8: the moment the premise happens. The kid walks down his own street,
+     * a neighbour turns and spots him, and the compliment curdles into a
+     * manhunt. Runs in its own state so nothing spawns or collides mid-scene,
+     * and any key or tap skips straight to the run -- kids replay constantly.
+     */
+    playIntro() {
+        if (this.save.settings.reducedMotion) return this.start();
+        this.ui.hideStart();
+        this.state = GameState.CUTSCENE;
+        this.gameTime = 0;
+        this.enemies = [];
+        this.projectiles = [];
+        this.enemyProjectiles = [];
+        this.expOrbs = [];
+        this.particles = [];
+        this.floatingTexts = [];
+        this.callouts = [];
+        this.mines = [];
+        this._metNeighbours = new Set();
+
+        const W = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+        const H = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+        const midY = H * 0.5;
+        this.player = new Player(W * 0.3, midY);
+        this._updateCamera();
+
+        // Neighbours start at their houses and step out into the road.
+        this._introActors = [
+            { key: 'zombie', x: W * 0.47, y: midY - 210, tx: W * 0.47, ty: midY - 70, size: 18, out: 2.0 },
+            { key: 'skeleton', x: W * 0.56, y: midY + 215, tx: W * 0.55, ty: midY + 80, size: 17, out: 2.3 },
+            { key: 'box_kid', x: W * 0.63, y: midY - 200, tx: W * 0.62, ty: midY - 50, size: 16, out: 2.6 },
+            { key: 'golem', x: W * 0.5, y: midY + 230, tx: W * 0.5, ty: midY + 140, size: 26, out: 2.9 },
+            { key: 'wolf', x: W * 0.66, y: midY + 210, tx: W * 0.65, ty: midY + 60, size: 16, out: 3.1 }
+        ];
+        this._introT = 0;
+        this._introDone = false;
+        this._introSaid = new Set();
+        this.audio.unlock?.();
+
+        const skip = () => this._endIntro();
+        this._introSkip = skip;
+        window.addEventListener('keydown', skip, { once: true });
+        window.addEventListener('pointerdown', skip, { once: true });
+
+        // The scene needs the frame loop running: it only started when a run
+        // began, so the cutscene rendered nothing at all.
+        cancelAnimationFrame(this.raf);
+        this.lastTime = performance.now();
+        this._scheduleFrame();
+        this.audio.startMusic('intro');
+
+        this._introTimer = setTimeout(() => this._endIntro(), 6000);
+    }
+
+    /** Leave the scene exactly once, however it ended. */
+    _endIntro() {
+        if (this._introDone) return;
+        this._introDone = true;
+        clearTimeout(this._introTimer);
+        window.removeEventListener('keydown', this._introSkip);
+        window.removeEventListener('pointerdown', this._introSkip);
+        this._introActors = null;
+        this.start({ fromIntro: true });
+    }
+
+    /**
+     * The beats: the kid strolls home, a dad compliments the costume, then
+     * the street works out it is not one. Everything is said in-world by the
+     * neighbours themselves rather than as a banner across the screen.
+     */
+    _updateIntro(dt) {
+        this._introT += dt;
+        const t = this._introT;
+        if (this.player) this.player.x += 74 * dt;
+
+        for (const a of this._introActors || []) {
+            if (t >= a.out) {
+                a.x += (a.tx - a.x) * Math.min(1, 2.2 * dt);
+                a.y += (a.ty - a.y) * Math.min(1, 2.2 * dt);
             }
-        }, 1450);
+        }
+
+        const say = (id, text, actorIdx, accent, big) => {
+            if (this._introSaid.has(id)) return;
+            this._introSaid.add(id);
+            const a = (this._introActors || [])[actorIdx];
+            if (!a) return;
+            this.callouts.push(
+                new Callout(text, a.x, a.y - a.size - 30, { accent, big, life: 2.2 })
+            );
+        };
+
+        if (t >= 1.3) say('a', 'Nice costume, kid!', 0, '#FFC830', false);
+        if (t >= 2.6) say('b', "That's not a costume.", 1, '#FF4B4B', false);
+        if (t >= 3.5) {
+            say('c', 'GET THEM!', 3, '#FF4B4B', true);
+            this.audio.bossWarn?.();
+        }
+        if (t >= 4.0 && !this._introSaid.has('d')) {
+            this._introSaid.add('d');
+            // Everyone turns and starts closing in.
+            for (const a of this._introActors || []) {
+                a.tx = this.player.x + (a.x - this.player.x) * 0.45;
+                a.ty = this.player.y + (a.y - this.player.y) * 0.45;
+                a.out = 0;
+            }
+        }
+
+        for (let i = this.callouts.length - 1; i >= 0; i--) {
+            const c = this.callouts[i];
+            c.update(dt);
+            if (c.shouldRemove) this.callouts.splice(i, 1);
+        }
+        this._updateCamera();
+    }
+
+    /** The scene is drawn with the ordinary street + sprite pipeline. */
+    _renderIntro() {
+        const ctx = this.ctx;
+        const bg = getBackgroundFor(this.stageId);
+        ctx.fillStyle = bg.fill;
+        ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+        ctx.save();
+        ctx.translate(-this.camera.worldX, -this.camera.worldY);
+        this._drawStreet();
+        for (const a of this._introActors || []) {
+            drawSprite(ctx, a.key, a.x, a.y, a.size * 2.6);
+        }
+        if (this.player) this.player.render(ctx);
+        for (const c of this.callouts || []) c.render(ctx);
+        ctx.restore();
+    }
+
+    start(opts = {}) {
+        this.state = GameState.PLAYING;
+        // The cutscene already played these beats in-world; only shout them
+        // when it was skipped (or reduced motion turned it off).
+        if (!opts.fromIntro) {
+            this.ui.showStreetShout?.("THAT'S NOT A COSTUME - GET THEM!", 2200);
+        }
         this.gameTime = 0;
         this.kills = 0;
         this.enemies = [];
@@ -685,7 +817,10 @@ export class Game {
         }
 
         this.audio.unlock();
-        this.audio.startMusic();
+        // The transition into the run should be audible: a short rising
+        // flourish, then the chase theme.
+        this.audio.chaseStart();
+        this.audio.startMusic('street');
 
         this.lastTime = performance.now();
         this._scheduleFrame();
@@ -934,7 +1069,10 @@ export class Game {
         } else if (this.state === GameState.PAUSED) {
             this.state = GameState.PLAYING;
             this.ui.hidePause();
-            this.audio.startMusic();
+            // Resume the theme that fits the moment -- unpausing mid-boss
+            // should not drop back to the street music -- and no flourish,
+            // which would fire every time a kid pauses to read something.
+            this.audio.startMusic(this.enemies.some((e) => e.boss) ? 'boss' : 'street');
             this.lastTime = performance.now();
             // iter-16 bug-bash: shift the speedrun + run-start anchors forward
             // by however long we were paused so wall-clock readings exclude
@@ -1065,6 +1203,7 @@ export class Game {
         cancelAnimationFrame(this.raf);
         this.audio.stopMusic();
         this.audio.death();
+        this.audio.gameOverSting();
         // iter-19: long death-knell pattern. Fired once at the moment of
         // game over, before any leaderboard / replay finalisation work.
         this.haptics?.gameOver();
@@ -1200,7 +1339,15 @@ export class Game {
     }
 
     _frame(now) {
-        if (this.state !== GameState.PLAYING && this.state !== GameState.LEVEL_UP) return;
+        // The cutscene drives itself from this loop, so it has to be allowed
+        // through. Returning early here also skipped _scheduleFrame(), which
+        // killed the loop after a single frame and left the scene black.
+        if (
+            this.state !== GameState.PLAYING &&
+            this.state !== GameState.LEVEL_UP &&
+            this.state !== GameState.CUTSCENE
+        )
+            return;
         // Clamp dt so that (a) a paused+resumed tab does not nuke the sim in
         // one step, and (b) frame-rate spikes don't create tunneling bugs.
         // `now` is the rAF timestamp, but lastTime is captured from
@@ -1214,7 +1361,9 @@ export class Game {
         // are fresh by the time update() reads `getMoveVector`. Safe no-op
         // when no pad is attached.
         this.input.pollGamepad?.();
-        if (this.state === GameState.PLAYING) {
+        if (this.state === GameState.CUTSCENE) {
+            this._updateIntro(dt);
+        } else if (this.state === GameState.PLAYING) {
             this.update(dt);
         }
         // iter-20: pass the canvas viewport so EffectLayer can recycle
@@ -1231,6 +1380,18 @@ export class Game {
 
     update(dt) {
         this.gameTime += dt;
+
+        // v2.8 audio: how hectic the street feels right now drives how many
+        // music layers play. Tempo never changes -- that would fight the
+        // sequencer -- so danger adds percussion, harmony and sparkle.
+        this._intensityAt = (this._intensityAt || 0) + dt;
+        if (this._intensityAt > 0.75) {
+            this._intensityAt = 0;
+            const crowd = Math.min(1, this.enemies.length / 26);
+            const elapsed = Math.min(1, this.gameTime / 300);
+            const boss = this.enemies.some((e) => e.boss) ? 0.25 : 0;
+            this.audio.setIntensity?.(Math.min(1, crowd * 0.55 + elapsed * 0.45 + boss));
+        }
 
         const { hpMult, dmgMult, diff } = this._computeDifficultyMults();
         this.enemyDmgMult = dmgMult; // used by enemy projectile spawn
@@ -1441,12 +1602,18 @@ export class Game {
     _onEnemyKilled(e, hpMult, dmgMult) {
         this.kills++;
         this.createConfetti(e.x, e.y, e.boss ? 40 : 12);
+        // Bigger neighbours pop lower; the registry pitches each successive
+        // defeat a little higher so clearing a mob builds.
+        if (e.boss) this.audio.play?.('bossDeath');
+        else this.audio.play?.('enemyDeath', { freq: Math.max(160, 520 - e.size * 11) });
         this.effects.hit(e.x, e.y, this._rgbFromHex(e.color));
         this.dropExp(e.x, e.y, e.expValue);
         if (e.boss) {
             this.shake(0.5);
             this.audio.explosion();
             this.achievements.onBossDefeated(e.id);
+            // Back to the chase once the last boss on screen is down.
+            if (!this.enemies.some((x) => x.boss && x !== e)) this.audio.startMusic('street');
             this._announce(`${e.id.replace('_', ' ')} defeated`);
             // Mark no-hit-boss if the player's unhit streak is longer than
             // the fight itself. We use the unhit timer (seconds without
@@ -1749,6 +1916,8 @@ export class Game {
                 life: boss ? 2.8 : 2.2
             })
         );
+        const voice = this.audio.voiceFor?.(type.id);
+        if (voice) this.audio.play?.(voice);
         this._announce(`${type.name} ahead`);
     }
 
@@ -1781,6 +1950,7 @@ export class Game {
         this.enemies.push(new Enemy(x, y, bossDef, hpMult, dmgMult));
         this.ui.showBossBanner(bossDef.name);
         this.audio.bossSpawn();
+        this.audio.startMusic('boss');
         this.effects.bossSpawn();
         // iter-15 polish: bump boss-spawn camera shake by +50% (0.8 → 1.2).
         // The reduced-motion gate inside `shake()` still applies so
@@ -1902,6 +2072,10 @@ export class Game {
     // --- Rendering --------------------------------------------------------
     render(_dt) {
         const ctx = this.ctx;
+        if (this.state === GameState.CUTSCENE) {
+            this._renderIntro();
+            return;
+        }
         // 1) Background fill in screen space (no transform). This guarantees
         //    the viewport is always cleared even when the camera sits flush
         //    against an arena edge and a sliver would otherwise be unfilled.

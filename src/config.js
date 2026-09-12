@@ -59,6 +59,7 @@ export const CONFIG = {
 
 export const GameState = Object.freeze({
     MENU: 'menu',
+    CUTSCENE: 'cutscene',
     PLAYING: 'playing',
     PAUSED: 'paused',
     LEVEL_UP: 'levelup',

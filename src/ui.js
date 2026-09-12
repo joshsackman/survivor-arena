@@ -1116,7 +1116,7 @@ export class UI {
     }
 }
 
-function buildUpgradePool(player) {
+export function buildUpgradePool(player) {
     // Two tiers: live (selectable) upgrades first, then "maxed" cards as a
     // visible reminder of mastery. The level-up screen still prefers `live`,
     // so the player rarely sees a maxed card unless their build is full.
@@ -1149,7 +1149,7 @@ function buildUpgradePool(player) {
     return live.concat(maxed);
 }
 
-function isUpgradeLive(player, up) {
+export function isUpgradeLive(player, up) {
     if (up.type === 'weapon') {
         const existing = player.weapons.find((w) => w.id === up.data.id);
         return !existing || existing.level < CONFIG.WEAPON_MAX_LEVEL;
@@ -1158,7 +1158,7 @@ function isUpgradeLive(player, up) {
     return !existing || existing.count < CONFIG.PASSIVE_MAX_STACK;
 }
 
-function pickN(arr, n) {
+export function pickN(arr, n) {
     const out = [];
     const copy = arr.slice();
     while (out.length < n && copy.length) {

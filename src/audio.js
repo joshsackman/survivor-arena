@@ -120,104 +120,422 @@ export class AudioEngine {
         return buf;
     }
 
+    // ---- Playback budget -------------------------------------------------
+    // A mob of 30 neighbours must not produce 30 simultaneous voices. Every
+    // sound goes through `play()`, which enforces a per-name cooldown and a
+    // global cap on how many one-shots may start in the same frame.
+    _canPlay(name, cooldownMs) {
+        if (!this.enabled || !this.ctx || !this.unlocked) return false;
+        const now = performance.now();
+        this._lastPlayed ??= Object.create(null);
+        if (cooldownMs && now - (this._lastPlayed[name] || 0) < cooldownMs) return false;
+        // Global voice budget: at most 6 new one-shots per 60ms window.
+        if (now - (this._voiceWindowAt || 0) > 60) {
+            this._voiceWindowAt = now;
+            this._voicesThisWindow = 0;
+        }
+        if ((this._voicesThisWindow || 0) >= 6) return false;
+        this._voicesThisWindow = (this._voicesThisWindow || 0) + 1;
+        this._lastPlayed[name] = now;
+        return true;
+    }
+
+    /** Fire several tones as one sound, offsets in ms. */
+    _seq(steps) {
+        for (const st of steps) {
+            if (!st.at) this.tone(st);
+            else setTimeout(() => this.tone(st), st.at);
+        }
+    }
+
+    /**
+     * The one entry point for sound effects.
+     * `audio.play('shoot')`, `audio.play('enemyDeath')`, ...
+     * Unknown names are ignored rather than throwing, so gameplay code can
+     * name a sound before it exists.
+     */
+    play(name, opts = {}) {
+        const def = this._sfx()[name];
+        if (!def) return;
+        if (!this._canPlay(name, def.cooldown ?? 0)) return;
+        def.run.call(this, opts);
+    }
+
+    /**
+     * The palette. Volumes are balanced as a hierarchy: player feedback is
+     * loudest, enemy personality quietest, so a crowd never buries the
+     * information the player actually needs.
+     */
+    _sfx() {
+        if (this._sfxTable) return this._sfxTable;
+        const V = { loud: 0.22, mid: 0.15, soft: 0.09, quiet: 0.06 };
+        this._sfxTable = {
+            // --- player ---------------------------------------------------
+            startGame: {
+                run: () =>
+                    this._seq([
+                        { freq: 392, dur: 0.09, type: 'square', volume: V.mid },
+                        { freq: 523, dur: 0.09, type: 'square', volume: V.mid, at: 90 },
+                        { freq: 784, dur: 0.2, type: 'square', volume: V.loud, at: 180 }
+                    ])
+            },
+            playerHit: {
+                cooldown: 120,
+                run: () =>
+                    this.tone({ freq: 700, dur: 0.09, type: 'square', volume: V.mid, sweep: -420 })
+            },
+            playerHurt: {
+                cooldown: 300,
+                run: () =>
+                    this._seq([
+                        { freq: 300, dur: 0.12, type: 'sawtooth', volume: V.mid, sweep: -60 },
+                        { freq: 240, dur: 0.16, type: 'sawtooth', volume: V.mid, sweep: -70, at: 110 }
+                    ])
+            },
+            gameOver: {
+                run: () =>
+                    this._seq([
+                        { freq: 392, dur: 0.18, type: 'square', volume: V.loud },
+                        { freq: 330, dur: 0.18, type: 'square', volume: V.loud, at: 190 },
+                        { freq: 262, dur: 0.22, type: 'square', volume: V.loud, at: 380 },
+                        { freq: 165, dur: 0.75, type: 'sawtooth', volume: V.loud, sweep: -60, at: 600 }
+                    ])
+            },
+            levelUp: {
+                run: () =>
+                    this._seq([
+                        { freq: 523, dur: 0.07, type: 'square', volume: V.mid },
+                        { freq: 659, dur: 0.07, type: 'square', volume: V.mid, at: 70 },
+                        { freq: 784, dur: 0.07, type: 'square', volume: V.mid, at: 140 },
+                        { freq: 1047, dur: 0.16, type: 'square', volume: V.loud, at: 210 }
+                    ])
+            },
+            pickup: {
+                cooldown: 45,
+                run: () =>
+                    this.tone({ freq: 1180, dur: 0.05, type: 'square', volume: V.soft, sweep: 380 })
+            },
+            pickupRare: {
+                run: () =>
+                    this._seq([
+                        { freq: 784, dur: 0.06, type: 'square', volume: V.mid },
+                        { freq: 1047, dur: 0.06, type: 'square', volume: V.mid, at: 60 },
+                        { freq: 1319, dur: 0.06, type: 'square', volume: V.mid, at: 120 },
+                        { freq: 1568, dur: 0.18, type: 'triangle', volume: V.mid, at: 180 }
+                    ])
+            },
+            doorbell: {
+                run: () =>
+                    this._seq([
+                        { freq: 659, dur: 0.22, type: 'triangle', volume: V.mid },
+                        { freq: 523, dur: 0.34, type: 'triangle', volume: V.mid, at: 240 }
+                    ])
+            },
+            // --- combat ---------------------------------------------------
+            shoot: {
+                cooldown: 70,
+                run: () =>
+                    this.tone({ freq: 820, dur: 0.035, type: 'square', volume: V.quiet, sweep: -340 })
+            },
+            impact: {
+                cooldown: 55,
+                run: () => this.tone({ noise: true, dur: 0.04, volume: V.quiet, release: 0.03 })
+            },
+            enemyDeath: {
+                cooldown: 35,
+                run: (o) => {
+                    // Combo: each quick successive defeat pops a little higher.
+                    const now = performance.now();
+                    if (now - (this._comboAt || 0) > 900) this._combo = 0;
+                    this._comboAt = now;
+                    this._combo = Math.min((this._combo || 0) + 1, 8);
+                    const base = (o.freq || 300) * Math.pow(1.06, this._combo);
+                    this.tone({
+                        freq: base,
+                        dur: 0.06,
+                        type: 'square',
+                        volume: V.soft,
+                        sweep: -Math.min(240, base * 0.5)
+                    });
+                }
+            },
+            bossDeath: {
+                run: () =>
+                    this._seq([
+                        { noise: true, dur: 0.3, volume: V.loud, release: 0.2 },
+                        { freq: 300, dur: 0.4, type: 'sawtooth', volume: V.mid, sweep: -200, at: 60 }
+                    ])
+            },
+            // --- neighbours (quietest layer) ------------------------------
+            dad: {
+                cooldown: 1400,
+                run: () =>
+                    this._seq([
+                        { freq: 190, dur: 0.07, type: 'square', volume: V.quiet },
+                        { freq: 150, dur: 0.1, type: 'square', volume: V.quiet, at: 80 }
+                    ])
+            },
+            mom: {
+                cooldown: 1400,
+                run: () =>
+                    this._seq([
+                        { freq: 620, dur: 0.06, type: 'square', volume: V.quiet },
+                        { freq: 740, dur: 0.08, type: 'square', volume: V.quiet, at: 70 }
+                    ])
+            },
+            grandma: {
+                cooldown: 1800,
+                run: () =>
+                    this._seq([
+                        { freq: 420, dur: 0.09, type: 'triangle', volume: V.quiet, sweep: 60 },
+                        { freq: 380, dur: 0.11, type: 'triangle', volume: V.quiet, sweep: -60, at: 90 }
+                    ])
+            },
+            bully: {
+                cooldown: 1500,
+                run: () =>
+                    this._seq([
+                        { freq: 330, dur: 0.07, type: 'square', volume: V.quiet },
+                        { freq: 262, dur: 0.1, type: 'square', volume: V.quiet, at: 90 }
+                    ])
+            },
+            dog: {
+                cooldown: 1200,
+                run: () =>
+                    this._seq([
+                        { noise: true, dur: 0.05, volume: V.soft, release: 0.02 },
+                        { noise: true, dur: 0.05, volume: V.quiet, release: 0.02, at: 110 }
+                    ])
+            },
+            cat: {
+                cooldown: 1600,
+                run: () => this.tone({ noise: true, dur: 0.18, volume: V.quiet, release: 0.12 })
+            },
+            kid: {
+                cooldown: 1500,
+                run: () =>
+                    this.tone({ freq: 900, dur: 0.06, type: 'square', volume: V.quiet, sweep: 260 })
+            },
+            // --- world ----------------------------------------------------
+            spookyChime: {
+                cooldown: 9000,
+                run: () =>
+                    this._seq([
+                        { freq: 622, dur: 0.3, type: 'triangle', volume: V.quiet },
+                        { freq: 466, dur: 0.45, type: 'triangle', volume: V.quiet, at: 300 }
+                    ])
+            },
+            ufo: {
+                cooldown: 6000,
+                run: () =>
+                    this.tone({ freq: 520, dur: 0.5, type: 'sine', volume: V.quiet, sweep: 180 })
+            },
+            // --- title ----------------------------------------------------
+            titleSting: {
+                run: () =>
+                    this._seq([
+                        // three ominous notes...
+                        { freq: 196, dur: 0.24, type: 'sawtooth', volume: V.mid },
+                        { freq: 185, dur: 0.24, type: 'sawtooth', volume: V.mid, at: 260 },
+                        { freq: 175, dur: 0.3, type: 'sawtooth', volume: V.mid, at: 520 },
+                        // ...nope.
+                        { freq: 523, dur: 0.09, type: 'square', volume: V.mid, at: 880 },
+                        { freq: 659, dur: 0.09, type: 'square', volume: V.mid, at: 970 },
+                        { freq: 784, dur: 0.09, type: 'square', volume: V.mid, at: 1060 },
+                        { freq: 1047, dur: 0.22, type: 'square', volume: V.loud, at: 1150 },
+                        { noise: true, dur: 0.06, volume: V.soft, at: 1150 }
+                    ])
+            }
+        };
+        return this._sfxTable;
+    }
+
+    /** Which personality sound a given character uses. */
+    voiceFor(id) {
+        if (/^dad|zombie/.test(id)) return 'dad';
+        if (/^mom|skeleton/.test(id)) return 'mom';
+        if (/grandma|golem/.test(id)) return 'grandma';
+        if (/bully/.test(id)) return 'bully';
+        if (/^pet_cat$/.test(id)) return 'cat';
+        if (/wolf|pet_/.test(id)) return 'dog';
+        if (/bat|box_kid|pumpkin_kid|ghost|mage/.test(id)) return 'kid';
+        return null;
+    }
+
     // High-level SFX -------------------------------------------------------
+    // Thin aliases so every existing call site gets the balanced, throttled
+    // versions without being rewritten. New code should call play() directly.
     hit() {
-        this.tone({ freq: 320, dur: 0.05, type: 'square', volume: 0.12, sweep: -120 });
+        this.play('impact');
     }
     shoot() {
-        this.tone({ freq: 780, dur: 0.04, type: 'triangle', volume: 0.08, sweep: -200 });
+        this.play('shoot');
     }
     explosion() {
-        this.tone({ noise: true, dur: 0.25, volume: 0.22, release: 0.15 });
+        this.play('bossDeath');
     }
     pickup() {
-        this.tone({ freq: 1200, dur: 0.06, type: 'sine', volume: 0.12, sweep: 400 });
+        this.play('pickup');
     }
     levelUp() {
-        this.tone({ freq: 660, dur: 0.1, type: 'triangle', volume: 0.2 });
-        setTimeout(() => this.tone({ freq: 990, dur: 0.12, type: 'triangle', volume: 0.22 }), 90);
-        setTimeout(() => this.tone({ freq: 1320, dur: 0.18, type: 'triangle', volume: 0.24 }), 200);
+        this.play('levelUp');
     }
     damage() {
-        this.tone({ freq: 180, dur: 0.18, type: 'sawtooth', volume: 0.18, sweep: -80 });
+        this.play('playerHurt');
     }
     death() {
-        this.tone({ freq: 220, dur: 0.4, type: 'sawtooth', volume: 0.25, sweep: -180 });
-        setTimeout(
-            () => this.tone({ freq: 110, dur: 0.6, type: 'sawtooth', volume: 0.2, sweep: -80 }),
-            200
-        );
+        this.play('gameOver');
     }
     bossSpawn() {
-        this.tone({ noise: true, dur: 0.4, volume: 0.3, release: 0.25 });
-        setTimeout(() => this.tone({ freq: 80, dur: 0.6, type: 'sawtooth', volume: 0.3 }), 100);
+        this.play('bossDeath');
     }
     bossWarn() {
-        // Three-note descending "alert" — used in the boss banner lead-in.
-        this.tone({ freq: 480, dur: 0.12, type: 'square', volume: 0.2 });
-        setTimeout(() => this.tone({ freq: 360, dur: 0.12, type: 'square', volume: 0.2 }), 140);
-        setTimeout(() => this.tone({ freq: 240, dur: 0.2, type: 'square', volume: 0.22 }), 280);
+        this.play('spookyChime');
     }
     achievement() {
-        this.tone({ freq: 880, dur: 0.08, type: 'triangle', volume: 0.18 });
-        setTimeout(() => this.tone({ freq: 1174, dur: 0.1, type: 'triangle', volume: 0.2 }), 70);
-        setTimeout(() => this.tone({ freq: 1567, dur: 0.14, type: 'triangle', volume: 0.22 }), 150);
+        this.play('pickupRare');
+    }
+    gameOverSting() {
+        this.play('gameOver');
+    }
+    chaseStart() {
+        this.play('startGame');
     }
 
-    // Procedural music: arpeggiated minor progression. Four bars of 8 steps.
-    // Chord roots walk i - VI - III - VII (A minor relative: A, F, C, G).
-    startMusic() {
-        if (!this.enabled || !this.ctx || this.musicInterval) return;
+    // ---- Music -----------------------------------------------------------
+    // A goofy neighbourhood-mob chase, built as a 16-step loop at a FIXED
+    // tempo (~152 BPM). Danger never changes the tempo -- that would fight
+    // the sequencer -- it adds LAYERS instead: percussion, harmony, then an
+    // octave arpeggio, so the street gets busier without drifting out of time.
+    _themes() {
+        return {
+            // Mischievous, bouncy, slightly ridiculous. Minor with a cheeky
+            // major sixth, plenty of syncopation, and a turnaround at the end.
+            street: {
+                stepMs: 98,
+                root: 262,
+                wave: 'square',
+                // da-da-da DA / da-da-da DA / uh-oh-the-neighbours-are-coming
+                melody: [0, 0, 3, 7, null, 7, 3, 0, 5, 5, 8, 12, null, 10, 8, 7],
+                bass: [0, null, 0, null, -5, null, -5, null, -3, null, -3, null, 2, 2, 2, 2],
+                // The goofy turnaround: a quick chromatic scramble home.
+                turnaround: [12, 11, 10, 9]
+            },
+            boss: {
+                stepMs: 92,
+                root: 196,
+                wave: 'square',
+                melody: [0, 1, 0, -1, 0, 1, 5, 6, 0, 1, 0, -1, 6, 5, 1, 0],
+                bass: [0, 0, null, 0, -2, -2, null, -2, -4, -4, null, -4, -1, -1, -1, -1],
+                turnaround: [6, 5, 1, 0]
+            },
+            intro: {
+                stepMs: 210,
+                root: 196,
+                wave: 'triangle',
+                melody: [0, null, 4, null, 7, null, 4, null],
+                bass: [0, null, null, null, 5, null, null, null],
+                turnaround: null
+            }
+        };
+    }
+
+    /** 0 = calm, 1 = the whole street is after you. Adds layers, not speed. */
+    setIntensity(level) {
+        this._intensity = Math.max(0, Math.min(1, Number(level) || 0));
+    }
+
+    /**
+     * @param {'street'|'boss'|'intro'} [style]
+     */
+    startMusic(style = 'street') {
+        if (!this.enabled || !this.ctx) return;
         if (this.settings.musicEnabled === false) return;
+        // Already playing this theme: leave it alone. Restarting the run must
+        // never stack a second sequencer on top of the first.
+        if (this.musicInterval && this._musicStyle === style) return;
+        this.stopMusic();
         this.unlock();
-        const rootHz = 220; // A3
-        const minorArp = [0, 3, 7, 12, 7, 3]; // semitones
-        const progression = [0, -4, -9, -2]; // i, VI, iii, VII in semitones from root
-        const stepMs = 180;
-        let bar = 0;
+        this._musicStyle = style;
+        this._intensity ??= 0;
+        const T = this._themes()[style] || this._themes().street;
         let step = 0;
-        const totalStepsPerBar = minorArp.length;
-        const schedule = () => {
-            if (!this.ctx) return;
+        let bar = 0;
+
+        const note = (semi, opts) => {
+            if (semi === null || semi === undefined) return;
             const now = this.ctx.currentTime;
-            const rootSemis = progression[bar % progression.length];
-            const arpSemi = minorArp[step % minorArp.length];
-            const freq = rootHz * Math.pow(2, (rootSemis + arpSemi) / 12);
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.value = freq;
+            osc.type = opts.wave || T.wave;
+            osc.frequency.value = (opts.root || T.root) * Math.pow(2, semi / 12);
             gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.linearRampToValueAtTime(0.06, now + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+            gain.gain.linearRampToValueAtTime(opts.vol, now + 0.008);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + (opts.dur || 0.16));
             osc.connect(gain).connect(this.musicGain);
             osc.start(now);
-            osc.stop(now + 0.34);
+            osc.stop(now + (opts.dur || 0.16) + 0.02);
+        };
 
-            // Every 4 steps add a softer bass pedal tone one octave down.
-            if (step % 4 === 0) {
-                const bass = this.ctx.createOscillator();
-                const bgain = this.ctx.createGain();
-                bass.type = 'sine';
-                bass.frequency.value = (rootHz / 2) * Math.pow(2, rootSemis / 12);
-                bgain.gain.setValueAtTime(0.0001, now);
-                bgain.gain.linearRampToValueAtTime(0.04, now + 0.03);
-                bgain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
-                bass.connect(bgain).connect(this.musicGain);
-                bass.start(now);
-                bass.stop(now + 0.62);
+        const drum = (vol) => {
+            const now = this.ctx.currentTime;
+            const src = this.ctx.createBufferSource();
+            const gain = this.ctx.createGain();
+            src.buffer = this._noiseBuffer();
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+            src.connect(gain).connect(this.musicGain);
+            src.start(now);
+            src.stop(now + 0.06);
+        };
+
+        const tick = () => {
+            if (!this.ctx) return;
+            const I = this._intensity || 0;
+            const len = T.melody.length;
+
+            // Layer 1 (always): melody + bass.
+            note(T.melody[step % len], { vol: 0.05, dur: T.stepMs / 1000 + 0.04 });
+            note(T.bass[step % T.bass.length], {
+                root: T.root / 2,
+                wave: 'triangle',
+                vol: 0.055,
+                dur: 0.2
+            });
+
+            // Layer 2 (medium): noise percussion on the backbeat.
+            if (I > 0.33 && step % 4 === 2) drum(0.05 + I * 0.05);
+
+            // Layer 3 (busier): a harmony a fifth up, staccato.
+            if (I > 0.55 && T.melody[step % len] !== null && step % 2 === 0) {
+                note(T.melody[step % len] + 7, { vol: 0.028, dur: 0.09 });
+            }
+
+            // Layer 4 (chaos): octave arpeggio sparkle + extra percussion.
+            if (I > 0.75) {
+                if (step % 2 === 1) note((T.melody[step % len] ?? 0) + 12, { vol: 0.022, dur: 0.06 });
+                if (step % 4 === 0) drum(0.04);
             }
 
             step++;
-            if (step >= totalStepsPerBar) {
+            if (step >= len) {
                 step = 0;
                 bar++;
+                // Goofy turnaround every fourth bar: a quick chromatic scramble.
+                if (T.turnaround && bar % 4 === 0) {
+                    T.turnaround.forEach((semi, i) => {
+                        setTimeout(() => note(semi, { vol: 0.045, dur: 0.07 }), i * (T.stepMs / 2));
+                    });
+                }
             }
         };
-        this.musicInterval = setInterval(schedule, stepMs);
+
+        tick();
+        this.musicInterval = setInterval(tick, T.stepMs);
     }
 
     stopMusic() {
+        this._musicStyle = null;
         if (this.musicInterval) {
             clearInterval(this.musicInterval);
             this.musicInterval = null;
