@@ -804,6 +804,15 @@ export class Game {
         // setting so a stage-picker change between runs takes effect here.
         const stageOverride =
             this.dailyMode && this.dailyChallenge ? this.dailyChallenge.stage : null;
+        // A run armed by the ODG secret is played as Owens, then spent.
+        this._owensRun = !!this.save?.flags?.owensArmed;
+        if (this._owensRun) {
+            this.skinId = 'owens';
+            this.save.flags.owensArmed = false;
+            saveSave(this.save);
+        } else {
+            this.skinId = this.save?.settings?.skin || DEFAULT_SKIN_ID;
+        }
         this.stageId = stageOverride || this.save?.settings?.stage || DEFAULT_STAGE_ID;
         this.stageWaves = getWavesFor(this.stageId);
         this.stageBosses = this._applyDailyBossOffset(getBossesFor(this.stageId));
@@ -834,6 +843,15 @@ export class Game {
             (CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT) / 2,
             this.skinId
         );
+        if (this._owensRun) {
+            this.callouts ??= [];
+            this.callouts.push(
+                new Callout('OWENS MODE', this.player.x, this.player.y - 60, {
+                    accent: '#F5D547',
+                    life: 2.6
+                })
+            );
+        }
         this.player.weapons.push(new Weapon(WEAPONS.WHIP));
         // Snap camera to player at run start so the first frame doesn't show
         // a one-tick lerp from (0,0).
@@ -1198,6 +1216,15 @@ export class Game {
                     localStorage.setItem('vs_last_initials', normaliseInitials(input.value));
                 } catch {
                     /* private mode — not worth failing over */
+                }
+                // The secret: ODG on the world board arms the Owens costume
+                // for exactly one run.
+                if (normaliseInitials(input.value) === 'ODG') {
+                    this.save.flags = this.save.flags || {};
+                    this.save.flags.owensArmed = true;
+                    saveSave(this.save);
+                    status.textContent = '🍌 SECRET UNLOCKED — start a run!';
+                    this.audio?.play?.('pickupRare');
                 }
                 this._justPosted = {
                     initials: normaliseInitials(input.value),
@@ -1681,6 +1708,14 @@ export class Game {
 
     _onEnemyKilled(e, hpMult, dmgMult) {
         this.kills++;
+        // Owens: whatever you drop takes the rest of the crowd with it.
+        if (this.player?.oneHitKill && !this._owensChaining) {
+            this._owensChaining = true;
+            for (const other of this.enemies) {
+                if (other !== e && other.hp > 0) other.hp = 0;
+            }
+            this._owensChaining = false;
+        }
         this.createConfetti(e.x, e.y, e.boss ? 40 : 12);
         // Bigger neighbours pop lower; the registry pitches each successive
         // defeat a little higher so clearing a mob builds.

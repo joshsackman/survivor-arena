@@ -80,6 +80,9 @@ const C = {
     snakeDark: '#6E7A2E',
     tongue: '#E8455E',
     tabby: '#E8913C',
+    banana: '#F5D547',
+    bananaDark: '#C9A81E',
+    bananaTip: '#6B5A18',
     tabbyStripe: '#B8641F',
     catNose: '#E8709E',
     muzzle: '#FBD7B7',
@@ -816,6 +819,35 @@ const SPRITES = {
 
     // Kid in a Cardboard Box: the plainest costume on the street, and the
     // one every kid has worn at least once.
+    player_banana: {
+        rows: [
+            '.......TT.......',
+            '......BBBB......',
+            '.....BBBBBB.....',
+            '....BBBBBBBB....',
+            '....BBFFFFBB....',
+            '....BFKFFKFB....',
+            '....BFFFFFFB....',
+            '....BFFMMFFB....',
+            '...BBBBBBBBBB...',
+            '...BBBBBBBBBB...',
+            '...DBBBBBBBBD...',
+            '....DBBBBBBD....',
+            '.....LL..LL.....',
+            '....WWW..WWW....'
+        ],
+        palette: {
+            B: C.banana,
+            D: C.bananaDark,
+            T: C.bananaTip,
+            F: C.neighbourSkin,
+            K: C.eye,
+            M: C.eye,
+            L: C.pants,
+            W: C.shoe
+        }
+    },
+
     player_zombie: {
         rows: [
             '................',

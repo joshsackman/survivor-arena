@@ -63,6 +63,23 @@ export const SKINS = Object.freeze({
     })
 });
 
+/**
+ * Secret costume. Not in listSkins(), so it can never be chosen directly --
+ * it is armed by putting ODG on the world board and is spent after one run.
+ */
+export const SECRET_SKIN = Object.freeze({
+    id: 'owens',
+    name: 'Owens',
+    sprite: 'player_banana',
+    icon: '🍌',
+    blurb: 'One round only. Everything you touch goes down, and takes the rest with it.',
+    perk: 'One-hit KO',
+    oneHitKill: true,
+    secret: true
+});
+
+export const SECRET_CODE = 'ODG';
+
 export function listSkins() {
     return [SKINS.ALIEN, SKINS.ZOMBIE, SKINS.ROBOT, SKINS.GHOST, SKINS.PUMPKIN];
 }
@@ -75,6 +92,7 @@ export function isSkinUnlocked(skin, save) {
 
 export function getSkin(id) {
     if (!id) return SKINS.ALIEN;
+    if (id === SECRET_SKIN.id) return SECRET_SKIN;
     for (const s of Object.values(SKINS)) if (s.id === id) return s;
     return SKINS.ALIEN;
 }

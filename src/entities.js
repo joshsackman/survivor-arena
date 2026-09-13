@@ -38,7 +38,8 @@ export class Player {
         const skin = getSkin(skinId);
         this.skin = skin;
         this.spriteKey = skin.sprite || 'player';
-        this.skinDamageMult = skin.damageMult || 1;
+        this.skinDamageMult = skin.oneHitKill ? 1e9 : skin.damageMult || 1;
+        this.oneHitKill = !!skin.oneHitKill;
         this.skinDodge = skin.dodgeBonus || 0;
         this.baseMaxHp = 100 + (skin.maxHpBonus || 0);
         this.maxHp = this.baseMaxHp;
