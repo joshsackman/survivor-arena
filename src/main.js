@@ -1683,6 +1683,16 @@ export class Game {
             const dx = e.x - this.player.x;
             const dy = e.y - this.player.y;
             const d = Math.hypot(dx, dy);
+
+            // The General: nobody wants to charge him, so the neighbours
+            // hesitate. Refreshed every frame while they are inside the
+            // radius, and lapses on its own once they leave.
+            const auraR = this.player.auraSlowRadius;
+            if (auraR && d < auraR) {
+                e.slowTimer = Math.max(e.slowTimer || 0, 0.2);
+                e.slowPct = Math.max(e.slowPct || 0, this.player.auraSlowPct);
+            }
+
             if (d < e.size + this.player.size && !this.player.invincible) {
                 if (e.type?.stealsCandy) this._stealCandy(e);
                 this._lastAttacker = e.type?.name || null;

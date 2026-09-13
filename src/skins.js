@@ -67,9 +67,11 @@ export const SKINS = Object.freeze({
         name: 'The General',
         sprite: 'player_general',
         icon: '🎖️',
-        blurb: 'Medals, brass and a thick coat. Every hit hurts less.',
-        perk: 'Every hit -4 damage',
-        armorBonus: 4,
+        blurb: 'Nobody wants to charge a General. They slow right down near you.',
+        perk: 'Neighbours nearby slow down',
+        armorBonus: 2,
+        auraSlowRadius: 150,
+        auraSlowPct: 0.35,
         unlockAtRunExp: 3000
     }),
     GHOST: Object.freeze({

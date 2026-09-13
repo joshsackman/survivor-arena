@@ -43,6 +43,8 @@ export class Player {
         this.skinDodge = skin.dodgeBonus || 0;
         this.skinSpeedMult = skin.speedMult || 1;
         this.skinArmor = skin.armorBonus || 0;
+        this.auraSlowRadius = skin.auraSlowRadius || 0;
+        this.auraSlowPct = skin.auraSlowPct || 0;
         this.baseMaxHp = 100 + (skin.maxHpBonus || 0);
         this.maxHp = this.baseMaxHp;
         this.hp = this.baseMaxHp;
