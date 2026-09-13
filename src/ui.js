@@ -62,6 +62,7 @@ export class UI {
             'achievementToasts',
             'highScoreList',
             'caughtBy',
+            'goldEarned',
             'waveLabel',
             'achievementsScreen',
             'leaderboardScreen',
@@ -70,6 +71,8 @@ export class UI {
             'helpScreen',
             'howToPlayScreen',
             'skinPickerScreen',
+            'shopScreen',
+            'btnShopChip',
             'btnStageChip',
             'btnSkinChip'
         ];
@@ -237,6 +240,57 @@ export class UI {
                 onPick && onPick(btn.dataset.weapon);
             })
         );
+    }
+
+    /** Weapon Shop. Buy with gold earned from candy and kills. */
+    showShop(save, onBuy) {
+        const m = this.els.shopScreen;
+        if (!m) return;
+        const gold = save?.gold || 0;
+        const owned = save?.ownedWeapons || {};
+        const forSale = Object.values(WEAPONS).filter((w) => w.shopPrice);
+        m.innerHTML = `
+            <div class="overlay-card stage-picker-card">
+                <h2>Weapon Shop <span class="ach-count">${gold} gold</span></h2>
+                <p class="subtitle">100 candies = 1 gold &middot; 100 kills = 10 gold</p>
+                <div class="stage-grid">
+                    ${forSale
+                        .map((w) => {
+                            const have = !!owned[w.id];
+                            const canAfford = gold >= w.shopPrice;
+                            const cls = have ? ' owned' : canAfford ? '' : ' locked';
+                            return `
+                            <button class="stage-card${cls}" data-buy="${w.id}" ${
+                                have || !canAfford ? 'disabled' : ''
+                            }>
+                                <div class="stage-icon">${w.icon}</div>
+                                <div class="stage-name">${w.name}</div>
+                                <div class="stage-desc">${w.description}</div>
+                                <div class="skin-req">${
+                                    have ? '✅ Bought' : `${w.shopPrice} gold`
+                                }</div>
+                            </button>`;
+                        })
+                        .join('')}
+                </div>
+                <div class="btn-row">
+                    <button id="shopClose" class="btn primary">${t('close')}</button>
+                </div>
+            </div>`;
+        m.style.display = 'flex';
+        m.querySelector('#shopClose')?.addEventListener('click', () => {
+            m.style.display = 'none';
+        });
+        m.querySelectorAll('[data-buy]').forEach((btn) =>
+            btn.addEventListener('click', () => {
+                if (btn.disabled) return;
+                onBuy && onBuy(btn.dataset.buy);
+            })
+        );
+    }
+
+    updateShopChip(gold) {
+        if (this.els.btnShopChip) this.els.btnShopChip.textContent = `${gold || 0} gold`;
     }
 
     hideStagePicker() {
@@ -1171,6 +1225,10 @@ export class UI {
             const who = game._lastAttacker;
             this.els.caughtBy.textContent = who ? `${who} got you` : '';
         }
+        if (this.els.goldEarned) {
+            const g = game._goldEarnedThisRun || 0;
+            this.els.goldEarned.textContent = g > 0 ? `+${g} gold` : '';
+        }
         this.els.finalTime.textContent = `${m}:${s}`;
         this.els.finalKills.textContent = game.kills;
         this.els.finalLevel.textContent = game.player.level;
@@ -1288,6 +1346,8 @@ export function buildUpgradePool(player) {
     const live = [];
     const maxed = [];
     for (const weapon of Object.values(WEAPONS)) {
+        // Bought weapons only: a shop weapon you do not own is not offered.
+        if (weapon.shopPrice && !player.ownedWeapons?.[weapon.id]) continue;
         const existing = player.weapons.find((w) => w.id === weapon.id);
         if (existing) {
             if (existing.level < CONFIG.WEAPON_MAX_LEVEL) {

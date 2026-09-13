@@ -228,6 +228,7 @@ export class Game {
         // player sees which map their next Start Run would launch.
         this.ui.updateStageChip(this.stageId);
         this.ui.updateSkinChip?.(this.skinId);
+        this.ui.updateShopChip?.(this.save?.gold || 0);
 
         // iter-15: tutorial state machine + replay bookkeeping. Both are
         // inert until explicitly engaged by the player (via Try Tutorial /
@@ -539,6 +540,7 @@ export class Game {
         q('btnLeaderboard')?.addEventListener('click', () => this.openLeaderboard());
         q('btnSettings')?.addEventListener('click', () => this.openSettings());
         q('btnAchievements')?.addEventListener('click', () => this.openAchievements());
+        q('btnShop')?.addEventListener('click', () => this.openShop());
         q('btnViewStreak')?.addEventListener('click', () => this.openStreak());
         q('btnHowTo')?.addEventListener('click', () => this.openHowToPlay());
         // iter-15: replay-last-run + tutorial entry points on the start menu.
@@ -880,6 +882,7 @@ export class Game {
                 })
             );
         }
+        this.player.ownedWeapons = this.save?.ownedWeapons || {};
         if (this._owensRun) {
             this.callouts ??= [];
             this.callouts.push(
@@ -1015,6 +1018,28 @@ export class Game {
             this._arenaWeaponId = id;
             onChosen && onChosen();
         });
+    }
+
+    /** Weapon Shop: spend gold earned from candy and kills. */
+    openShop() {
+        this.ui.showShop?.(this.save, (id) => this.buyWeapon(id));
+    }
+
+    /** @returns {boolean} true when the purchase went through. */
+    buyWeapon(id) {
+        const def = Object.values(WEAPONS).find((w) => w.id === id);
+        if (!def || !def.shopPrice) return false;
+        this.save.ownedWeapons = this.save.ownedWeapons || {};
+        if (this.save.ownedWeapons[id]) return false;
+        if ((this.save.gold || 0) < def.shopPrice) return false;
+        this.save.gold -= def.shopPrice;
+        this.save.ownedWeapons[id] = true;
+        saveSave(this.save);
+        this.audio?.play?.('pickupRare');
+        this.ui.updateShopChip?.(this.save.gold);
+        // Re-render so the card flips to "Bought" and the balance updates.
+        this.ui.showShop?.(this.save, (next) => this.buyWeapon(next));
+        return true;
     }
 
     openSkinPicker() {
@@ -1415,6 +1440,14 @@ export class Game {
         // of weapon ids at death. If we haven't seen this combination before,
         // append it. Hard-cap the array at SEEN_BUILDS_CAP (1000) to keep the
         // save under a reasonable byte budget — older keys roll out FIFO.
+        // Weapon Shop earnings for this run.
+        const candies = this.run?.orbsCollected || 0;
+        const goldFromCandy = Math.floor(candies / 100);
+        const goldFromKills = Math.floor((this.kills || 0) / 100) * 10;
+        this._goldEarnedThisRun = goldFromCandy + goldFromKills;
+        if (this._goldEarnedThisRun > 0) {
+            this.save.gold = (this.save.gold || 0) + this._goldEarnedThisRun;
+        }
         this.save.totals ??= { kills: 0, timePlayed: 0, runs: 0, bossKills: 0 };
         this.save.totals.seenBuilds ??= [];
         const buildKey = this.player.weapons
@@ -1909,12 +1942,28 @@ export class Game {
                 if (d < enemy.size + p.size) {
                     const pct = p.def?.percentMaxHp || 0;
                     let dmg = pct ? enemy.maxHp * pct : p.damage;
-                    const chance = this.player.getCritChance();
+                    let chance = this.player.getCritChance();
+                    // Alien Raygun: far likelier to crit against the greys,
+                    // the guards and the Real Alien.
+                    if (p.def?.alienBonusCrit && p.def.alienIds?.includes(enemy.id)) {
+                        chance += p.def.alienBonusCrit;
+                    }
                     // A crit on a percentage hit would double 50% into a
                     // one-shot, so percentage weapons never crit.
                     const crit = !pct && chance > 0 && Math.random() < chance;
                     if (crit) dmg *= 2;
                     enemy.takeDamage(dmg);
+                    // Egg Launcher: the egg bursts, catching anyone close.
+                    if (p.def?.eggSplat) {
+                        const r = p.def.splatRadius || 70;
+                        for (const near of this.spatial.queryRect(p.x, p.y, r)) {
+                            if (near === enemy) continue;
+                            if (Math.hypot(near.x - p.x, near.y - p.y) <= r) {
+                                near.takeDamage(dmg * 0.6);
+                            }
+                        }
+                        this.createParticles(p.x, p.y, '#FFEE9C', 10);
+                    }
                     p.hitEnemies.add(enemy);
                     if (enemy.hp > 0) {
                         this.createFloatingText(

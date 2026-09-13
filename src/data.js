@@ -190,6 +190,54 @@ export const WEAPONS = {
     // Code on the main menu. Behaves like a fast piercing projectile (a nod
     // to retro shoot-'em-ups). Not part of the regular drop pool — only
     // available as a starter once UNLOCKS.konami_code is earned.
+    ULTRA_CHARGER: {
+        id: 'ultra_charger',
+        name: 'Ultra Charger',
+        icon: '🍬',
+        description: 'Candy corn fired all the way around you, ray-gun fast.',
+        baseDamage: 16,
+        baseCooldown: 1.1,
+        baseRange: 420,
+        projectileCount: 10,
+        piercing: true,
+        type: 'projectile',
+        speed: 560,
+        // Fires a full ring instead of aiming at one target.
+        radial: true,
+        shopPrice: 100
+    },
+    ALIEN_RAYGUN: {
+        id: 'alien_raygun',
+        name: 'Alien Raygun',
+        icon: '🛸',
+        description: 'A steady beam. Far more likely to crit against aliens.',
+        baseDamage: 22,
+        baseCooldown: 0.6,
+        baseRange: 460,
+        projectileCount: 1,
+        piercing: true,
+        type: 'projectile',
+        speed: 640,
+        // Who counts as an alien: the Area 51 natives and the Real Alien.
+        alienBonusCrit: 0.5,
+        alienIds: ['grey', 'guard', 'ice_queen'],
+        shopPrice: 50
+    },
+    EGG_LAUNCHER: {
+        id: 'egg_launcher',
+        name: 'Egg Launcher',
+        icon: '🥚',
+        description: 'Lob eggs that splatter where they land.',
+        baseDamage: 26,
+        baseCooldown: 1.0,
+        baseRange: 400,
+        projectileCount: 1,
+        type: 'projectile',
+        speed: 380,
+        eggSplat: true,
+        splatRadius: 70,
+        shopPrice: 30
+    },
     MAYOR_MALLET: {
         id: 'mayor_mallet',
         name: "Mayor's Mallet",

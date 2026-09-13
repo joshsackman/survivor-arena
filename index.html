@@ -209,6 +209,9 @@
                         <button id="btnAchievements" class="btn ghost" data-i18n="achievements">
                             Achievements
                         </button>
+                        <button id="btnShop" class="btn ghost">
+                            Weapon Shop <span id="btnShopChip" class="stage-chip">0 gold</span>
+                        </button>
                         <button id="btnLeaderboard" class="btn ghost" data-i18n="leaderboard">
                             World Board
                         </button>
@@ -233,6 +236,7 @@
             <div id="leaderboardScreen" class="overlay" style="display: none"></div>
             <div id="stagePickerScreen" class="overlay" style="display: none"></div>
             <div id="skinPickerScreen" class="overlay" style="display: none"></div>
+            <div id="shopScreen" class="overlay" style="display: none"></div>
             <div id="streakScreen" class="overlay" style="display: none"></div>
             <div id="helpScreen" class="overlay" style="display: none"></div>
             <div id="howToPlayScreen" class="overlay" style="display: none"></div>
@@ -283,6 +287,7 @@
                 <div class="overlay-card gameover">
                     <h1 id="gameOverTitle" data-i18n="gameover">CAUGHT!</h1>
                     <div id="caughtBy" class="caught-by"></div>
+                    <div id="goldEarned" class="gold-earned"></div>
                     <div class="stats">
                         <div>
                             <span data-i18n="finalTime">Survived</span>:

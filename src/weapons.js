@@ -220,6 +220,18 @@ export class Weapon {
         if (this.isEvolved() && this.id === 'knife') count = Math.max(count, 5);
         if (this.isEvolved() && this.id === 'magic_wand') count += 2;
         const spreadDeg = count > 1 ? (this.isEvolved() ? 24 : 14) : 0;
+        // Radial weapons fire all the way around and need no target at all.
+        if (this.def.radial) {
+            const turn = (this._radialTurn = (this._radialTurn || 0) + 1) * 0.17;
+            for (let i = 0; i < count; i++) {
+                const a = turn + (i / count) * Math.PI * 2;
+                game.projectiles.push(
+                    new Projectile(player.x, player.y, a, this.def, this.getDamage(player), this.level, player)
+                );
+            }
+            game.audio.shoot();
+            return;
+        }
         const target = game.spatial.findNearestEnemy(player.x, player.y, this.getRange(player));
         if (!target) return;
         const base = Math.atan2(target.y - player.y, target.x - player.x);
