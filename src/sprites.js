@@ -895,8 +895,8 @@ const SPRITES = {
             '.....CCCCCC.....',
             '...CCCCCCCCCC...',
             '..CCHHCCCCHHCC..',
-            '..CCBBBBBBBBCC..',
-            '.CCCBBBBBBBBBCC.',
+            '..CCRRBBRRRRCC..',
+            '.CCCRRRRRRRRRCC.',
             '.CCCCFFFFFFFFCC.',
             '.CCCCFKKFFKKFCC.',
             '.CCCCFFFFFFFFCC.',
@@ -910,6 +910,7 @@ const SPRITES = {
         palette: {
             C: C.cookie,
             H: C.choc,
+            R: C.bark,
             B: C.blueStreak,
             F: C.neighbourSkin,
             K: C.eye,
