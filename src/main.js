@@ -884,12 +884,6 @@ export class Game {
                 })
             );
         }
-        // The banana is a normal costume in here: no one-hit KO, no chain
-        // wipe, just a solid punch. Otherwise the final fight lasts a frame.
-        if (this.stageId === 'arena' && this.player.oneHitKill) {
-            this.player.oneHitKill = false;
-            this.player.skinDamageMult = 1.3;
-        }
         if (this.stageId === 'arena') {
             const def =
                 Object.values(WEAPONS).find((w) => w.id === this._arenaWeaponId) || WEAPONS.WHIP;
