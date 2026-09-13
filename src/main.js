@@ -884,6 +884,12 @@ export class Game {
                 })
             );
         }
+        // Owen and Freddie are ordinary costumes in here -- they keep the
+        // look and a solid punch, but they cannot one-shot the shopkeeper.
+        if (this.stageId === 'arena' && this.player.oneHitKill) {
+            this.player.oneHitKill = false;
+            this.player.skinDamageMult = 1.3;
+        }
         if (this.stageId === 'arena') {
             const def =
                 Object.values(WEAPONS).find((w) => w.id === this._arenaWeaponId) || WEAPONS.WHIP;
