@@ -55,8 +55,10 @@ import {
     DEFAULT_STAGE_ID,
     getBackgroundFor,
     getBossesFor,
+    getStage,
     getStageModifiers,
     getWavesFor,
+    isStageUnlocked,
     pickWeighted
 } from './stages.js';
 import { getSkin, DEFAULT_SKIN_ID } from './skins.js';
@@ -821,6 +823,17 @@ export class Game {
             this.skinId = this.save?.settings?.skin || DEFAULT_SKIN_ID;
         }
         this.stageId = stageOverride || this.save?.settings?.stage || DEFAULT_STAGE_ID;
+        // The Final Neighborhood is earned, not just hidden. A saved stage
+        // can outlive the boss record (a reset, a fresh profile), so the gate
+        // is enforced here too rather than only in the picker.
+        if (!isStageUnlocked(getStage(this.stageId), this.save)) {
+            this.stageId = DEFAULT_STAGE_ID;
+            if (this.save?.settings) {
+                this.save.settings.stage = DEFAULT_STAGE_ID;
+                saveSave(this.save);
+            }
+            this.ui.updateStageChip?.(this.stageId);
+        }
         this.stageWaves = getWavesFor(this.stageId);
         this.stageBosses = this._applyDailyBossOffset(getBossesFor(this.stageId));
         this.currentWave = this.stageWaves[0];
