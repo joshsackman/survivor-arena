@@ -308,6 +308,10 @@ export class Enemy {
         this.ranged = !!type.ranged;
         this.splitter = !!type.splitter;
         this.dasher = !!type.dasher;
+        // Boss charge state, driven by game.onBossAbility('charge').
+        this.chargeActive = 0;
+        this.chargeAngle = 0;
+        this.chargeSpeed = 0;
         this.shielded = !!type.shielded;
         this.bomber = !!type.bomber;
         this.illusionist = !!type.illusionist;
@@ -454,6 +458,13 @@ export class Enemy {
                 this.fireTimer = this.type.fireCooldown || 2;
                 game.audio?.shoot?.();
             }
+        } else if (this.chargeActive > 0) {
+            // Boss charge: barrel forward in a straight line for a moment.
+            // Previously onBossAbility moved x/y directly, which read on
+            // screen as the boss teleporting on top of you.
+            this.chargeActive -= dt;
+            vx = Math.cos(this.chargeAngle) * (this.chargeSpeed || 270) * slowMult;
+            vy = Math.sin(this.chargeAngle) * (this.chargeSpeed || 270) * slowMult;
         } else if (this.dasher) {
             this.dashTimer -= dt;
             if (this.dashActive > 0) {

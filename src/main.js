@@ -2407,10 +2407,12 @@ export class Game {
         } else if (boss.ability === 'charge') {
             const dx = this.player.x - boss.x;
             const dy = this.player.y - boss.y;
-            const d = Math.hypot(dx, dy) || 1;
-            boss.x += (dx / d) * 120;
-            boss.y += (dy / d) * 120;
+            boss.chargeAngle = Math.atan2(dy, dx);
+            boss.chargeActive = 0.45;
+            boss.chargeSpeed = 270;
+            // Dust kicked up where the run-up starts, so the tell is visible.
             this.createParticles(boss.x, boss.y, '#ff3366', 15);
+            this.audio?.play?.('impact');
         }
     }
 
