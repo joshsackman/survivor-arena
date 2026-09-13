@@ -81,6 +81,9 @@ const C = {
     tongue: '#E8455E',
     tabby: '#E8913C',
     banana: '#F5D547',
+    cookie: '#C98B4B',
+    cookieDark: '#9A6430',
+    choc: '#4A2C17',
     heroBlue: '#2B5FD9',
     shopPurple: '#6B3FA0',
     shopDark: '#452869',
@@ -883,6 +886,34 @@ const SPRITES = {
             M: C.eye,
             B: C.brass,
             W: C.armyDark
+        }
+    },
+
+    player_cookie: {
+        rows: [
+            '................',
+            '.....CCCCCC.....',
+            '...CCCCCCCCCC...',
+            '..CCHHCCCCHHCC..',
+            '..CCCCFFFFCCCC..',
+            '.CCCCFKKFFKKFCC.',
+            '.CCCCFFFFFFFFCC.',
+            '.CCHHCFFMMFFCHH.',
+            '.CCCCCCCCCCCCCC.',
+            '.CCCCHHCCCCHHCC.',
+            '..CCCCCCCCCCCC..',
+            '...CCCCCCCCCC...',
+            '.....LL..LL.....',
+            '....WWW..WWW....'
+        ],
+        palette: {
+            C: C.cookie,
+            H: C.choc,
+            F: C.neighbourSkin,
+            K: C.eye,
+            M: C.eye,
+            L: C.pants,
+            W: C.shoe
         }
     },
 

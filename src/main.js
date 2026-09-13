@@ -61,7 +61,7 @@ import {
     isStageUnlocked,
     pickWeighted
 } from './stages.js';
-import { getSkin, DEFAULT_SKIN_ID } from './skins.js';
+import { getSkin, DEFAULT_SKIN_ID, secretForCode } from './skins.js';
 import { dailyChallenge, saveDailyResult } from './daily.js';
 import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
@@ -814,9 +814,12 @@ export class Game {
         const stageOverride =
             this.dailyMode && this.dailyChallenge ? this.dailyChallenge.stage : null;
         // A run armed by the ODG secret is played as Owens, then spent.
-        this._owensRun = !!this.save?.flags?.owensArmed;
-        if (this._owensRun) {
-            this.skinId = 'owens';
+        const armed =
+            this.save?.flags?.secretArmed || (this.save?.flags?.owensArmed ? 'owens' : null);
+        this._owensRun = !!armed;
+        if (armed) {
+            this.skinId = armed;
+            this.save.flags.secretArmed = null;
             this.save.flags.owensArmed = false;
             saveSave(this.save);
         } else {
@@ -875,7 +878,7 @@ export class Game {
         if (this._owensRun) {
             this.callouts ??= [];
             this.callouts.push(
-                new Callout('OWENS MODE', this.player.x, this.player.y - 60, {
+                new Callout(`${getSkin(this.skinId).name.toUpperCase()} MODE`, this.player.x, this.player.y - 60, {
                     accent: '#F5D547',
                     life: 2.6
                 })
@@ -1290,11 +1293,14 @@ export class Game {
                 }
                 // The secret: ODG on the world board arms the Owens costume
                 // for exactly one run.
-                if (normaliseInitials(input.value) === 'ODG') {
+                const secret = secretForCode(normaliseInitials(input.value));
+                if (secret) {
                     this.save.flags = this.save.flags || {};
-                    this.save.flags.owensArmed = true;
+                    this.save.flags.secretArmed = secret.id;
+                    // Keep the original flag in step for older saves.
+                    this.save.flags.owensArmed = secret.id === 'owens';
                     saveSave(this.save);
-                    status.textContent = '🍌 SECRET UNLOCKED — start a run!';
+                    status.textContent = `${secret.icon} SECRET UNLOCKED — start a run!`;
                     this.audio?.play?.('pickupRare');
                 }
                 this._justPosted = {

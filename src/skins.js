@@ -89,17 +89,42 @@ export const SKINS = Object.freeze({
  * Secret costume. Not in listSkins(), so it can never be chosen directly --
  * it is armed by putting ODG on the world board and is spent after one run.
  */
-export const SECRET_SKIN = Object.freeze({
-    id: 'owens',
-    name: 'Owens',
-    sprite: 'player_banana',
-    icon: '🍌',
-    blurb: 'One round only. Everything you touch goes down, and takes the rest with it.',
-    perk: 'One-hit KO',
-    oneHitKill: true,
-    secret: true
+export const SECRET_SKINS = Object.freeze({
+    ODG: Object.freeze({
+        id: 'owens',
+        name: 'Owens',
+        sprite: 'player_banana',
+        icon: '🍌',
+        blurb: 'One round only. Everything you touch goes down, and takes the rest with it.',
+        perk: 'One-hit KO',
+        oneHitKill: true,
+        secret: true
+    }),
+    UZI: Object.freeze({
+        id: 'freddie',
+        name: 'Freddie',
+        sprite: 'player_cookie',
+        icon: '🍪',
+        blurb: 'One round only. Everything you touch goes down, and takes the rest with it.',
+        perk: 'One-hit KO',
+        oneHitKill: true,
+        secret: true
+    })
 });
 
+/** @returns {object|null} the costume a scoreboard code arms, if any. */
+export function secretForCode(code) {
+    return SECRET_SKINS[String(code || '').toUpperCase()] || null;
+}
+
+/** @returns {object|null} look a secret costume up by its id. */
+export function secretById(id) {
+    for (const s of Object.values(SECRET_SKINS)) if (s.id === id) return s;
+    return null;
+}
+
+// Kept for compatibility with the original single-secret wiring.
+export const SECRET_SKIN = SECRET_SKINS.ODG;
 export const SECRET_CODE = 'ODG';
 
 export function listSkins() {
@@ -133,7 +158,8 @@ export function skinRequirement(skin, save) {
 
 export function getSkin(id) {
     if (!id) return SKINS.ALIEN;
-    if (id === SECRET_SKIN.id) return SECRET_SKIN;
+    const secret = secretById(id);
+    if (secret) return secret;
     for (const s of Object.values(SKINS)) if (s.id === id) return s;
     return SKINS.ALIEN;
 }
