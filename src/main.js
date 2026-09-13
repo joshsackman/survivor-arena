@@ -801,9 +801,6 @@ export class Game {
         this._metNeighbours = new Set();
         this.callouts = [];
         this._bullyTimer = 0;
-        // The arena is a straight duel: no doorbell power-ups.
-        if (this.stageId === 'arena') this.doorbells = [];
-        else this._buildDoorbells();
         this._bossWarnedAt.clear();
         this._spawnAccumulator = 0;
         this._lastAnnouncedWave = null;
@@ -840,6 +837,11 @@ export class Game {
             }
             this.ui.updateStageChip?.(this.stageId);
         }
+        // Doorbells are decided here, not in the reset block above: stageId is
+        // only known at this point, so testing it earlier read the PREVIOUS
+        // run's stage and handed the arena a full set of power-ups.
+        if (this.stageId === 'arena') this.doorbells = [];
+        else this._buildDoorbells();
         this.stageWaves = getWavesFor(this.stageId);
         this.stageBosses = this._applyDailyBossOffset(getBossesFor(this.stageId));
         this.currentWave = this.stageWaves[0];
