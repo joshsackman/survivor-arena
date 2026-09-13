@@ -30,10 +30,17 @@ export class Weapon {
         // re-picked at level-up to refill.
         this.timeLeft = def.duration ?? Infinity;
         this._expired = false;
+        this._refreshName();
+    }
+
+    /** Evolved weapons take their evolved name, so the HUD shows it. */
+    _refreshName() {
+        this.name = this.isEvolved() && this.def.evolveName ? this.def.evolveName : this.def.name;
     }
 
     levelUp() {
         this.level++;
+        this._refreshName();
         if (this.def.duration) {
             this.timeLeft = this.def.duration;
             this._expired = false;

@@ -863,6 +863,15 @@ export class Game {
             (CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT) / 2,
             this.skinId
         );
+        if (this.stageId === 'arena') {
+            this.callouts ??= [];
+            this.callouts.push(
+                new Callout('PIXEL STORM UNLOCKED', this.player.x, this.player.y - 92, {
+                    accent: '#4FC3F7',
+                    life: 3.2
+                })
+            );
+        }
         if (this._owensRun) {
             this.callouts ??= [];
             this.callouts.push(
@@ -884,6 +893,13 @@ export class Game {
             const w = new Weapon(def);
             while (w.level < CONFIG.WEAPON_MAX_LEVEL) w.levelUp();
             this.player.weapons.push(w);
+            // The Pixel Storm: the Toy Ray Gun at full power, handed over at
+            // the start of the last fight. Skipped if they already chose it.
+            if (def.id !== WEAPONS.RETRO_BLASTER.id) {
+                const storm = new Weapon(WEAPONS.RETRO_BLASTER);
+                while (storm.level < CONFIG.WEAPON_MAX_LEVEL) storm.levelUp();
+                this.player.weapons.push(storm);
+            }
         } else {
             this.player.weapons.push(new Weapon(WEAPONS.WHIP));
         }
