@@ -1249,14 +1249,14 @@ export const ACHIEVEMENTS = [
         check: (c) => c.game.gameTime >= 300 && (c.run.passivesPicked || 0) === 0
     },
     // --- iter-20: hidden / easter-egg achievements ------------------------
-    // These three are intentionally undocumented in the gallery's tooltip
-    // copy until they're earned (the UI reveals them once unlocked). Their
-    // `hidden: true` flag is read by ui.js to gate the description preview.
+    // These three are secrets: the gallery masks the icon and name of an
+    // unearned achievement (🔒 / ???) but always shows the description, so the
+    // description has to read as a hint you can act on.
     {
         id: 'konami_code',
         name: 'Konami Code',
         icon: '🎮',
-        description: 'Found the legendary cheat. Unlocks the Toy Ray Gun.',
+        description: 'On the menu, press \u2191 \u2191 \u2193 \u2193 \u2190 \u2192 \u2190 \u2192 B A. Unlocks the Toy Ray Gun.',
         hidden: true,
         check: (c) => !!c.run.konamiCode
     },
