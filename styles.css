@@ -1630,3 +1630,29 @@ body.cb-mode .exp-fill {
 .stage-card.owned .skin-req {
     color: #f2c33c;
 }
+
+/* Mobile Konami Code: swipe the eight arrows on the title screen and these
+   two appear to finish the sequence. Hidden until then, on every device. */
+.konami-pad {
+    display: none;
+}
+.konami-pad.revealed {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 12px;
+}
+.konami-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--accent, #ffcc66);
+    background: rgba(255, 204, 102, 0.14);
+    color: var(--fg, #eee);
+    font-size: 21px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.konami-btn:active {
+    background: rgba(255, 204, 102, 0.35);
+}

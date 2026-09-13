@@ -13,6 +13,8 @@
  *   - KONAMI_SEQUENCE       canonical sequence (lowercased keys)
  *   - class KonamiDetector  push(key) → boolean (true on the matching push)
  *   - normaliseKonamiKey(k) test helper for keyboard event values
+ *   - swipeToKonamiKey(dx, dy) turns a finger swipe into an arrow key, so a
+ *     phone can enter the arrow half of the code
  */
 
 // Canonical sequence. Lowercased so we compare apples to apples — the DOM
@@ -34,6 +36,22 @@ export const KONAMI_SEQUENCE = Object.freeze([
  * Lowercase a KeyboardEvent.key value. Returns '' for non-strings so the
  * detector treats them as a reset rather than crashing the matcher.
  */
+/** A swipe shorter than this is a tap or a wobble, not a direction. */
+export const SWIPE_MIN_DISTANCE = 40;
+
+/**
+ * Turn a finger's travel into the arrow key it most resembles, so a phone can
+ * enter the arrow half of the code. The dominant axis wins, which makes a
+ * sloppy diagonal still count as the direction the kid meant.
+ * @returns {string} an arrow key name, or '' when the swipe was too short.
+ */
+export function swipeToKonamiKey(dx, dy, minDistance = SWIPE_MIN_DISTANCE) {
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) return '';
+    if (Math.hypot(dx, dy) < minDistance) return '';
+    if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? 'arrowright' : 'arrowleft';
+    return dy > 0 ? 'arrowdown' : 'arrowup';
+}
+
 export function normaliseKonamiKey(k) {
     if (typeof k !== 'string' || !k) return '';
     return k.toLowerCase();
@@ -83,6 +101,11 @@ export class KonamiDetector {
 
     reset() {
         this._idx = 0;
+    }
+
+    /** How many steps of the sequence are matched so far. */
+    progress() {
+        return this._idx;
     }
 
     /** True if this detector has already fired its unlock callback. */

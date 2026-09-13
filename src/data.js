@@ -1256,7 +1256,7 @@ export const ACHIEVEMENTS = [
         id: 'konami_code',
         name: 'Konami Code',
         icon: '🎮',
-        description: 'On the menu, press \u2191 \u2191 \u2193 \u2193 \u2190 \u2192 \u2190 \u2192 B A. Unlocks the Toy Ray Gun.',
+        description: 'On the menu press (or swipe) \u2191 \u2191 \u2193 \u2193 \u2190 \u2192 \u2190 \u2192, then B A. Unlocks the Toy Ray Gun.',
         hidden: true,
         check: (c) => !!c.run.konamiCode
     },

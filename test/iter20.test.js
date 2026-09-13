@@ -11,7 +11,12 @@ import assert from 'node:assert/strict';
 import { AchievementTracker } from '../src/achievements.js';
 import { ACHIEVEMENTS, UNLOCKS, WEAPONS } from '../src/data.js';
 import { EffectLayer, EmojiRain } from '../src/effects.js';
-import { KONAMI_SEQUENCE, KonamiDetector, normaliseKonamiKey } from '../src/konami.js';
+import {
+    KONAMI_SEQUENCE,
+    KonamiDetector,
+    normaliseKonamiKey,
+    swipeToKonamiKey
+} from '../src/konami.js';
 import { getStageModifiers } from '../src/stages.js';
 
 // ---------------------------------------------------------------------------
@@ -283,4 +288,38 @@ test('iter20 stages: forest defaults are still untouched', () => {
     assert.equal(mods.playerSpeedMult, 1);
     assert.equal(mods.enemyHpMult, 1);
     assert.equal(mods.coldTickInterval, 0);
+});
+
+test('iter20 konami: swipes map to arrow keys, short ones are ignored', () => {
+    assert.equal(swipeToKonamiKey(0, -80), 'arrowup');
+    assert.equal(swipeToKonamiKey(0, 80), 'arrowdown');
+    assert.equal(swipeToKonamiKey(-80, 0), 'arrowleft');
+    assert.equal(swipeToKonamiKey(80, 0), 'arrowright');
+    // A tap-sized wobble is not a direction.
+    assert.equal(swipeToKonamiKey(5, -5), '');
+    assert.equal(swipeToKonamiKey(NaN, 10), '');
+    // A sloppy diagonal counts as its dominant axis.
+    assert.equal(swipeToKonamiKey(70, -30), 'arrowright');
+    assert.equal(swipeToKonamiKey(-30, 70), 'arrowdown');
+});
+
+test('iter20 konami: eight swipes then B/A completes the code', () => {
+    let fired = 0;
+    const det = new KonamiDetector(() => fired++);
+    const swipes = [
+        [0, -80],
+        [0, -80],
+        [0, 80],
+        [0, 80],
+        [-80, 0],
+        [80, 0],
+        [-80, 0],
+        [80, 0]
+    ];
+    for (const [dx, dy] of swipes) det.push(swipeToKonamiKey(dx, dy));
+    assert.equal(det.progress(), swipes.length, 'all eight arrows registered');
+    assert.equal(fired, 0, 'not unlocked before B and A');
+    det.push('b');
+    det.push('a');
+    assert.equal(fired, 1);
 });

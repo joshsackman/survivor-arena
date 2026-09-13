@@ -11,7 +11,7 @@
 /* eslint-env serviceworker */
 /* global self, caches, fetch */
 
-const CACHE = 'survivor-v2.29.0-shop-only';
+const CACHE = 'survivor-v2.30.0-konami-touch';
 const ASSETS = [
     './',
     './index.html',

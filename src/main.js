@@ -65,7 +65,7 @@ import { getSkin, DEFAULT_SKIN_ID, secretForCode } from './skins.js';
 import { dailyChallenge, saveDailyResult } from './daily.js';
 import { TutorialState } from './tutorial.js';
 import { ReplayPlayer, ReplayRecorder, loadReplay, saveReplay } from './replay.js';
-import { KonamiDetector } from './konami.js';
+import { KONAMI_SEQUENCE, KonamiDetector, swipeToKonamiKey } from './konami.js';
 import { submitScore, fetchTopScores, checkInitials, normaliseInitials } from './leaderboard.js';
 import { drawSprite, hasSprite, spriteDataUrl } from './sprites.js';
 
@@ -325,6 +325,63 @@ export class Game {
             if (tag === 'INPUT' || tag === 'TEXTAREA') return;
             this._konami.push(e.key);
         });
+        this._bindKonamiTouch();
+    }
+
+    /**
+     * Mobile Konami: a phone has no arrow keys, so the title screen reads
+     * swipes instead. Once the eight arrows are in, the B and A buttons
+     * appear to finish it off. Both paths push into the same detector, so
+     * half-swiped and half-typed still completes.
+     */
+    _bindKonamiTouch() {
+        const screen = document.getElementById('startScreen');
+        if (!screen) return;
+        this._konamiPad = document.getElementById('konamiPad');
+        // Everything up to the trailing B and A is enterable by swiping.
+        const arrowSteps = KONAMI_SEQUENCE.length - 2;
+        const syncPad = () =>
+            this._konamiPad?.classList.toggle('revealed', this._konami.progress() >= arrowSteps);
+
+        let startX = 0;
+        let startY = 0;
+        let touchId = null;
+        screen.addEventListener(
+            'touchstart',
+            (e) => {
+                // One finger only, and a touch that lands on a control is a
+                // tap for that control -- never the start of a swipe.
+                if (e.touches.length !== 1 || e.target?.closest?.('button, a, input, select, label')) {
+                    touchId = null;
+                    return;
+                }
+                const t = e.changedTouches[0];
+                touchId = t.identifier;
+                startX = t.clientX;
+                startY = t.clientY;
+            },
+            { passive: true }
+        );
+        screen.addEventListener(
+            'touchend',
+            (e) => {
+                if (touchId === null) return;
+                const t = [...e.changedTouches].find((c) => c.identifier === touchId);
+                touchId = null;
+                if (!t) return;
+                const key = swipeToKonamiKey(t.clientX - startX, t.clientY - startY);
+                if (!key) return;
+                this._konami.push(key);
+                syncPad();
+            },
+            { passive: true }
+        );
+        for (const btn of this._konamiPad?.querySelectorAll('[data-konami]') || []) {
+            btn.addEventListener('click', () => {
+                this._konami.push(btn.dataset.konami);
+                syncPad();
+            });
+        }
     }
 
     /** Konami sequence completed: flip the per-run flag and unlock the cheat. */
@@ -332,6 +389,7 @@ export class Game {
         // `this.run` is aliased to `this.achievements.run` (see constructor +
         // start()), so setting the flag in one place is enough for the
         // achievement check to read it.
+        this._konamiPad?.classList.remove('revealed');
         if (this.run) this.run.konamiCode = true;
         try {
             this.achievements.check(this);
