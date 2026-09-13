@@ -859,6 +859,12 @@ export class Game {
                 })
             );
         }
+        // The banana is a normal costume in here: no one-hit KO, no chain
+        // wipe, just a solid punch. Otherwise the final fight lasts a frame.
+        if (this.stageId === 'arena' && this.player.oneHitKill) {
+            this.player.oneHitKill = false;
+            this.player.skinDamageMult = 1.3;
+        }
         if (this.stageId === 'arena') {
             const def =
                 Object.values(WEAPONS).find((w) => w.id === this._arenaWeaponId) || WEAPONS.WHIP;
@@ -950,6 +956,19 @@ export class Game {
 
     /** Show the stage picker overlay; persists the choice via `save.settings.stage`. */
     /** The arena asks which weapon you want, at full power, before it begins. */
+    /** Back to the front door. Mirrors the Main Menu button exactly. */
+    _returnToMenu() {
+        cancelAnimationFrame(this.raf);
+        this.ui.hideGameOver?.();
+        this.ui.hideLevelUp?.();
+        this.ui.showStart();
+        this._paintStartScene();
+        this.audio.stopMusic?.();
+        this.audio.play?.('titleSting');
+        this.state = GameState.MENU;
+        this.speedrunMode = false;
+    }
+
     openArenaWeaponPicker(onChosen) {
         this.ui.showWeaponPicker?.(Object.values(WEAPONS), (id) => {
             this._arenaWeaponId = id;
@@ -1771,6 +1790,26 @@ export class Game {
             if (!this.enemies.some((x) => x.boss && x !== e))
                 this.audio.startMusic(this._stageTheme());
             this._announce(`${e.id.replace('_', ' ')} defeated`);
+            if (e.id === 'costume_owner') {
+                this.ui.showStreetShout?.("YOU'RE THE LEADER OF THE CITY NOW", 5000);
+                this.callouts ??= [];
+                this.callouts.push(
+                    new Callout('CITY MAYOR', e.x, e.y - 60, { accent: '#FFC72C', life: 4 })
+                );
+                this.audio.play?.('pickupRare');
+                this.effects.celebrate?.(
+                    this.canvas?.width || CONFIG.CANVAS_WIDTH,
+                    this.canvas?.height || CONFIG.CANVAS_HEIGHT
+                );
+                // Then hand them back to the front door, once they have had a
+                // few seconds to read it.
+                if (!this._mayorReturnTimer) {
+                    this._mayorReturnTimer = setTimeout(() => {
+                        this._mayorReturnTimer = null;
+                        this._returnToMenu();
+                    }, 5200);
+                }
+            }
             // Mark no-hit-boss if the player's unhit streak is longer than
             // the fight itself. We use the unhit timer (seconds without
             // damage) as a cheap proxy; any damage during the fight resets it.
@@ -2451,6 +2490,25 @@ export class Game {
                 );
             }
             this.createParticles(boss.x, boss.y, '#aa33ff', 20);
+        } else if (boss.ability === 'eggs') {
+            // A fan of five. Damage is a share of MAX health, so it stings the
+            // same no matter which costume you turned up in.
+            const maxHp = this.player?.maxHp || 100;
+            const direct = maxHp * 0.2;
+            const splat = maxHp * 0.08;
+            const base = Math.atan2(this.player.y - boss.y, this.player.x - boss.x);
+            for (let i = -2; i <= 2; i++) {
+                this.enemyProjectiles.push(
+                    new EnemyProjectile(boss.x, boss.y, base + i * 0.2, 260, direct, {
+                        kind: 'egg',
+                        ownerName: boss.type?.name || 'The Costume Store Owner',
+                        splatRadius: 80,
+                        splatDamage: splat
+                    })
+                );
+            }
+            this.createParticles(boss.x, boss.y, '#FFEE9C', 16);
+            this.audio?.play?.('shoot');
         } else if (boss.ability === 'scrap') {
             // A fan of heavy scrap flung at the player. Each piece explodes.
             const base = Math.atan2(this.player.y - boss.y, this.player.x - boss.x);

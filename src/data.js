@@ -854,7 +854,9 @@ export const BOSSES = {
         color: '#6B3FA0',
         size: 56,
         boss: true,
-        ability: 'summon',
+        // Eggs, not helpers: 'summon' was spawning adds into a level that is
+        // meant to be a duel.
+        ability: 'eggs',
         spawnAt: 0
     },
     BIG_G: {
@@ -1043,6 +1045,13 @@ export const WAVES = [
 // `check(ctx)` returns true when unlocked. `ctx` = { game, run }
 // ---------------------------------------------------------------------------
 export const ACHIEVEMENTS = [
+    {
+        id: 'city_mayor',
+        name: 'City Mayor',
+        icon: '🏙️',
+        description: 'Beat the Costume Store Owner in the Final Neighborhood.',
+        check: (c) => !!c.run.bossesDefeated?.costume_owner
+    },
     {
         id: 'first_blood',
         name: 'First Blood',
