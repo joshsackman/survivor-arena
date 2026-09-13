@@ -889,6 +889,33 @@ const SPRITES = {
         }
     },
 
+    player_mayor: {
+        rows: [
+            '................',
+            '.....HHHHHH.....',
+            '.....GGGGGG.....',
+            '...HHHHHHHHHH...',
+            '...FFFFFFFFFF...',
+            '...FKKFFFFKKF...',
+            '...FKKFFFFKKF...',
+            '...FFFFFFFFFF...',
+            '..SSSSSSSSSSSS..',
+            '.SSGGSSSSSSSSSS.',
+            '.SSSGGSSSSSSSSS.',
+            '.SSSSGGSSSSSSSS.',
+            '....SS....SS....',
+            '...WWW....WWW...'
+        ],
+        palette: {
+            H: C.eye,
+            G: C.shopGold,
+            F: C.neighbourSkin,
+            K: C.eye,
+            S: C.hoodie,
+            W: C.pants
+        }
+    },
+
     player_cookie: {
         rows: [
             '................',

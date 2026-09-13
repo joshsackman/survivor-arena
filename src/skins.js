@@ -44,7 +44,7 @@ export const SKINS = Object.freeze({
     MAYOR: Object.freeze({
         id: 'mayor',
         name: 'The Mayor',
-        sprite: 'player_general',
+        sprite: 'player_mayor',
         icon: '🏙️',
         blurb: "You run the place now. Comes with the Mayor's Mallet.",
         perk: "Starts with the Mayor's Mallet",
