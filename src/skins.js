@@ -60,7 +60,7 @@ export const SKINS = Object.freeze({
         blurb: 'Cape, mask, and a serious turn of speed.',
         perk: '+20% run speed',
         speedMult: 1.2,
-        unlockAtRunExp: 100
+        unlockAtRunExp: 1500
     }),
     GENERAL: Object.freeze({
         id: 'general',
@@ -70,7 +70,7 @@ export const SKINS = Object.freeze({
         blurb: 'Medals, brass and a thick coat. Every hit hurts less.',
         perk: 'Every hit -4 damage',
         armorBonus: 4,
-        unlockAtRunExp: 150
+        unlockAtRunExp: 3000
     }),
     GHOST: Object.freeze({
         id: 'ghost',
