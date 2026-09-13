@@ -696,15 +696,29 @@ export class EnemyProjectile {
         this.ownerName = opts.ownerName || null;
         this.splatRadius = opts.splatRadius || 0;
         this.splatDamage = opts.splatDamage || 0;
+        // The shopkeeper's barrage: these never time out. They travel until
+        // they leave the map, so a 3s life would have popped them mid-flight.
+        this.crossMap = !!opts.crossMap;
         this.spin = Math.random() * Math.PI;
     }
     update(dt, game) {
         this.x += this.vx * dt;
         this.y += this.vy * dt;
-        this.life -= dt;
-        if (this.life <= 0) {
-            this.shouldRemove = true;
-            return;
+        if (this.crossMap) {
+            // Gone only once it is off the edge of the map.
+            const aw = CONFIG.ARENA_WIDTH ?? CONFIG.CANVAS_WIDTH;
+            const ah = CONFIG.ARENA_HEIGHT ?? CONFIG.CANVAS_HEIGHT;
+            const m = 40;
+            if (this.x < -m || this.y < -m || this.x > aw + m || this.y > ah + m) {
+                this.shouldRemove = true;
+                return;
+            }
+        } else {
+            this.life -= dt;
+            if (this.life <= 0) {
+                this.shouldRemove = true;
+                return;
+            }
         }
         const p = game.player;
         const d = Math.hypot(this.x - p.x, this.y - p.y);
@@ -719,7 +733,7 @@ export class EnemyProjectile {
             return;
         }
         // An egg that lands near the player still catches them.
-        if (this.kind === 'egg' && this.life < 0.05) this._splat(game);
+        if (this.kind === 'egg' && !this.crossMap && this.life < 0.05) this._splat(game);
     }
 
     /** Yolk everywhere, and a small blast that hurts if you are standing in it. */

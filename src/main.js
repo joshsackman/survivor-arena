@@ -2526,23 +2526,28 @@ export class Game {
             }
             this.createParticles(boss.x, boss.y, '#aa33ff', 20);
         } else if (boss.ability === 'eggs') {
-            // A fan of five. Damage is a share of MAX health, so it stings the
-            // same no matter which costume you turned up in.
+            // A ring fired all the way around him, every egg running off to
+            // the edge of the map. Damage is a share of MAX health, so it
+            // stings the same whichever costume you turned up in.
             const maxHp = this.player?.maxHp || 100;
             const direct = maxHp * 0.2;
             const splat = maxHp * 0.08;
-            const base = Math.atan2(this.player.y - boss.y, this.player.x - boss.x);
-            for (let i = -2; i <= 2; i++) {
+            const count = 16;
+            // Each volley is rotated a little so they never repeat the lanes.
+            const offset = (this._eggVolley = ((this._eggVolley || 0) + 1)) * 0.13;
+            for (let i = 0; i < count; i++) {
+                const a = offset + (i / count) * Math.PI * 2;
                 this.enemyProjectiles.push(
-                    new EnemyProjectile(boss.x, boss.y, base + i * 0.2, 260, direct, {
+                    new EnemyProjectile(boss.x, boss.y, a, 230, direct, {
                         kind: 'egg',
                         ownerName: boss.type?.name || 'The Costume Store Owner',
+                        crossMap: true,
                         splatRadius: 80,
                         splatDamage: splat
                     })
                 );
             }
-            this.createParticles(boss.x, boss.y, '#FFEE9C', 16);
+            this.createParticles(boss.x, boss.y, '#FFEE9C', 20);
             this.audio?.play?.('shoot');
         } else if (boss.ability === 'scrap') {
             // A fan of heavy scrap flung at the player. Each piece explodes.
