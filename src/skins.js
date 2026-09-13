@@ -41,6 +41,16 @@ export const SKINS = Object.freeze({
         perk: '+20% damage',
         damageMult: 1.2
     }),
+    MAYOR: Object.freeze({
+        id: 'mayor',
+        name: 'The Mayor',
+        sprite: 'player_general',
+        icon: '🏙️',
+        blurb: "You run the place now. Comes with the Mayor's Mallet.",
+        perk: "Starts with the Mayor's Mallet",
+        startingWeapon: 'mayor_mallet',
+        unlockAfterCostumeOwner: true
+    }),
     PUMPKIN: Object.freeze({
         id: 'pumpkin',
         name: 'Jack-o-Lantern',
@@ -135,12 +145,14 @@ export function listSkins() {
         SKINS.GHOST,
         SKINS.SUPERHERO,
         SKINS.GENERAL,
-        SKINS.PUMPKIN
+        SKINS.PUMPKIN,
+        SKINS.MAYOR
     ];
 }
 
 /** A locked costume stays visible in the picker, but greyed out. */
 export function isSkinUnlocked(skin, save) {
+    if (skin?.unlockAfterCostumeOwner) return !!save?.bossesEverDefeated?.costume_owner;
     if (skin?.lockedUntilBossKill) return (save?.totals?.bossKills || 0) > 0;
     if (skin?.unlockAtRunExp) return (save?.totals?.bestRunExp || 0) >= skin.unlockAtRunExp;
     return true;
@@ -148,6 +160,7 @@ export function isSkinUnlocked(skin, save) {
 
 /** What the picker prints under a locked costume, so the goal is visible. */
 export function skinRequirement(skin, save) {
+    if (skin?.unlockAfterCostumeOwner) return 'Beat the Costume Store Owner to unlock';
     if (skin?.lockedUntilBossKill) return 'Beat any boss to unlock';
     if (skin?.unlockAtRunExp) {
         const best = Math.floor(save?.totals?.bestRunExp || 0);

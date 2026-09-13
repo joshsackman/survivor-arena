@@ -909,7 +909,11 @@ export class Game {
                 this.player.weapons.push(storm);
             }
         } else {
-            this.player.weapons.push(new Weapon(WEAPONS.WHIP));
+            // A costume can bring its own weapon -- the Mayor carries his mallet.
+            const startId = getSkin(this.skinId)?.startingWeapon;
+            const startDef =
+                (startId && Object.values(WEAPONS).find((w) => w.id === startId)) || WEAPONS.WHIP;
+            this.player.weapons.push(new Weapon(startDef));
         }
         // Snap camera to player at run start so the first frame doesn't show
         // a one-tick lerp from (0,0).
@@ -1903,9 +1907,12 @@ export class Game {
                 if (p.hitEnemies.has(enemy)) continue;
                 const d = Math.hypot(p.x - enemy.x, p.y - enemy.y);
                 if (d < enemy.size + p.size) {
-                    let dmg = p.damage;
+                    const pct = p.def?.percentMaxHp || 0;
+                    let dmg = pct ? enemy.maxHp * pct : p.damage;
                     const chance = this.player.getCritChance();
-                    const crit = chance > 0 && Math.random() < chance;
+                    // A crit on a percentage hit would double 50% into a
+                    // one-shot, so percentage weapons never crit.
+                    const crit = !pct && chance > 0 && Math.random() < chance;
                     if (crit) dmg *= 2;
                     enemy.takeDamage(dmg);
                     p.hitEnemies.add(enemy);

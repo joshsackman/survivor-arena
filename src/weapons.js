@@ -212,7 +212,11 @@ export class Weapon {
     }
 
     _fireProjectile(player, game) {
-        let count = this.def.projectileCount + Math.floor((this.level - 1) / 2);
+        // A percentage-damage weapon (the Mayor's Mallet) is defined by being
+        // ONE pellet, so it never gains extra ones from levelling.
+        let count = this.def.percentMaxHp
+            ? this.def.projectileCount
+            : this.def.projectileCount + Math.floor((this.level - 1) / 2);
         if (this.isEvolved() && this.id === 'knife') count = Math.max(count, 5);
         if (this.isEvolved() && this.id === 'magic_wand') count += 2;
         const spreadDeg = count > 1 ? (this.isEvolved() ? 24 : 14) : 0;

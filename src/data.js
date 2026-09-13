@@ -190,6 +190,24 @@ export const WEAPONS = {
     // Code on the main menu. Behaves like a fast piercing projectile (a nod
     // to retro shoot-'em-ups). Not part of the regular drop pool — only
     // available as a starter once UNLOCKS.konami_code is earned.
+    MAYOR_MALLET: {
+        id: 'mayor_mallet',
+        name: "Mayor's Mallet",
+        icon: '🔨',
+        description: 'One pellet. Takes half of whatever it hits, however big.',
+        baseDamage: 20,
+        baseCooldown: 0.9,
+        baseRange: 480,
+        projectileCount: 1,
+        // Deliberately NOT piercing: one pellet, one target. With piercing it
+        // would halve every enemy in a line, which is a different weapon.
+        piercing: false,
+        type: 'projectile',
+        speed: 700,
+        // Damage is a share of the TARGET's maximum health, so it is just as
+        // devastating on a 28,000 HP boss as on a bat.
+        percentMaxHp: 0.5
+    },
     RETRO_BLASTER: {
         id: 'retro_blaster',
         name: 'Toy Ray Gun',
