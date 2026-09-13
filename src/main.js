@@ -1018,9 +1018,13 @@ export class Game {
     }
 
     openArenaWeaponPicker(onChosen) {
-        const choices = Object.values(WEAPONS).filter(
-            (w) => !w.skinOnly || w.skinOnly === this.skinId
-        );
+        const choices = Object.values(WEAPONS).filter((w) => {
+            // A costume's signature weapon belongs to that costume alone.
+            if (w.skinOnly && w.skinOnly !== this.skinId) return false;
+            // A shop weapon is bought in the shop or not had at all.
+            if (w.shopPrice && !this.save?.ownedWeapons?.[w.id]) return false;
+            return true;
+        });
         this.ui.showWeaponPicker?.(choices, (id) => {
             this._arenaWeaponId = id;
             onChosen && onChosen();
