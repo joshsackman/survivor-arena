@@ -81,6 +81,12 @@ const C = {
     tongue: '#E8455E',
     tabby: '#E8913C',
     banana: '#F5D547',
+    heroBlue: '#2B5FD9',
+    heroRed: '#D93B3B',
+    heroGold: '#FFC72C',
+    armyGreen: '#4A5A38',
+    armyDark: '#333F26',
+    brass: '#D9A441',
     bananaDark: '#C9A81E',
     bananaTip: '#6B5A18',
     tabbyStripe: '#B8641F',
@@ -819,6 +825,63 @@ const SPRITES = {
 
     // Kid in a Cardboard Box: the plainest costume on the street, and the
     // one every kid has worn at least once.
+    player_superhero: {
+        rows: [
+            '................',
+            '.....HHHHHH.....',
+            '....HHHHHHHH....',
+            '....MMMMMMMM....',
+            '....MKKMMKKM....',
+            '....FFFFFFFF....',
+            '..RRSSSSSSSSRR..',
+            '.RRRSSGGGGSSRRR.',
+            '.RRRSSGGGGSSRRR.',
+            '.RRRSSSSSSSSRRR.',
+            '..RRSSSSSSSSRR..',
+            '....SSSSSSSS....',
+            '....BB....BB....',
+            '...GGG....GGG...'
+        ],
+        palette: {
+            H: C.bark,
+            M: C.heroBlue,
+            K: C.sheet,
+            F: C.neighbourSkin,
+            S: C.heroBlue,
+            R: C.heroRed,
+            G: C.heroGold,
+            B: C.heroBlue
+        }
+    },
+
+    player_general: {
+        rows: [
+            '....DDDDDDDD....',
+            '...DDDDDDDDDD...',
+            '...BBBBBBBBBB...',
+            '....FFFFFFFF....',
+            '....FKKFFKKF....',
+            '....FFFFFFFF....',
+            '.....FMMMMF.....',
+            '..BBAAAAAAAABB..',
+            '.BBBAABBAAAABBB.',
+            '.BBBAABBAAAABBB.',
+            '.BBBAAAAAAAABBB.',
+            '..AAAAAAAAAAAA..',
+            '....DD....DD....',
+            '...WWW....WWW...'
+        ],
+        palette: {
+            A: C.armyGreen,
+            D: C.armyDark,
+            F: C.neighbourSkin,
+            K: C.eye,
+            M: C.eye,
+            B: C.brass,
+            W: C.armyDark
+        }
+    },
+
     player_banana: {
         rows: [
             '.......TT.......',

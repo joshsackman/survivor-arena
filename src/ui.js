@@ -17,7 +17,7 @@ import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
 import { getStage, listStages } from './stages.js';
-import { getSkin, listSkins, isSkinUnlocked } from './skins.js';
+import { getSkin, listSkins, isSkinUnlocked, skinRequirement } from './skins.js';
 import { buildShareText, dailyStreakSummary, loadDailyHistory } from './daily.js';
 import {
     DEFAULT_KEYMAP,
@@ -160,6 +160,7 @@ export class UI {
                     ${skins
                         .map((s) => {
                             const open = isSkinUnlocked(s, save);
+                            const req = open ? '' : skinRequirement(s, save);
                             return `
                             <button class="stage-card ${s.id === currentId ? 'active' : ''}${
                                 open ? '' : ' locked'
@@ -168,6 +169,7 @@ export class UI {
                                 <div class="stage-name">${s.name}</div>
                                 <div class="skin-perk">${s.perk}</div>
                                 <div class="stage-desc">${s.blurb}</div>
+                                ${req ? `<div class="skin-req">${req}</div>` : ''}
                             </button>`;
                         })
                         .join('')}

@@ -227,6 +227,9 @@ export function accumulateTotals(save, run) {
     save.totals.timePlayed += run.gameTime || 0;
     save.totals.runs += 1;
     save.totals.bossKills += run.bossKills || 0;
+    // Best XP in a SINGLE round -- what the unlockable costumes are scored
+    // on, so this is a high-water mark rather than a sum.
+    save.totals.bestRunExp = Math.max(save.totals.bestRunExp || 0, run.runExp || 0);
 }
 
 export function structuredCloneCompat(obj) {

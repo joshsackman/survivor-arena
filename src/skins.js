@@ -52,6 +52,26 @@ export const SKINS = Object.freeze({
         damageMult: 1.1,
         lockedUntilBossKill: true
     }),
+    SUPERHERO: Object.freeze({
+        id: 'superhero',
+        name: 'Superhero',
+        sprite: 'player_superhero',
+        icon: '🦸',
+        blurb: 'Cape, mask, and a serious turn of speed.',
+        perk: '+20% run speed',
+        speedMult: 1.2,
+        unlockAtRunExp: 100
+    }),
+    GENERAL: Object.freeze({
+        id: 'general',
+        name: 'The General',
+        sprite: 'player_general',
+        icon: '🎖️',
+        blurb: 'Medals, brass and a thick coat. Every hit hurts less.',
+        perk: 'Every hit -4 damage',
+        armorBonus: 4,
+        unlockAtRunExp: 150
+    }),
     GHOST: Object.freeze({
         id: 'ghost',
         name: 'Ghost',
@@ -81,13 +101,32 @@ export const SECRET_SKIN = Object.freeze({
 export const SECRET_CODE = 'ODG';
 
 export function listSkins() {
-    return [SKINS.ALIEN, SKINS.ZOMBIE, SKINS.ROBOT, SKINS.GHOST, SKINS.PUMPKIN];
+    return [
+        SKINS.ALIEN,
+        SKINS.ZOMBIE,
+        SKINS.ROBOT,
+        SKINS.GHOST,
+        SKINS.SUPERHERO,
+        SKINS.GENERAL,
+        SKINS.PUMPKIN
+    ];
 }
 
 /** A locked costume stays visible in the picker, but greyed out. */
 export function isSkinUnlocked(skin, save) {
-    if (!skin?.lockedUntilBossKill) return true;
-    return (save?.totals?.bossKills || 0) > 0;
+    if (skin?.lockedUntilBossKill) return (save?.totals?.bossKills || 0) > 0;
+    if (skin?.unlockAtRunExp) return (save?.totals?.bestRunExp || 0) >= skin.unlockAtRunExp;
+    return true;
+}
+
+/** What the picker prints under a locked costume, so the goal is visible. */
+export function skinRequirement(skin, save) {
+    if (skin?.lockedUntilBossKill) return 'Beat any boss to unlock';
+    if (skin?.unlockAtRunExp) {
+        const best = Math.floor(save?.totals?.bestRunExp || 0);
+        return `Get ${skin.unlockAtRunExp} XP in one round — best so far ${best}`;
+    }
+    return '';
 }
 
 export function getSkin(id) {

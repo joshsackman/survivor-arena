@@ -41,6 +41,8 @@ export class Player {
         this.skinDamageMult = skin.oneHitKill ? 1e9 : skin.damageMult || 1;
         this.oneHitKill = !!skin.oneHitKill;
         this.skinDodge = skin.dodgeBonus || 0;
+        this.skinSpeedMult = skin.speedMult || 1;
+        this.skinArmor = skin.armorBonus || 0;
         this.baseMaxHp = 100 + (skin.maxHpBonus || 0);
         this.maxHp = this.baseMaxHp;
         this.hp = this.baseMaxHp;
@@ -150,7 +152,7 @@ export class Player {
         return Math.max(0.2, mult);
     }
     getSpeedMult() {
-        return this._passiveMult('speedMult');
+        return this._passiveMult('speedMult') * this.skinSpeedMult;
     }
     getExpMult() {
         return this._passiveMult('expMult');
@@ -165,7 +167,7 @@ export class Player {
         return CONFIG.MAGNET_BASE * mult;
     }
     getArmor() {
-        return this._passiveSum('armor');
+        return this._passiveSum('armor') + this.skinArmor;
     }
     getCritChance() {
         return this._passiveSum('critChance');
@@ -187,7 +189,10 @@ export class Player {
     }
 
     gainExp(amount) {
-        this.exp += amount * this.getExpMult();
+        const gained = amount * this.getExpMult();
+        // Total XP earned this run -- what the unlockable costumes are scored on.
+        this.runExp = (this.runExp || 0) + gained;
+        this.exp += gained;
         const levelUps = [];
         while (this.exp >= this.expToNext) {
             this.exp -= this.expToNext;

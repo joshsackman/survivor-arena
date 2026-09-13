@@ -1378,7 +1378,8 @@ export class Game {
         accumulateTotals(this.save, {
             kills: this.kills,
             gameTime: this.gameTime,
-            bossKills: Object.keys(this.run.bossesDefeated).length
+            bossKills: Object.keys(this.run.bossesDefeated).length,
+            runExp: Math.floor(this.player?.runExp || 0)
         });
         saveSave(this.save);
 

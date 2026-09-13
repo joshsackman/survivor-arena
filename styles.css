@@ -1602,3 +1602,11 @@ body.cb-mode .exp-fill {
     min-height: 0;
     flex: 1 1 auto;
 }
+
+/* What a locked costume costs, printed on its card. */
+.skin-req {
+    margin-top: 6px;
+    font-size: 0.76rem;
+    color: var(--accent);
+    font-weight: 700;
+}
