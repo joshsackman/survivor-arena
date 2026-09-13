@@ -33,7 +33,8 @@ test('iter14 stages: tundra is registered and exposed by listStages', () => {
         'tundra',
         'jamaica',
         'junkyard',
-        'huss_valley'
+        'huss_valley',
+        'arena'
     ]);
     assert.ok(STAGES.TUNDRA, 'TUNDRA bucket must exist on STAGES');
     assert.equal(STAGES.TUNDRA.id, 'tundra');

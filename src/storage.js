@@ -32,6 +32,8 @@ const DEFAULT_SAVE = {
         bossKills: 0
     },
     achievements: {},
+    // Which bosses have EVER been beaten, by id. Gates the boss-rush arena.
+    bossesEverDefeated: {},
     // v2.6 (iter-12): per-stage leaderboards. Each key is a stage id; the
     // value is a top-N array shaped like `highScores`. The legacy global
     // `highScores` field is retained as the union-of-all-stages view so old

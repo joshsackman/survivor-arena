@@ -82,6 +82,10 @@ const C = {
     tabby: '#E8913C',
     banana: '#F5D547',
     heroBlue: '#2B5FD9',
+    shopPurple: '#6B3FA0',
+    shopDark: '#452869',
+    shopGold: '#E8C34A',
+    tapeRed: '#C43B4B',
     heroRed: '#D93B3B',
     heroGold: '#FFC72C',
     armyGreen: '#4A5A38',
@@ -969,6 +973,38 @@ const SPRITES = {
             '.G...G..G...G...'
         ],
         palette: { G: C.sheet, K: C.eye }
+    },
+
+    costume_owner: {
+        rows: [
+            '....................',
+            '.......SSSSSS.......',
+            '......SSSSSSSS......',
+            '......SFFFFFFS......',
+            '......FKKFFKKF......',
+            '......FFFFFFFF......',
+            '.......FMMMMF.......',
+            '....TTTTTTTTTTTT....',
+            '...SSSSSSSSSSSSSS...',
+            '..SSSSGGGGGGSSSSSS..',
+            '..SSSSGGGGGGSSSSSS..',
+            '..SSSSSSSSSSSSSSSS..',
+            '..SSSSSSSSSSSSSSSS..',
+            '...SSSSSSSSSSSSSS...',
+            '....SSSSSSSSSSSS....',
+            '.....SSSS..SSSS.....',
+            '.....SSSS..SSSS.....',
+            '....DDDDD..DDDDD....'
+        ],
+        palette: {
+            S: C.shopPurple,
+            D: C.shopDark,
+            F: C.neighbourSkin,
+            K: C.eye,
+            M: C.eye,
+            G: C.shopGold,
+            T: C.tapeRed
+        }
     },
 
     big_g: {

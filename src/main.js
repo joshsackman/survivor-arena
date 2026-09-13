@@ -517,6 +517,11 @@ export class Game {
             this.audio.unlock();
             this.speedrunMode = false;
             this.dailyMode = false;
+            if (this.stageId === 'arena') {
+                this.ui.hideStart?.();
+                this.openArenaWeaponPicker(() => this.start());
+                return;
+            }
             this.playIntro();
         });
         q('btnSpeedrun')?.addEventListener('click', () => {
@@ -791,7 +796,9 @@ export class Game {
         this._metNeighbours = new Set();
         this.callouts = [];
         this._bullyTimer = 0;
-        this._buildDoorbells();
+        // The arena is a straight duel: no doorbell power-ups.
+        if (this.stageId === 'arena') this.doorbells = [];
+        else this._buildDoorbells();
         this._bossWarnedAt.clear();
         this._spawnAccumulator = 0;
         this._lastAnnouncedWave = null;
@@ -852,7 +859,15 @@ export class Game {
                 })
             );
         }
-        this.player.weapons.push(new Weapon(WEAPONS.WHIP));
+        if (this.stageId === 'arena') {
+            const def =
+                Object.values(WEAPONS).find((w) => w.id === this._arenaWeaponId) || WEAPONS.WHIP;
+            const w = new Weapon(def);
+            while (w.level < CONFIG.WEAPON_MAX_LEVEL) w.levelUp();
+            this.player.weapons.push(w);
+        } else {
+            this.player.weapons.push(new Weapon(WEAPONS.WHIP));
+        }
         // Snap camera to player at run start so the first frame doesn't show
         // a one-tick lerp from (0,0).
         this._updateCamera();
@@ -934,6 +949,14 @@ export class Game {
     }
 
     /** Show the stage picker overlay; persists the choice via `save.settings.stage`. */
+    /** The arena asks which weapon you want, at full power, before it begins. */
+    openArenaWeaponPicker(onChosen) {
+        this.ui.showWeaponPicker?.(Object.values(WEAPONS), (id) => {
+            this._arenaWeaponId = id;
+            onChosen && onChosen();
+        });
+    }
+
     openSkinPicker() {
         this.ui.showSkinPicker?.(this.skinId, this.save, (id) => {
             this.skinId = id;
@@ -944,7 +967,7 @@ export class Game {
     }
 
     openStagePicker() {
-        this.ui.showStagePicker(this.stageId, (newStageId) => {
+        this.ui.showStagePicker(this.stageId, this.save, (newStageId) => {
             this.stageId = newStageId;
             this.save.settings.stage = newStageId;
             saveSave(this.save);
@@ -1738,6 +1761,12 @@ export class Game {
             this.shake(0.5);
             this.audio.explosion();
             this.achievements.onBossDefeated(e.id);
+            // Remember it across runs: the arena unlocks on beating them all.
+            this.save.bossesEverDefeated = this.save.bossesEverDefeated || {};
+            if (!this.save.bossesEverDefeated[e.id]) {
+                this.save.bossesEverDefeated[e.id] = true;
+                saveSave(this.save);
+            }
             // Back to the chase once the last boss on screen is down.
             if (!this.enemies.some((x) => x.boss && x !== e))
                 this.audio.startMusic(this._stageTheme());
@@ -1979,6 +2008,10 @@ export class Game {
     }
 
     _spawnLogic(dt, hpMult, dmgMult, diffSpawnMult) {
+        // The arena is a duel: no waves and no bully, but the boss scheduler
+        // below still has to run -- an early return here left the boss-rush
+        // level with no boss at all.
+        const duel = this.stageId === 'arena';
         const wave = this.currentWave;
         const waveMult = wave.spawnMult || 1;
         const maxEnemies = Math.min(CONFIG.MAX_ENEMIES, 26 + Math.floor(this.gameTime / 8));
@@ -1986,18 +2019,19 @@ export class Game {
         // being threatened. Neighbours arrive sooner from the first second and
         // the ramp still tightens over the run.
         const interval = Math.max(0.18, 0.9 - this.gameTime / 220) / (diffSpawnMult * waveMult);
-        this._spawnAccumulator += dt;
-
-        while (this._spawnAccumulator >= interval && this.enemies.length < maxEnemies) {
-            this._spawnAccumulator -= interval;
-            this._spawnOne(wave.pool, hpMult, dmgMult);
+        if (!duel) {
+            this._spawnAccumulator += dt;
+            while (this._spawnAccumulator >= interval && this.enemies.length < maxEnemies) {
+                this._spawnAccumulator -= interval;
+                this._spawnOne(wave.pool, hpMult, dmgMult);
+            }
         }
 
         // v2.8: the Big Bully. Deliberately not in any wave pool -- pools pick
         // near-uniformly, which would make "one huge rare bully" common. One
         // at a time, first appearing a couple of minutes in.
         this._bullyTimer = (this._bullyTimer || 0) + dt;
-        if (this.gameTime > 120 && this._bullyTimer > 70 && !this.enemies.some((e) => e.id === 'bully')) {
+        if (!duel && this.gameTime > 120 && this._bullyTimer > 70 && !this.enemies.some((e) => e.id === 'bully')) {
             this._bullyTimer = 0;
             const def = findEnemyDef('bully');
             if (def) {

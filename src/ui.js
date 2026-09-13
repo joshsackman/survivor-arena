@@ -16,7 +16,7 @@ import { ACHIEVEMENTS, BOSSES, ENEMIES, PASSIVES, WEAPONS } from './data.js';
 import { spriteDataUrl, hasSprite } from './sprites.js';
 import { CONFIG } from './config.js';
 import { t, setLocale, availableLocales } from './i18n.js';
-import { getStage, listStages } from './stages.js';
+import { getStage, listStages, isStageUnlocked, arenaProgress } from './stages.js';
 import { getSkin, listSkins, isSkinUnlocked, skinRequirement } from './skins.js';
 import { buildShareText, dailyStreakSummary, loadDailyHistory } from './daily.js';
 import {
@@ -111,7 +111,7 @@ export class UI {
      * they've selected. Selecting a card persists via the supplied callback
      * and closes the dialog.
      */
-    showStagePicker(currentId, onPick) {
+    showStagePicker(currentId, save, onPick) {
         const m = this.els.stagePickerScreen;
         if (!m) return;
         const stages = listStages();
@@ -120,14 +120,23 @@ export class UI {
                 <h2>${t('chooseStage')}</h2>
                 <div class="stage-grid">
                     ${stages
-                        .map(
-                            (s) => `
-                            <button class="stage-card ${s.id === currentId ? 'active' : ''}" data-stage="${s.id}">
-                                <div class="stage-icon">${s.icon}</div>
+                        .map((s) => {
+                            const open = isStageUnlocked(s, save);
+                            let req = '';
+                            if (!open && s.id === 'arena') {
+                                const p = arenaProgress(save);
+                                req = `Beat every boss to unlock — ${p.beaten} of ${p.total}`;
+                            }
+                            return `
+                            <button class="stage-card ${s.id === currentId ? 'active' : ''}${
+                                open ? '' : ' locked'
+                            }" data-stage="${s.id}" ${open ? '' : 'disabled'}>
+                                <div class="stage-icon">${open ? s.icon : '🔒'}</div>
                                 <div class="stage-name">${s.name}</div>
                                 <div class="stage-desc">${s.description}</div>
-                            </button>`
-                        )
+                                ${req ? `<div class="skin-req">${req}</div>` : ''}
+                            </button>`;
+                        })
                         .join('')}
                 </div>
                 <div class="btn-row">
@@ -141,6 +150,7 @@ export class UI {
         m.querySelector('#stageClose')?.addEventListener('click', close);
         m.querySelectorAll('.stage-card').forEach((btn) =>
             btn.addEventListener('click', () => {
+                if (btn.classList.contains('locked')) return;
                 const id = btn.dataset.stage;
                 onPick && onPick(id);
                 close();
@@ -197,6 +207,36 @@ export class UI {
         const s = getSkin(id);
         this.els.btnSkinChip.textContent = `${s.icon} ${s.name}`;
         this.els.btnSkinChip.dataset.skin = s.id;
+    }
+
+    /** Arena only: pick one weapon, granted at full power. */
+    showWeaponPicker(weapons, onPick) {
+        const m = this.els.stagePickerScreen;
+        if (!m) return;
+        m.innerHTML = `
+            <div class="overlay-card stage-picker-card">
+                <h2>Pick your weapon</h2>
+                <p class="subtitle">One fight. Whatever you choose comes fully upgraded.</p>
+                <div class="stage-grid">
+                    ${weapons
+                        .map(
+                            (w) => `
+                            <button class="stage-card" data-weapon="${w.id}">
+                                <div class="stage-icon">${w.icon}</div>
+                                <div class="stage-name">${w.name}</div>
+                                <div class="stage-desc">${w.description || ''}</div>
+                            </button>`
+                        )
+                        .join('')}
+                </div>
+            </div>`;
+        m.style.display = 'flex';
+        m.querySelectorAll('.stage-card').forEach((btn) =>
+            btn.addEventListener('click', () => {
+                m.style.display = 'none';
+                onPick && onPick(btn.dataset.weapon);
+            })
+        );
     }
 
     hideStagePicker() {

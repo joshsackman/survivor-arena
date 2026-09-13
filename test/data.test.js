@@ -62,10 +62,11 @@ test('data: v2.4 bosses are on a strictly increasing timeline', () => {
     for (let i = 1; i < spawns.length; i++) {
         assert.ok(spawns[i] > spawns[i - 1], `duplicate spawn ${spawns[i]}`);
     }
+    // Costume Store Owner sits at 0 (arena-only, there from the first frame).
     // Compressed to match how long runs actually last (median ~2 min):
     // Timmy 60, Reaper 90, Owen 120, Necromancer 150, Void Lord 195,
     // Robot Rob 210 (junkyard-only), IceQueen 225 (tundra-only), Chrono 255.
-    assert.deepEqual(spawns, [60, 90, 120, 150, 195, 210, 225, 240, 255]);
+    assert.deepEqual(spawns, [0, 60, 90, 120, 150, 195, 210, 225, 240, 255]);
 });
 
 test('data: every boss has hp/damage/exp/size/color and boss flag', () => {

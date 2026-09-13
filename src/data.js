@@ -841,6 +841,22 @@ export const BOSSES = {
         ability: 'charge',
         spawnAt: 195 // 3:15
     },
+    COSTUME_OWNER: {
+        id: 'costume_owner',
+        name: 'The Costume Store Owner',
+        // The one who sold him the costume. Harder than Robot Rob (14000/90)
+        // and Big G (5200/52) put together, because beating him is the whole
+        // point of the arena.
+        hp: 28000,
+        speed: 84,
+        damage: 160,
+        exp: 5000,
+        color: '#6B3FA0',
+        size: 56,
+        boss: true,
+        ability: 'summon',
+        spawnAt: 0
+    },
     BIG_G: {
         id: 'big_g',
         name: 'Big G',

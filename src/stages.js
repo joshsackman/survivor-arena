@@ -231,6 +231,36 @@ export const STAGES = Object.freeze({
         extraEnemies: ['cactus', 'vulture', 'snake'],
         bossOffsets: {},
         bossOverrides: { void_lord: 'big_g' }
+    }),
+    // ----------------------------------------------------------------------
+    // The Final Neighborhood — one fight, nothing else. No waves, no doorbells, no
+    // stage modifiers in either direction: just you, a weapon of your choosing
+    // at full power, and the man who sold you the costume.
+    //
+    // Locked until every other boss in the game has been beaten, which means
+    // playing every stage (Rob is junkyard-only, Big G is Huss-only, the Real
+    // Alien is Area 51-only).
+    // ----------------------------------------------------------------------
+    ARENA: Object.freeze({
+        id: 'arena',
+        name: 'The Final Neighborhood',
+        icon: '🏪',
+        description: 'One fight. Pick a weapon at full power. No waves, no help.',
+        background: { fill: '#1A1024', gridAlpha: 0.05 },
+        musicStyle: 'boss',
+        poolOverrides: {},
+        extraEnemies: [],
+        bossOffsets: {},
+        // Only the shopkeeper. Every other boss is swapped out of the schedule.
+        bossOnly: 'costume_owner',
+        // A duel: no penalties and no advantages, as asked.
+        modifiers: Object.freeze({
+            playerSpeedMult: 1,
+            enemyHpMult: 1,
+            coldTickInterval: 0,
+            coldTickDamage: 0,
+            warmthSourceEnabled: false
+        })
     })
 });
 
@@ -253,7 +283,8 @@ export function listStages() {
         STAGES.TUNDRA,
         STAGES.JAMAICA,
         STAGES.JUNKYARD,
-        STAGES.HUSS_VALLEY
+        STAGES.HUSS_VALLEY,
+        STAGES.ARENA
     ];
 }
 
@@ -326,7 +357,14 @@ export function getBossesFor(id) {
     // and never on their own. Currently just IceQueen (tundra-exclusive).
     // Skipping these on stages that don't override into them keeps the
     // forest/crypt boss timelines pristine.
-    const overrideOnlyIds = new Set(['ice_queen', 'robot_rob', 'big_g']);
+    const overrideOnlyIds = new Set(['ice_queen', 'robot_rob', 'big_g', 'costume_owner']);
+
+    // A `bossOnly` stage (the arena) runs exactly one fight: every other boss
+    // is dropped from the schedule entirely.
+    if (stage.bossOnly) {
+        const only = bossesById[stage.bossOnly];
+        return only ? [{ ...only, sourceId: only.id }] : [];
+    }
 
     const out = [];
     for (const b of Object.values(BOSSES)) {
@@ -349,6 +387,35 @@ export function getBossesFor(id) {
         out.push({ ...def, spawnAt, sourceId: b.id });
     }
     return out;
+}
+
+/**
+ * Bosses that must be beaten before the arena opens. The shopkeeper himself
+ * is the reward, so he is not part of his own requirement.
+ */
+export function arenaBossIds() {
+    return Object.values(BOSSES)
+        .map((b) => b.id)
+        .filter((id) => id !== 'costume_owner');
+}
+
+/** @returns {{open: boolean, beaten: number, total: number, missing: string[]}} */
+export function arenaProgress(save) {
+    const need = arenaBossIds();
+    const done = save?.bossesEverDefeated || {};
+    const missing = need.filter((id) => !done[id]);
+    return {
+        open: missing.length === 0,
+        beaten: need.length - missing.length,
+        total: need.length,
+        missing
+    };
+}
+
+/** Is this stage playable yet? Only the arena is ever gated. */
+export function isStageUnlocked(stage, save) {
+    if (stage?.id !== 'arena') return true;
+    return arenaProgress(save).open;
 }
 
 /** Background palette helper; the renderer reads this once per frame. */
