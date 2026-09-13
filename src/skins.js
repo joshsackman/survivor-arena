@@ -12,6 +12,8 @@
  *   - SKINS, listSkins(), getSkin(id), DEFAULT_SKIN_ID
  */
 
+import { ACHIEVEMENTS } from './data.js';
+
 export const DEFAULT_SKIN_ID = 'alien';
 
 export const SKINS = Object.freeze({
@@ -40,6 +42,19 @@ export const SKINS = Object.freeze({
         blurb: 'Hits harder. Every weapon does 20% more damage.',
         perk: '+20% damage',
         damageMult: 1.2
+    }),
+    GOLDEN: Object.freeze({
+        id: 'golden',
+        name: 'Golden Alien',
+        sprite: 'player_gold',
+        icon: '🌟',
+        blurb: 'The costume, perfected. A bit of everything, all at once.',
+        perk: '+40 health, +20% damage, +15% speed, +10% dodge',
+        maxHpBonus: 40,
+        damageMult: 1.2,
+        speedMult: 1.15,
+        dodgeBonus: 0.1,
+        unlockAllAchievements: true
     }),
     MAYOR: Object.freeze({
         id: 'mayor',
@@ -146,12 +161,18 @@ export function listSkins() {
         SKINS.SUPERHERO,
         SKINS.GENERAL,
         SKINS.PUMPKIN,
-        SKINS.MAYOR
+        SKINS.MAYOR,
+        SKINS.GOLDEN
     ];
 }
 
 /** A locked costume stays visible in the picker, but greyed out. */
 export function isSkinUnlocked(skin, save) {
+    if (skin?.unlockAllAchievements) {
+        const total = ACHIEVEMENTS.length;
+        const earned = ACHIEVEMENTS.filter((a) => save?.achievements?.[a.id]).length;
+        return total > 0 && earned >= total;
+    }
     if (skin?.unlockAfterCostumeOwner) return !!save?.bossesEverDefeated?.costume_owner;
     if (skin?.lockedUntilBossKill) return (save?.totals?.bossKills || 0) > 0;
     if (skin?.unlockAtRunExp) return (save?.totals?.bestRunExp || 0) >= skin.unlockAtRunExp;
@@ -160,6 +181,11 @@ export function isSkinUnlocked(skin, save) {
 
 /** What the picker prints under a locked costume, so the goal is visible. */
 export function skinRequirement(skin, save) {
+    if (skin?.unlockAllAchievements) {
+        const total = ACHIEVEMENTS.length;
+        const earned = ACHIEVEMENTS.filter((a) => save?.achievements?.[a.id]).length;
+        return `Earn every achievement — ${earned} of ${total}`;
+    }
     if (skin?.unlockAfterCostumeOwner) return 'Beat the Costume Store Owner to unlock';
     if (skin?.lockedUntilBossKill) return 'Beat any boss to unlock';
     if (skin?.unlockAtRunExp) {

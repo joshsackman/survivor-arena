@@ -86,6 +86,9 @@ const C = {
     choc: '#4A2C17',
     heroBlue: '#2B5FD9',
     shopPurple: '#6B3FA0',
+    gold: '#F2C33C',
+    goldDark: '#B8860B',
+    goldGlow: '#FFF1B8',
     shopDark: '#452869',
     shopGold: '#E8C34A',
     tapeRed: '#C43B4B',
@@ -886,6 +889,33 @@ const SPRITES = {
             M: C.eye,
             B: C.brass,
             W: C.armyDark
+        }
+    },
+
+    player_gold: {
+        rows: [
+            '..L..........L..',
+            '...L........L...',
+            '....GGGGGGGG....',
+            '...GGGGGGGGGG...',
+            '..GGWWWWWWWWGG..',
+            '..GGWKKWWWWKKW..',
+            '..GGWKKWWWWKKW..',
+            '..GGWWWWWWWWGG..',
+            '..GGGGGGGGGGGG..',
+            '.GGGGGGGGGGGGGG.',
+            '.GGGGDDDDDDGGGG.',
+            '..GGGGGGGGGGGG..',
+            '....GG....GG....',
+            '...SSS....SSS...'
+        ],
+        palette: {
+            G: C.gold,
+            D: C.goldDark,
+            W: C.goldGlow,
+            K: C.eye,
+            L: C.goldGlow,
+            S: C.sheet
         }
     },
 

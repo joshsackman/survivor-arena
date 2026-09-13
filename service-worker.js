@@ -11,7 +11,7 @@
 /* eslint-env serviceworker */
 /* global self, caches, fetch */
 
-const CACHE = 'survivor-v2.24.0-tophat';
+const CACHE = 'survivor-v2.25.0-golden';
 const ASSETS = [
     './',
     './index.html',
