@@ -792,6 +792,9 @@ export class Game {
         this._penaltyDmgMult = 1;
         this._penaltySpeedMult = 1;
         this._lastAttacker = null;
+        // Cancel any egg rings still queued from a previous run.
+        for (const t of this._eggRingTimers || []) clearTimeout(t);
+        this._eggRingTimers = [];
         setEnemySpeedMult(1);
         // v2.8: the names are half the joke, so each neighbour gets introduced
         // the first time you meet them in a run.
@@ -2535,17 +2538,28 @@ export class Game {
             const count = 16;
             // Each volley is rotated a little so they never repeat the lanes.
             const offset = (this._eggVolley = ((this._eggVolley || 0) + 1)) * 0.13;
-            for (let i = 0; i < count; i++) {
-                const a = offset + (i / count) * Math.PI * 2;
-                this.enemyProjectiles.push(
-                    new EnemyProjectile(boss.x, boss.y, a, 230, direct, {
-                        kind: 'egg',
-                        ownerName: boss.type?.name || 'The Costume Store Owner',
-                        crossMap: true,
-                        splatRadius: 80,
-                        splatDamage: splat
-                    })
-                );
+            const fireRing = (turn) => {
+                if (!this.enemies.includes(boss)) return;
+                for (let i = 0; i < count; i++) {
+                    // Half a lane of extra turn per ring, so each one leaves
+                    // through the gaps the ring before it opened up.
+                    const a = offset + ((i + turn * 0.5) / count) * Math.PI * 2;
+                    this.enemyProjectiles.push(
+                        new EnemyProjectile(boss.x, boss.y, a, 230, direct, {
+                            kind: 'egg',
+                            ownerName: boss.type?.name || 'The Costume Store Owner',
+                            crossMap: true,
+                            splatRadius: 80,
+                            splatDamage: splat
+                        })
+                    );
+                }
+            };
+            fireRing(0);
+            // Two more close behind, filling in as the first ring opens out.
+            this._eggRingTimers = this._eggRingTimers || [];
+            for (const turn of [1, 2]) {
+                this._eggRingTimers.push(setTimeout(() => fireRing(turn), turn * 260));
             }
             this.createParticles(boss.x, boss.y, '#FFEE9C', 20);
             this.audio?.play?.('shoot');
