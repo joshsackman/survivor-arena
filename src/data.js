@@ -240,6 +240,8 @@ export const WEAPONS = {
     },
     MAYOR_MALLET: {
         id: 'mayor_mallet',
+        // The Mayor's own weapon: never offered to any other costume.
+        skinOnly: 'mayor',
         name: "Mayor's Mallet",
         icon: '🔨',
         description: 'One pellet. Takes half of whatever it hits, however big.',

@@ -37,6 +37,7 @@ export class Player {
         this.size = CONFIG.PLAYER_SIZE;
         const skin = getSkin(skinId);
         this.skin = skin;
+        this.skinId = skin.id || skinId;
         this.spriteKey = skin.sprite || 'player';
         this.skinDamageMult = skin.oneHitKill ? 1e9 : skin.damageMult || 1;
         this.oneHitKill = !!skin.oneHitKill;

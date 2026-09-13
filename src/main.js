@@ -912,8 +912,12 @@ export class Game {
                 this.player.weapons.push(storm);
             }
         } else {
-            // A costume can bring its own weapon -- the Mayor carries his mallet.
-            const startId = getSkin(this.skinId)?.startingWeapon;
+            // A weapon equipped in the shop comes with you; otherwise a costume
+            // can bring its own -- the Mayor carries his mallet.
+            const equippedId = this.save?.ownedWeapons?.[this.save?.equippedWeapon]
+                ? this.save.equippedWeapon
+                : null;
+            const startId = equippedId || getSkin(this.skinId)?.startingWeapon;
             const startDef =
                 (startId && Object.values(WEAPONS).find((w) => w.id === startId)) || WEAPONS.WHIP;
             this.player.weapons.push(new Weapon(startDef));
@@ -1014,7 +1018,10 @@ export class Game {
     }
 
     openArenaWeaponPicker(onChosen) {
-        this.ui.showWeaponPicker?.(Object.values(WEAPONS), (id) => {
+        const choices = Object.values(WEAPONS).filter(
+            (w) => !w.skinOnly || w.skinOnly === this.skinId
+        );
+        this.ui.showWeaponPicker?.(choices, (id) => {
             this._arenaWeaponId = id;
             onChosen && onChosen();
         });
@@ -1022,7 +1029,29 @@ export class Game {
 
     /** Weapon Shop: spend gold earned from candy and kills. */
     openShop() {
-        this.ui.showShop?.(this.save, (id) => this.buyWeapon(id));
+        this.ui.showShop?.(
+            this.save,
+            (id) => this.buyWeapon(id),
+            (id) => this.equipWeapon(id)
+        );
+    }
+
+    /**
+     * Equip a bought weapon so runs start with it. Tapping the equipped one
+     * again takes it back off.
+     * @returns {boolean} true when the equipped weapon changed.
+     */
+    equipWeapon(id) {
+        if (!this.save.ownedWeapons?.[id]) return false;
+        this.save.equippedWeapon = this.save.equippedWeapon === id ? null : id;
+        saveSave(this.save);
+        this.audio?.play?.('pickup');
+        this.ui.showShop?.(
+            this.save,
+            (next) => this.buyWeapon(next),
+            (next) => this.equipWeapon(next)
+        );
+        return true;
     }
 
     /** @returns {boolean} true when the purchase went through. */
@@ -1038,7 +1067,11 @@ export class Game {
         this.audio?.play?.('pickupRare');
         this.ui.updateShopChip?.(this.save.gold);
         // Re-render so the card flips to "Bought" and the balance updates.
-        this.ui.showShop?.(this.save, (next) => this.buyWeapon(next));
+        this.ui.showShop?.(
+            this.save,
+            (next) => this.buyWeapon(next),
+            (next) => this.equipWeapon(next)
+        );
         return true;
     }
 

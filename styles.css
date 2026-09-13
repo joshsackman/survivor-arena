@@ -1618,11 +1618,14 @@ body.cb-mode .exp-fill {
     font-weight: 700;
     letter-spacing: 0.04em;
 }
-/* A weapon already bought in the shop. */
+/* A weapon already bought in the shop -- press it to equip or unequip. */
 .stage-card.owned {
     border-color: #f2c33c;
     opacity: 0.75;
-    cursor: default;
+}
+.stage-card.owned.active {
+    opacity: 1;
+    background: rgba(242, 195, 60, 0.12);
 }
 .stage-card.owned .skin-req {
     color: #f2c33c;

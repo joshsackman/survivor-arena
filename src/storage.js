@@ -38,6 +38,8 @@ const DEFAULT_SAVE = {
     // 100 candies = 1 gold; 100 kills = 10 gold, awarded at the end of a run.
     gold: 0,
     ownedWeapons: {},
+    // Which bought weapon you start runs with, if any.
+    equippedWeapon: null,
     // v2.6 (iter-12): per-stage leaderboards. Each key is a stage id; the
     // value is a top-N array shaped like `highScores`. The legacy global
     // `highScores` field is retained as the union-of-all-stages view so old
